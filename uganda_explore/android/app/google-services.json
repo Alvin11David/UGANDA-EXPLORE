@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "116601275817",
+    "project_id": "uganda-explore",
+    "storage_bucket": "uganda-explore.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:116601275817:android:87645805792893beb5f0b8",
+        "android_client_info": {
+          "package_name": "com.example.uganda_explore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlMhem690sa2rqlfDhCL3-0yVcdTHeWYU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
