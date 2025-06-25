@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -15,7 +16,69 @@ class SplashScreen extends StatelessWidget {
               Color(0xFF0C0F0A),
               Color(0xFF1FF813),
             ],
-          )
+            stops: [
+              0.03,
+              0.63,
+            ],
+          ),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              top: 30,
+              left: 180,
+              child: Image.asset(
+                'assets/images/snake.png',
+                width: 60,
+                height: 60,
+              ),
+            ),
+            Positioned(
+              top: 120,
+              left: 280,
+              child: Image.asset(
+                'assets/images/rhino.png',
+                width: 80,
+                height: 80,
+              ),
+            ),
+            Positioned(
+              top: 95,
+              left: 50,
+              child: Image.asset(
+                'assets/images/impala.png',
+                width: 60,
+                height: 60,
+              ),
+            ),
+            Positioned(
+              top: 25,
+              right: 20,
+              child: Image.asset(
+                'assets/images/elephant.png',
+                width: 60,
+                height: 60,
+              ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: SvgPicture.asset(
+                'assets/vectors/toppattern.svg',
+                width: 160,
+                height: 160,
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                'assets/vectors/bottompattern.svg',
+                width: 160,
+                height: 160,
+              ),
+            ),
+          ]
         ),
       )
     );
