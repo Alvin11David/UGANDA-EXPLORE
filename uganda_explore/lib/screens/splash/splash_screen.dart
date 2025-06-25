@@ -154,7 +154,16 @@ class SplashScreen extends StatelessWidget {
                   ]
                 )
               )
-            )
+            ),
+            Positioned(
+              bottom:0,
+              left: 0,
+              child: Image.asset(
+                'assets/images/crestedcrane.png',
+                width: 150,
+                height: 150,
+              ),
+            ),
           ]
         ),
       )
