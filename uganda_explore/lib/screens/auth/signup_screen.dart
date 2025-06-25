@@ -23,7 +23,16 @@ class SignUpScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: ClipOval(
+                  child: Image.asset('logo/blacklogo.png'
+                    , fit: BoxFit.cover,
+                  ),
+                )
+              )
+
             ],
           )
         )
