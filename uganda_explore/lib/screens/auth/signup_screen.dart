@@ -1,0 +1,33 @@
+import 'package:flutter/material.dart';
+
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.center,
+            radius: 0.5,
+            colors: [
+              Color(0xFF0C0F0A),
+              Color(0xFF1FF813),
+            ],
+            stops: [0.03, 0.63],
+            
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              
+            ],
+          )
+        )
+      ),
+    );
+  }
+}
