@@ -78,6 +78,38 @@ class SplashScreen extends StatelessWidget {
                 height: 160,
               ),
             ),
+            Positioned(
+              top: 180,
+              left: 0,
+              right: null,
+              child: Center(
+                child: Stack(
+                  children: [
+                    Text(
+                      "Uganda",
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 120,
+                        fontWeight: FontWeight.bold,
+                        foreground: Paint()
+                          ..style = PaintingStyle.stroke
+                          ..strokeWidth = 1.39
+                          ..color = Colors.white,
+                      ),
+                    ),
+                    Text(
+                      "Uganda",
+                      style: TextStyle(
+                        fontFamily: "Poppins",
+                        fontSize: 120,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      )
+                    )
+                  ]
+                )
+              )
+            )
           ]
         ),
       )
