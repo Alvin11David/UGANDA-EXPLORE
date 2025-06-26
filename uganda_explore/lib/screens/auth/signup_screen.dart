@@ -89,7 +89,7 @@ class SignUpScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     Center(
                       child: SizedBox(
-                        width: 323,
+                        width: 450,
                         height: 40,
                         child: ElevatedButton(
                           onPressed: () {
@@ -99,13 +99,40 @@ class SignUpScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(30),
                             ),
-                            ), child: null,
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
                           ),
-                        )
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color(0xFF000000),
+                                  Color(0xFF1EF813),
+                                ],
+                                stops: [0.0, 0.47],
+                              ),
+                              borderRadius: BorderRadius.all(Radius.circular(30)),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Sign Up',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
+                    ),
                   ],
-                  ),
                 ),
+              ),
             ],
           ),
         ),
