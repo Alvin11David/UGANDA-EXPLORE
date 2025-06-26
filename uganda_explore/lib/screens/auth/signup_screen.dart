@@ -55,9 +55,9 @@ class SignUpScreen extends StatelessWidget {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
-                    children: const [ 
-                      SizedBox(height: 10,),
-                      Text(
+                    children: [ 
+                      const SizedBox(height: 10,),
+                      const Text(
                       "SignUp",
                       style: TextStyle(
                         color: Colors.black,
@@ -67,8 +67,8 @@ class SignUpScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 5),
-                    Text(
+                    const SizedBox(height: 5),
+                    const Text(
                       "Please enter the details to continue.",
                       style: TextStyle(
                         color: Colors.black,
@@ -78,14 +78,31 @@ class SignUpScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 20),
-                    FullNames(),
-                    SizedBox(height: 20),
-                    Email(),
-                    SizedBox(height: 20),
-                    Password(),
-                    SizedBox(height: 20),
-                    ConfirmPassword(),
+                    const SizedBox(height: 20),
+                    const FullNames(),
+                    const SizedBox(height: 20),
+                    const Email(),
+                    const SizedBox(height: 20),
+                    const Password(),
+                    const SizedBox(height: 20),
+                    const ConfirmPassword(),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: SizedBox(
+                        width: 323,
+                        height: 40,
+                        child: ElevatedButton(
+                          onPressed: () {
+                          },
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            ), child: null,
+                          ),
+                        )
+                      ),
                   ],
                   ),
                 ),
