@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  Offset ugandaOffset = const Offset(-1, 0);
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        ugandaOffset = Offset.zero;
+      });
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        ugandaOffset = const Offset(-2, 0);
+      });
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +149,10 @@ class SplashScreen extends StatelessWidget {
               top: 160,
               left: 0,
               right: null,
-              child: Center(
+              child: AnimatedSlide(
+                offset: ugandaOffset,
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeInOut,
                 child: Stack(
                   children: [
                     Text(
