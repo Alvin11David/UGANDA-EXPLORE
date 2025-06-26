@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
+import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 import 'package:uganda_explore/screens/splash/splash_screen.dart';
 
 void main() async {
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/onboarding_screen1': (context) => const OnboardingScreen1(),
         '/onboarding_screen2': (context) => const OnboardingScreen2(),
+        '/onboarding_screen3': (context) => const OnboardingScreen3(),
       },
       theme: ThemeData(
         // This is the theme of your application.
