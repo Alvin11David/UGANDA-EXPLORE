@@ -100,6 +100,58 @@ class OnboardingScreen1 extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
+                  SizedBox(height: 24),
+                  Text(
+                    "Explore Uganda like never before",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Center(
+                    child: Container(
+                      width: 323,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF000000),
+                            Color(0xFF1FF813),
+                          ],
+                          stops: [0.0, 0.47],
+                        ),
+                        border: Border.all(color: Color(0xFF1FF813),
+                        width: 1,
+                        ),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                        },
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Text(
+                          "Get Started",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
