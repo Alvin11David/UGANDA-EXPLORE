@@ -22,6 +22,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
+      routes: {
+        '/onboarding_screen1': (context) => const OnboardingScreen1(),
+        '/onboarding_screen2': (context) => const OnboardingScreen2(),
+      },
       theme: ThemeData(
         // This is the theme of your application.
         //

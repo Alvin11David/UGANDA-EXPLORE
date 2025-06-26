@@ -136,7 +136,7 @@ class OnboardingScreen1 extends StatelessWidget {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              // Add navigation or action here
+                              Navigator.of(context).pushReplacementNamed('/onboarding_screen2');
                             },
                             style: TextButton.styleFrom(
                               shape: RoundedRectangleBorder(

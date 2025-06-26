@@ -40,6 +40,33 @@ class OnboardingScreen2 extends StatelessWidget {
           ),
          ),
          Positioned(
+          top: 25,
+          left: 20,
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+              child: Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Color(0xFF1FF813),
+                    width: 1,
+                  ),
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/onboarding_screen1');
+                  }, 
+                  icon: const Icon(Icons.arrow_back_sharp, color: Color(0xFF1FF813),),)
+              ),
+            ),
+            
+          )
+         ),
+         Positioned(
           left: 4,
           right: 4,
           bottom: 4,
