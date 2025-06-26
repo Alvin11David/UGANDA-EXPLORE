@@ -39,10 +39,36 @@ class SignUpScreen extends StatelessWidget {
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
+                  fontFamily: 'Poppins',
                 ),
-                  textAlign: TextAlign.center
-
+                  textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 30),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(30), 
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset:Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const Text("Sign Up",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      
+                    ],),
+                )
 
             ],
           )
