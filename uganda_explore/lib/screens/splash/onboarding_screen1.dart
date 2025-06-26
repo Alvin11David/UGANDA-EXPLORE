@@ -87,9 +87,21 @@ class OnboardingScreen1 extends StatelessWidget {
                         ),
                       ),
                     ],
-                  )
+                  ),
+
+                  const SizedBox(height: 24,),
+                  const Text(
+                    "Discover the hidden gems,\ncultural heritage\nand stunning nature of\nUganda",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
-              )
+              ),
             ),
           ),
         ),
