@@ -45,9 +45,51 @@ class OnboardingScreen1 extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40), 
                 border: Border.all(
                   color: Colors.white,
-                  width: 1.5,
+                  width: 1.1,
                 ),
               ),
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Color(0xFF1FF813),
+                            width: 3,
+                          ),
+                          color: Colors.transparent,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 15,
+                        height: 15,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF1FF813),
+                        ),
+                      ),
+                      const SizedBox(width: 12,),
+                      Container(
+                        width: 15,
+                        height: 15,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF1FF813),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              )
             ),
           ),
         ),
