@@ -8,11 +8,33 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   Offset ugandaOffset = const Offset(-1, 0);
+  Offset exploreOffset = const Offset(1, 0);
+
+  late final AnimationController _logoController;
+  late final Animation<double> _logoScale;
+  late final Animation<double> _logoRotation;
+
   @override
   void initState() {
     super.initState();
+    _logoController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
+
+    _logoScale = Tween<double>(begin: 0.8, end: 1).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
+    );
+
+    _logoRotation = Tween<double>(begin: 0.0, end: 2 * 3.1416).animate(
+      CurvedAnimation(parent: _logoController, curve: Curves.easeInOut),
+    );
+
+    _logoController.forward();
+
+
     Future.delayed(const Duration(milliseconds: 300), () {
       setState(() {
         ugandaOffset = Offset.zero;
@@ -24,6 +46,27 @@ class _SplashScreenState extends State<SplashScreen> {
         ugandaOffset = const Offset(-2, 0);
       });
     });
+
+    Future.delayed(const Duration(milliseconds: 600), () {
+      setState(() {
+        exploreOffset = Offset.zero;
+      });
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        exploreOffset = const Offset(2, 0); 
+      });
+    });
+
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacementNamed('/signin');
+    });
+  }
+
+  @override
+  void dispose() {
+    _logoController.dispose();
+    super.dispose();
   }
   
   @override
@@ -102,31 +145,48 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             Align(
               alignment: Alignment.center,
+              child: AnimatedBuilder(
+                animation: _logoController,
+                builder: (context, child) {
+                  return Transform.rotate(
+                    angle: _logoRotation.value,
+                    child: Transform.scale(
+                      scale: _logoScale.value,
+                      child: child,
+                    ),
+                  );
+                },
               child: Image.asset(
                 'assets/logo/whitelogo.png',
                 width: 100,
                 height: 100,
               ),
+              ),
             ),
             Positioned(
               top: MediaQuery.of(context).size.height/2 + 20,
               right: 0,
-              child: Opacity(
-                opacity: 0.7,
-              child: Text(
-                "Explore",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 120,
-                  fontWeight: FontWeight.bold,
-                  foreground: Paint()
-                    ..style = PaintingStyle.stroke
-                    ..strokeWidth = 0.8
-                    ..color = Colors.white,
-                ),
-                textAlign: TextAlign.right,
-              )
-            ),
+              child: AnimatedSlide(
+                offset: exploreOffset,
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeInOut,
+                child: Opacity(
+                  opacity: 0.7,
+                child: Text(
+                  "Explore",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 120,
+                    fontWeight: FontWeight.bold,
+                    foreground: Paint()
+                      ..style = PaintingStyle.stroke
+                      ..strokeWidth = 0.8
+                      ..color = Colors.white,
+                  ),
+                  textAlign: TextAlign.right,
+                )
+                            ),
+              ),
             ),
             Positioned(
               top: MediaQuery.of(context).size.height/2 + 190,
