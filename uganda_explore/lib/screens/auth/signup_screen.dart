@@ -160,6 +160,48 @@ class SignUpScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    Center(
+                      child: SizedBox(
+                        width: 450,
+                        height: 40,
+                        child: OutlinedButton(
+                          onPressed: () {
+
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(right: 12.0),
+                                child: Image.asset(
+                                  'vectors/google.png',
+                                  width: 22,
+                                  height: 22,
+                                ),
+                              ),
+                              const Text(
+                                'Sign Up with Google',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Poppins',
+                                ),
+                              ),
+                            ]
+                          )
+                          )
+                        )
+                      )
+                    
                   ],
                 ),
               ),
