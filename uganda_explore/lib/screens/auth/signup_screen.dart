@@ -15,49 +15,49 @@ class SignUpScreen extends StatelessWidget {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813), 
+              Color(0xFF1EF813),
             ],
-            stops: [0.03, 0.63], 
+            stops: [0.03, 0.63],
           ),
         ),
         child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 5),
-                  Center(
-                    child: Image.asset(
-                      'logo/blacklogo.png',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  const Text(
-                    "Let's get you\n signed up!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Outfit',
-                      fontSize: 37,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.black,
-                    ),
-                  ),
+              Center(
+                child: Image.asset(
+                  'logo/blacklogo.png',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 15),
+              const Text(
+                "Let's get you\n signed up!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 37,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                ),
+              ),
               const SizedBox(height: 20),
-                Container(
-                  width: 490,
-                  padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(40),
-                    ),
+              Container(
+                width: 490,
+                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(40),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [ 
-                      const SizedBox(height: 10,),
-                      const Text(
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 10),
+                    const Text(
                       "SignUp",
                       style: TextStyle(
                         color: Colors.black,
@@ -92,8 +92,7 @@ class SignUpScreen extends StatelessWidget {
                         width: 450,
                         height: 40,
                         child: ElevatedButton(
-                          onPressed: () {
-                          },
+                          onPressed: () {},
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
                             shape: RoundedRectangleBorder(
@@ -102,9 +101,9 @@ class SignUpScreen extends StatelessWidget {
                             backgroundColor: Colors.transparent,
                             shadowColor: Colors.transparent,
                           ),
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
+                          child: Ink(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
                                 colors: [
@@ -113,16 +112,17 @@ class SignUpScreen extends StatelessWidget {
                                 ],
                                 stops: [0.0, 0.47],
                               ),
-                              borderRadius: BorderRadius.all(Radius.circular(30)),
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            child: Center(
-                              child: Text(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: const Text(
                                 'Sign Up',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Poppins',
                                 ),
                               ),
                             ),
@@ -130,6 +130,36 @@ class SignUpScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: const [
+                        Expanded(
+                          child: Divider(
+                            color: Color(0xFF000000),
+                            thickness: 1,
+                            indent: 20,
+                          ),
+                        ),
+                        Text(
+                          "Or Sign Up With",
+                          style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.w400,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: Color(0xFF000000),
+                            thickness: 1,
+                            endIndent: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -141,7 +171,6 @@ class SignUpScreen extends StatelessWidget {
   }
 }
 
-
 class FullNames extends StatelessWidget {
   const FullNames({super.key});
 
@@ -149,7 +178,7 @@ class FullNames extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 450,
         child: TextFormField(
           decoration: InputDecoration(
             labelText: 'Full Names',
@@ -216,7 +245,7 @@ class Email extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 450,
         child: TextFormField(
           decoration: InputDecoration(
             labelText: 'Email',
@@ -290,7 +319,7 @@ class _PasswordState extends State<Password> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 450,
         child: TextFormField(
           obscureText: _isObscured,
           decoration: InputDecoration(
@@ -325,15 +354,16 @@ class _PasswordState extends State<Password> {
               padding: const EdgeInsets.only(right: 6),
               child: IconButton(
                 onPressed: () {
-                setState(() {
-                  _isObscured = !_isObscured;
-                });
-              }, icon: Icon(
-                _isObscured ? Icons.visibility_off : Icons.visibility,
-                color: Colors.black54,
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                },
+                icon: Icon(
+                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black54,
+                ),
               ),
-              )
-              ),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
@@ -378,7 +408,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 450,
         child: TextFormField(
           obscureText: _isObscuredText,
           decoration: InputDecoration(
@@ -411,16 +441,17 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             ),
             suffixIcon: Padding(
               padding: const EdgeInsets.only(right: 6),
-              child: IconButton(onPressed: () {
-              setState(() {
-                _isObscuredText = !_isObscuredText;
-              });
-              }, 
-              icon: Icon(
-                _isObscuredText ? Icons.visibility_off : Icons.visibility,
-                color: Colors.black54,
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isObscuredText = !_isObscuredText;
+                  });
+                },
+                icon: Icon(
+                  _isObscuredText ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black54,
+                ),
               ),
-            )
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
