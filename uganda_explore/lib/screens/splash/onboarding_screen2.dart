@@ -57,6 +57,122 @@ class OnboardingScreen2 extends StatelessWidget {
                     width: 1,
                   ),
                 ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 18,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 15,
+                          height: 15,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF1FF813),
+                          ),
+                        ),
+                        const SizedBox(width: 12,),
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Color(0xFF1FF813),
+                              width: 3,
+                          ),
+                          color: Colors.transparent,
+                          ),
+                        ),
+                        const SizedBox(width: 12,),
+                        Container(
+                          width: 15,
+                          height: 15,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF1FF813),
+                          ),
+                        ),
+                      ]
+                    ),
+                    const SizedBox(height: 24),
+                      // Main text
+                      const Text(
+                        "See Before You\n Go",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      // Subtitle
+                      const Text(
+                        "Take 3D and 360° virtual tours of tourist\n sites from anywhere in the\n world.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      // Get Started Button
+                      Center(
+                        child: Container(
+                          width: 323,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            gradient: const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color(0xFF000000),
+                                Color(0xFF1FF813),
+                              ],
+                              stops: [0.0, 0.47],
+                            ),
+                            border: Border.all(
+                              color: Color(0xFF1FF813),
+                              width: 1,
+                            ),
+                          ),
+                          child: TextButton(
+                            onPressed: () {
+                              // Add navigation or action here
+                            },
+                            style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    "Next",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontFamily: 'Outfit',
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                       ),
+                     ),
+                  ],
+                )
               ),
             ),
           ),
