@@ -30,8 +30,19 @@ class SignUpScreen extends StatelessWidget {
                   child: Image.asset('logo/blacklogo.png'
                     , fit: BoxFit.cover,
                   ),
-                )
-              )
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Lets get you signed up!',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                  textAlign: TextAlign.center
+
+                ),
 
             ],
           )
