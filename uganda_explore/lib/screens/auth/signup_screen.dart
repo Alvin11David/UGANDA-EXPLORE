@@ -94,12 +94,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               Center(
                 child: Image.asset(
-                  'logo/blacklogo.png',
-                  width: 100,
-                  height: 100,
+                  'assets/logo/blacklogo.png',
+                  width: 80,
+                  height: 80,
                   fit: BoxFit.contain,
                 ),
               ),
@@ -165,7 +165,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 20),
                       Center(
                         child: SizedBox(
-                          width: 450,
+                          width: 320,
                           height: 40,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _signUp,
@@ -253,7 +253,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 16),
                       Center(
                         child: SizedBox(
-                          width: 450,
+                          width: 320,
                           height: 40,
                           child: OutlinedButton(
                             onPressed: () {
@@ -273,7 +273,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 Padding(
                                   padding: const EdgeInsets.only(right: 12.0),
                                   child: Image.asset(
-                                    'vectors/google.png',
+                                    'assets/vectors/google.png',
                                     width: 22,
                                     height: 22,
                                   ),
@@ -348,7 +348,7 @@ class FullNames extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: TextFormField(
           controller: controller,
           validator: (value) {
@@ -454,7 +454,7 @@ class Email extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: TextFormField(
           controller: controller,
           validator: _validateEmail,
@@ -551,7 +551,7 @@ class _PasswordState extends State<Password> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscured,
@@ -676,7 +676,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscuredText,

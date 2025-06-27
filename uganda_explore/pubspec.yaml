@@ -57,7 +57,7 @@ dependencies:
   video_player:
 
   # AR support 
-  arcore_flutter_plugin:
+  
 
   #Animations and utilities
   animated_text_kit: 
