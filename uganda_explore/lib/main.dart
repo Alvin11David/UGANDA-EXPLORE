@@ -1,10 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
-import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
-import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
-import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
+import 'screens/auth/signup_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,17 +14,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      routes: {
-        '/onboarding_screen1': (context) => const OnboardingScreen1(),
-        '/onboarding_screen2': (context) => const OnboardingScreen2(),
-        '/onboarding_screen3': (context) => const OnboardingScreen3(),
-      },
+      title: 'Uganda Explore',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -46,7 +37,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const OnboardingScreen1(),
+      home: SignUpScreen(),
     );
   }
 }
