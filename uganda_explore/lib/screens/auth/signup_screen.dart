@@ -351,8 +351,12 @@ class FullNames extends StatelessWidget {
         width: 450,
         child: TextFormField(
           controller: controller,
-          validator: (value) =>
-              value == null || value.isEmpty ? 'Enter your full names' : null,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Enter your full names';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'Full Names',
             labelStyle: const TextStyle(
@@ -395,6 +399,26 @@ class FullNames extends StatelessWidget {
                 width: 2,
               ),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 1.5,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 2,
+              ),
+            ),
+            errorStyle: const TextStyle(
+              color: Colors.red,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
@@ -415,6 +439,17 @@ class Email extends StatelessWidget {
   final TextEditingController controller;
   const Email({super.key, required this.controller});
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Enter your email address';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -422,8 +457,7 @@ class Email extends StatelessWidget {
         width: 450,
         child: TextFormField(
           controller: controller,
-          validator: (value) =>
-              value == null || !value.contains('@') ? 'Enter a valid email' : null,
+          validator: _validateEmail,
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
@@ -466,6 +500,26 @@ class Email extends StatelessWidget {
                 width: 2,
               ),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 1.5,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 2,
+              ),
+            ),
+            errorStyle: const TextStyle(
+              color: Colors.red,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
@@ -501,10 +555,15 @@ class _PasswordState extends State<Password> {
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscured,
-          validator: (value) =>
-              value == null || value.length < 6
-                  ? 'Password must be at least 6 characters'
-                  : null,
+          validator: (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Enter your password';
+            }
+            if (value.length < 6) {
+              return 'Password must be at least 6 characters';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'Password',
             labelStyle: const TextStyle(
@@ -561,6 +620,26 @@ class _PasswordState extends State<Password> {
                 width: 2,
               ),
             ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 1.5,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 2,
+              ),
+            ),
+            errorStyle: const TextStyle(
+              color: Colors.red,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
+            ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
@@ -602,7 +681,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
           controller: widget.controller,
           obscureText: _isObscuredText,
           validator: (value) {
-            if (value == null || value.isEmpty) {
+            if (value == null || value.trim().isEmpty) {
               return 'Please confirm your password';
             }
             if (value != widget.passwordController.text) {
