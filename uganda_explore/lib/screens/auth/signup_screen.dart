@@ -158,7 +158,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 20),
                       Password(controller: _passwordController),
                       const SizedBox(height: 20),
-                      ConfirmPassword(controller: _confirmPasswordController),
+                      ConfirmPassword(
+                        controller: _confirmPasswordController,
+                        passwordController: _passwordController,
+                      ),
                       const SizedBox(height: 20),
                       Center(
                         child: SizedBox(
@@ -576,7 +579,12 @@ class _PasswordState extends State<Password> {
 
 class ConfirmPassword extends StatefulWidget {
   final TextEditingController controller;
-  const ConfirmPassword({super.key, required this.controller});
+  final TextEditingController passwordController;
+  const ConfirmPassword({
+    super.key,
+    required this.controller,
+    required this.passwordController,
+  });
 
   @override
   State<ConfirmPassword> createState() => _ConfirmPasswordState();
@@ -593,10 +601,15 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscuredText,
-          validator: (value) =>
-              value != null && value != widget.controller.text
-                  ? 'Passwords do not match'
-                  : null,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please confirm your password';
+            }
+            if (value != widget.passwordController.text) {
+              return 'Passwords do not match';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'Confirm Password',
             labelStyle: const TextStyle(
@@ -652,6 +665,26 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                 color: Color(0xFF1EF813),
                 width: 2,
               ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 1.5,
+              ),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                color: Color(0xFF1EF813),
+                width: 2,
+              ),
+            ),
+            errorStyle: const TextStyle(
+              color: Colors.red,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
