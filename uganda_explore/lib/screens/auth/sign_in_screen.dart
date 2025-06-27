@@ -29,7 +29,6 @@ class SignInScreen extends StatelessWidget {
                   width: 100,
                   height: 100,
                   decoration: const BoxDecoration(
-                    color: Colors.white,
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
@@ -337,9 +336,12 @@ class SignInButton extends StatelessWidget {
             height: 50,
             decoration: ShapeDecoration(
               gradient: const LinearGradient(
-                begin: Alignment(0.00, 0.25),
-                end: Alignment(1.00, 0.25),
-                colors: [Color.fromARGB(255, 47, 44, 44), Color(0xFF1EF813)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromARGB(255, 47, 44, 44), 
+                  Color(0xFF1EF813)],
+                  stops: [0.0, 0.47],
               ),
               shape: RoundedRectangleBorder(
                 side: const BorderSide(
@@ -364,7 +366,7 @@ class SignInButton extends StatelessWidget {
                 color: Colors.black,
                 fontSize: 20,
                 fontFamily: 'Poppins',
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -438,12 +440,12 @@ class GoogleSignInButton extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.g_translate,
-                  color: Colors.black,
-                  size: 24,
+                Image(
+                  image: AssetImage('assets/vectors/google.png'),
+                  width: 100,
+                  height: 100,
                 ),
-                SizedBox(width: 15),
+                SizedBox(width: 5),
                 Text(
                   'Sign In with Google',
                   style: TextStyle(
