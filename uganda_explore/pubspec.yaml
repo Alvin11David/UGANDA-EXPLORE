@@ -84,7 +84,10 @@ flutter:
   uses-material-design: true
 
   
-  # assets:
+  assets:
+    - assets/images/
+    - assets/logo/
+    - assets/vectors/
     
   
 
