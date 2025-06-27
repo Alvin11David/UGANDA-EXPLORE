@@ -1,7 +1,78 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNamesController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  bool _isLoading = false;
+  String? _errorMessage;
+
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim());
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'fullNames': _fullNamesController.text.trim(),
+        'email': _emailController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sign Up Successful!')),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _errorMessage = e.message;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.message}')),
+      );
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'An Error occurred. Please try again.';
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _fullNamesController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,193 +124,209 @@ class SignUpScreen extends StatelessWidget {
                     top: Radius.circular(40),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 10),
-                    const Text(
-                      "SignUp",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Text(
+                        "SignUp",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      "Please enter the details to continue.",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Poppins',
+                      const SizedBox(height: 5),
+                      const Text(
+                        "Please enter the details to continue.",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    const FullNames(),
-                    const SizedBox(height: 20),
-                    const Email(),
-                    const SizedBox(height: 20),
-                    const Password(),
-                    const SizedBox(height: 20),
-                    const ConfirmPassword(),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: SizedBox(
-                        width: 450,
-                        height: 40,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                          ),
-                          child: Ink(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Color(0xFF000000),
-                                  Color(0xFF1EF813),
-                                ],
-                                stops: [0.0, 0.47],
+                      const SizedBox(height: 20),
+                      FullNames(controller: _fullNamesController),
+                      const SizedBox(height: 20),
+                      Email(controller: _emailController),
+                      const SizedBox(height: 20),
+                      Password(controller: _passwordController),
+                      const SizedBox(height: 20),
+                      ConfirmPassword(controller: _confirmPasswordController),
+                      const SizedBox(height: 20),
+                      Center(
+                        child: SizedBox(
+                          width: 450,
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _signUp,
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
                               ),
-                              borderRadius: BorderRadius.circular(30),
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
                             ),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: const Text(
-                                'Sign Up',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'Poppins',
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Color(0xFF000000),
+                                    Color(0xFF1EF813),
+                                  ],
+                                  stops: [0.0, 0.47],
                                 ),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: _isLoading
+                                    ? const CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                      )
+                                    : const Text(
+                                        'Sign Up',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: const [
-                        Expanded(
-                          child: Divider(
-                            color: Color(0xFF000000),
-                            thickness: 1,
-                            indent: 20,
-                          ),
-                        ),
-                        Text(
-                          "Or Sign Up With",
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontFamily: "Poppins",
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: Color(0xFF000000),
-                            thickness: 1,
-                            endIndent: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    // Social Sign-Up Button
-                    Center(
-                      child: SizedBox(
-                        width: 450,
-                        height: 40,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            // Handle Google sign up
-                          },
-                          style: OutlinedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
                             ),
-                            padding: EdgeInsets.zero,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 12.0),
-                                child: Image.asset(
-                                  'vectors/google.png',
-                                  width: 22,
-                                  height: 22,
-                                ),
-                              ),
-                              const Text(
-                                'Sign Up with Google',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  fontFamily: 'Poppins',
-                                ),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                    ),
-                    // Existing User Section
-                    const SizedBox(height: 18),
-                    Center(
-                      child: Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            "Already have an account? ",
+                      const SizedBox(height: 16),
+                      Row(
+                        children: const [
+                          Expanded(
+                            child: Divider(
+                              color: Color(0xFF000000),
+                              thickness: 1,
+                              indent: 20,
+                            ),
+                          ),
+                          Text(
+                            "Or Sign Up With",
                             style: TextStyle(
-                              color: Colors.black87,
-                              fontFamily: 'Poppins',
+                              color: Color(0xFF000000),
+                              fontFamily: "Poppins",
                               fontWeight: FontWeight.w400,
-                              fontSize: 17,
+                              fontSize: 14,
                             ),
+                            textAlign: TextAlign.center,
                           ),
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                // Handle navigation to sign in page
-                              },
-                              child: const Text(
-                                "Sign In",
-                                style: TextStyle(
-                                  color: Color(0xFF0F7709), // Primary brand color
-                                  fontFamily: 'Poppins',
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 17,
-                                  decorationThickness: 1.5,
-                                ),
-                              ),
+                          Expanded(
+                            child: Divider(
+                              color: Color(0xFF000000),
+                              thickness: 1,
+                              endIndent: 20,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
+                      const SizedBox(height: 16),
+                      Center(
+                        child: SizedBox(
+                          width: 450,
+                          height: 40,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              // Handle Google sign up
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 12.0),
+                                  child: Image.asset(
+                                    'vectors/google.png',
+                                    width: 22,
+                                    height: 22,
+                                  ),
+                                ),
+                                const Text(
+                                  'Sign Up with Google',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Center(
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            const Text(
+                              "Already have an account? ",
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.w400,
+                                fontSize: 17,
+                              ),
+                            ),
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: () {
+                                  // Handle navigation to sign in page
+                                },
+                                child: const Text(
+                                  "Sign In",
+                                  style: TextStyle(
+                                    color: Color(0xFF0F7709),
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 17,
+                                    decorationThickness: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -251,7 +338,8 @@ class SignUpScreen extends StatelessWidget {
 }
 
 class FullNames extends StatelessWidget {
-  const FullNames({super.key});
+  final TextEditingController controller;
+  const FullNames({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -259,6 +347,9 @@ class FullNames extends StatelessWidget {
       child: SizedBox(
         width: 450,
         child: TextFormField(
+          controller: controller,
+          validator: (value) =>
+              value == null || value.isEmpty ? 'Enter your full names' : null,
           decoration: InputDecoration(
             labelText: 'Full Names',
             labelStyle: const TextStyle(
@@ -318,7 +409,8 @@ class FullNames extends StatelessWidget {
 }
 
 class Email extends StatelessWidget {
-  const Email({super.key});
+  final TextEditingController controller;
+  const Email({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -326,6 +418,9 @@ class Email extends StatelessWidget {
       child: SizedBox(
         width: 450,
         child: TextFormField(
+          controller: controller,
+          validator: (value) =>
+              value == null || !value.contains('@') ? 'Enter a valid email' : null,
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
@@ -334,7 +429,7 @@ class Email extends StatelessWidget {
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
-            hintText: 'Enter Your Email',
+            hintText: 'Enter Your Email Address',
             hintStyle: const TextStyle(
               color: Colors.black54,
               fontFamily: 'Poppins',
@@ -385,7 +480,8 @@ class Email extends StatelessWidget {
 }
 
 class Password extends StatefulWidget {
-  const Password({super.key});
+  final TextEditingController controller;
+  const Password({super.key, required this.controller});
 
   @override
   State<Password> createState() => _PasswordState();
@@ -400,7 +496,12 @@ class _PasswordState extends State<Password> {
       child: SizedBox(
         width: 450,
         child: TextFormField(
+          controller: widget.controller,
           obscureText: _isObscured,
+          validator: (value) =>
+              value == null || value.length < 6
+                  ? 'Password must be at least 6 characters'
+                  : null,
           decoration: InputDecoration(
             labelText: 'Password',
             labelStyle: const TextStyle(
@@ -474,7 +575,8 @@ class _PasswordState extends State<Password> {
 }
 
 class ConfirmPassword extends StatefulWidget {
-  const ConfirmPassword({super.key});
+  final TextEditingController controller;
+  const ConfirmPassword({super.key, required this.controller});
 
   @override
   State<ConfirmPassword> createState() => _ConfirmPasswordState();
@@ -489,7 +591,12 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
       child: SizedBox(
         width: 450,
         child: TextFormField(
+          controller: widget.controller,
           obscureText: _isObscuredText,
+          validator: (value) =>
+              value != null && value != widget.controller.text
+                  ? 'Passwords do not match'
+                  : null,
           decoration: InputDecoration(
             labelText: 'Confirm Password',
             labelStyle: const TextStyle(
@@ -560,4 +667,4 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
       ),
     );
   }
-}  
+}
