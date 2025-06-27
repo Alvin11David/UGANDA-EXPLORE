@@ -160,13 +160,14 @@ class SignUpScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    // Social Sign-Up Button
                     Center(
                       child: SizedBox(
                         width: 450,
                         height: 40,
                         child: OutlinedButton(
                           onPressed: () {
-
+                            // Handle Google sign up
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -196,12 +197,48 @@ class SignUpScreen extends StatelessWidget {
                                   fontFamily: 'Poppins',
                                 ),
                               ),
-                            ]
-                          )
-                          )
-                        )
-                      )
-                    
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Existing User Section
+                    const SizedBox(height: 18),
+                    Center(
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          const Text(
+                            "Already have an account? ",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 17,
+                            ),
+                          ),
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Handle navigation to sign in page
+                              },
+                              child: const Text(
+                                "Sign In",
+                                style: TextStyle(
+                                  color: Color(0xFF0F7709), // Primary brand color
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 17,
+                                  decorationThickness: 1.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -523,4 +560,4 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
       ),
     );
   }
-}
+}  
