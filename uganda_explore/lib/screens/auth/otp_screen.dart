@@ -18,6 +18,34 @@ class OtpScreen extends StatelessWidget {
               Color(0xFF1EF813),
             ],
             stops: [0.03, 0.63],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 60),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Uganda",
+                    style: const TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Image.asset(
+                    "logo/blacklogo.png",
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.contain,
+                  ),
+                ]
+              )
+            ]
           )
         )
       ),
