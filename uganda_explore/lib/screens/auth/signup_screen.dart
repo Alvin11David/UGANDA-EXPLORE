@@ -265,8 +265,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               backgroundColor: Colors.white,
                               side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
                               shape: RoundedRectangleBorder(
+                                
                                 borderRadius: BorderRadius.circular(30),
                               ),
+                              
                               padding: EdgeInsets.zero,
                             ),
                             child: Row(
