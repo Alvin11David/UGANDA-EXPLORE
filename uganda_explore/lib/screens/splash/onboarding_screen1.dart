@@ -18,12 +18,12 @@ class OnboardingScreen1 extends StatelessWidget {
           ),
           // Top center logo
           Positioned(
-            top: 5,
+            top: 15,
             left: 0,
             right: 0,
             child: Center(
               child: Image.asset(
-                'logo/whiteugandaexplore.png',
+                'assets/logo/whiteugandaexplore.png',
                 width: 260,
                 height: 100,
                 fit: BoxFit.contain,

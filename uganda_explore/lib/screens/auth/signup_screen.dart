@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -44,6 +45,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sign Up Successful!')),
       );
+      Navigator.pushReplacementNamed(context, '/onboarding_screen1');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
@@ -94,7 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 10),
+              const SizedBox(height: 60),
               Center(
                 child: Image.asset(
                   'assets/logo/blacklogo.png',
@@ -310,7 +312,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
                                 onTap: () {
-                                  // Handle navigation to sign in page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => SignInScreen()),
+                                  );
                                 },
                                 child: const Text(
                                   "Sign In",

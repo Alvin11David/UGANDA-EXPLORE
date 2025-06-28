@@ -17,7 +17,7 @@ class OnboardingScreen3 extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 0,
+          top: 90,
           bottom: 0,
           right: 0,
           child: Image.asset(
@@ -27,12 +27,12 @@ class OnboardingScreen3 extends StatelessWidget {
           ),
          ),
          Positioned(
-          top: 5,
-          left: 0,
+          top: 15,
+          left: 5,
           right: 0,
           child: Center(
             child: Image.asset(
-              'assets/logo/blackugandaexplore.png',
+              'assets/logo/whiteugandaexplore.png',
               width: 260,
               height: 100,
               fit: BoxFit.contain,
@@ -40,14 +40,14 @@ class OnboardingScreen3 extends StatelessWidget {
           ),
          ),
          Positioned(
-          top: 25,
-          left: 20,
+          top: 38,
+          left: 2,
           child: ClipOval(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
-                width: 50,
-                height: 50,
+                width: 45,
+                height: 45,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
@@ -100,6 +100,15 @@ class OnboardingScreen3 extends StatelessWidget {
                         ),
                         const SizedBox(width: 12,),
                         Container(
+                          width: 15,
+                          height: 15,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF1FF813),
+                          ),
+                        ),
+                        const SizedBox(width: 12,),
+                        Container(
                           width: 20,
                           height: 20,
                           decoration: BoxDecoration(
@@ -109,15 +118,6 @@ class OnboardingScreen3 extends StatelessWidget {
                               width: 3,
                           ),
                           color: Colors.transparent,
-                          ),
-                        ),
-                        const SizedBox(width: 12,),
-                        Container(
-                          width: 15,
-                          height: 15,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF1FF813),
                           ),
                         ),
                       ]

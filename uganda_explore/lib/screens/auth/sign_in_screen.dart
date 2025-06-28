@@ -1,7 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uganda_explore/screens/auth/signup_screen.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final ValueNotifier<bool> _isLoading = ValueNotifier(false);
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _isLoading.dispose();
+    super.dispose();
+  }
+
+  void _setError(String? message) {
+    setState(() {
+      _errorMessage = message;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +42,9 @@ class SignInScreen extends StatelessWidget {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813), 
+              Color(0xFF1EF813),
             ],
-            stops: [0.03, 0.63], 
+            stops: [0.03, 0.63],
           ),
         ),
         child: SingleChildScrollView(
@@ -36,7 +63,7 @@ class SignInScreen extends StatelessWidget {
                     width: 100,
                     height: 100,
                     fit: BoxFit.contain,
-                  )
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -60,47 +87,64 @@ class SignInScreen extends StatelessWidget {
                     top: Radius.circular(40),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [ 
-                    SizedBox(height: 10,),
-                    Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10,),
+                      const Text(
+                        "Sign In",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      "Please enter the details to continue.",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Poppins',
+                      const SizedBox(height: 5),
+                      const Text(
+                        "Please enter the details to continue.",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'Poppins',
+                        ),
+                        textAlign: TextAlign.center,
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    EmailField(),
-                    SizedBox(height: 20),
-                    PasswordField(),
-                    SizedBox(height: 10),
-                    ForgotPasswordLink(),
-                    SizedBox(height: 20),
-                    SignInButton(),
-                    SizedBox(height: 20),
-                    OrDivider(),
-                    SizedBox(height: 16),
-                    GoogleSignInButton(),
-                    SizedBox(height: 20),
-                    SignUpLink(),
-                    SizedBox(height: 30),
-                  ],
+                      const SizedBox(height: 20),
+                      EmailField(controller: _emailController),
+                      const SizedBox(height: 20),
+                      PasswordField(controller: _passwordController),
+                      const SizedBox(height: 10),
+                      const ForgotPasswordLink(),
+                      const SizedBox(height: 20),
+                      if (_errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      SignInButton(
+                        emailController: _emailController,
+                        passwordController: _passwordController,
+                        formKey: _formKey,
+                        setError: _setError,
+                        isLoading: _isLoading,
+                      ),
+                      const SizedBox(height: 20),
+                      const OrDivider(),
+                      const SizedBox(height: 16),
+                      const GoogleSignInButton(),
+                      const SizedBox(height: 20),
+                      const SignUpLink(),
+                      const SizedBox(height: 30),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -111,30 +155,30 @@ class SignInScreen extends StatelessWidget {
   }
 }
 
-class EmailField extends StatefulWidget {
-  const EmailField({super.key});
+class EmailField extends StatelessWidget {
+  final TextEditingController controller;
+  const EmailField({super.key, required this.controller});
 
-  @override
-  State<EmailField> createState() => _EmailFieldState();
-}
-
-class _EmailFieldState extends State<EmailField> {
-  final TextEditingController _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Enter your email address';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Enter a valid email address';
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 320,
         child: TextFormField(
-          controller: _emailController,
+          controller: controller,
           keyboardType: TextInputType.emailAddress,
+          validator: _validateEmail,
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
@@ -194,30 +238,30 @@ class _EmailFieldState extends State<EmailField> {
 }
 
 class PasswordField extends StatefulWidget {
-  const PasswordField({super.key});
+  final TextEditingController controller;
+  const PasswordField({super.key, required this.controller});
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
 }
 
 class _PasswordFieldState extends State<PasswordField> {
-  final TextEditingController _passwordController = TextEditingController();
   bool _isObscured = true;
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 320,
         child: TextFormField(
-          controller: _passwordController,
+          controller: widget.controller,
           obscureText: _isObscured,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Enter your password';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'Password',
             labelStyle: const TextStyle(
@@ -253,7 +297,7 @@ class _PasswordFieldState extends State<PasswordField> {
                   setState(() {
                     _isObscured = !_isObscured;
                   });
-                }, 
+                },
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
                   color: Colors.black54,
@@ -296,7 +340,7 @@ class ForgotPasswordLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 450,
+      width: 320,
       alignment: Alignment.centerRight,
       child: GestureDetector(
         onTap: () {
@@ -317,59 +361,107 @@ class ForgotPasswordLink extends StatelessWidget {
 }
 
 class SignInButton extends StatelessWidget {
-  const SignInButton({super.key});
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final GlobalKey<FormState> formKey;
+  final void Function(String?) setError;
+  final ValueNotifier<bool> isLoading;
 
-  void _onSignInPressed(BuildContext context) {
-    // You'll need to implement your authentication logic here
-    // For now, just navigate to home
-    Navigator.pushReplacementNamed(context, '/home');
+  const SignInButton({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.formKey,
+    required this.setError,
+    required this.isLoading,
+  });
+
+  Future<void> _onSignInPressed(BuildContext context) async {
+    setError(null);
+    if (!formKey.currentState!.validate()) return;
+    isLoading.value = true;
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+      );
+      Navigator.pushReplacementNamed(context, '/onboarding_screen1');
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        setError('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        setError('Wrong password provided.');
+      } else {
+        setError(e.message);
+      }
+    } catch (e) {
+      print('Sign in error: $e'); // <-- This will show the real error in your debug console
+      setError('An error occurred. Please try again.');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
-        child: GestureDetector(
-          onTap: () => _onSignInPressed(context),
-          child: Container(
-            height: 50,
-            decoration: ShapeDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Color.fromARGB(255, 47, 44, 44), 
-                  Color(0xFF1EF813)],
-                  stops: [0.0, 0.47],
-              ),
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  width: 1,
-                  color: Color(0xFF1EF813),
+        width: 320,
+        child: ValueListenableBuilder<bool>(
+          valueListenable: isLoading,
+          builder: (context, loading, child) {
+            return GestureDetector(
+              onTap: loading ? null : () => _onSignInPressed(context),
+              child: Container(
+                height: 50,
+                decoration: ShapeDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color.fromARGB(255, 47, 44, 44),
+                      Color(0xFF1EF813)
+                    ],
+                    stops: [0.0, 0.47],
+                  ),
+                  shape: RoundedRectangleBorder(
+                    side: const BorderSide(
+                      width: 1,
+                      color: Color(0xFF1EF813),
+                    ),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  shadows: const [
+                    BoxShadow(
+                      color: Color(0x3F000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 4),
+                      spreadRadius: 0,
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(30),
+                alignment: Alignment.center,
+                child: loading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                          strokeWidth: 3,
+                        ),
+                      )
+                    : const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
-              shadows: const [
-                BoxShadow(
-                  color: Color(0x3F000000),
-                  blurRadius: 4,
-                  offset: Offset(0, 4),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            alignment: Alignment.center,
-            child: const Text(
-              'Sign In',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
@@ -382,7 +474,7 @@ class OrDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 450,
+      width: 320,
       child: Row(
         children: [
           Expanded(child: Container(height: 1, color: Colors.grey)),
@@ -412,7 +504,7 @@ class GoogleSignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: GestureDetector(
           onTap: () {
             // Handle Google sign in
@@ -440,20 +532,21 @@ class GoogleSignInButton extends StatelessWidget {
             child: const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image(
-                  image: AssetImage('assets/vectors/google.png'),
-                  width: 100,
-                  height: 100,
-                ),
-                SizedBox(width: 5),
+                  Image(
+                    image: AssetImage('assets/vectors/google.png'),
+                    width: 24,
+                    height: 24,
+                  ),
+                  SizedBox(width: 12),
                 Text(
-                  'Sign In with Google',
+                  'Sign In With Google',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 16,
                     fontFamily: 'Poppins',
                     fontWeight: FontWeight.w500,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -472,7 +565,10 @@ class SignUpLink extends StatelessWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, '/signup');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SignUpScreen()),
+          );
         },
         child: Text.rich(
           TextSpan(

@@ -17,7 +17,7 @@ class OnboardingScreen2 extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 0,
+          top: 90,
           bottom: 0,
           right: 0,
           child: Image.asset(
@@ -27,27 +27,27 @@ class OnboardingScreen2 extends StatelessWidget {
           ),
          ),
          Positioned(
-          top: 5,
-          left: 0,
+          top: 15,
+          left: 5,
           right: 0,
           child: Center(
             child: Image.asset(
               'assets/logo/blackugandaexplore.png',
-              width: 260,
-              height: 100,
+              width: 220,
+              height: 90,
               fit: BoxFit.contain,
             ),
           ),
          ),
          Positioned(
-          top: 25,
-          left: 20,
+          top: 38,
+          left: 2,
           child: ClipOval(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
-                width: 50,
-                height: 50,
+                width: 45,
+                height: 45,
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.15),
                   shape: BoxShape.circle,
