@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
+import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
+import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
+import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 import 'screens/auth/signup_screen.dart';
 
 void main() async {
@@ -17,6 +20,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      routes: {
+        '/onboarding_screen1': (context) => OnboardingScreen1(),
+        '/onboarding_screen2': (context) => OnboardingScreen2(),
+        '/onboarding_screen3': (context) => OnboardingScreen3(),
+      },
       debugShowCheckedModeBanner: false,
       title: 'Uganda Explore',
       theme: ThemeData(
