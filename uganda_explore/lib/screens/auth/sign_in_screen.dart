@@ -504,12 +504,7 @@ class GoogleSignInButton extends StatelessWidget {
   Future<void> _signInWithGoogle(BuildContext context) async {
   try {
     final googleSignIn = GoogleSignIn();
-    
-    // Force sign-out of any previous Google session
-    await googleSignIn.disconnect(); // Clears previous session
-    await googleSignIn.signOut();    // Just in case disconnect fails silently
-
-    // Show the account picker
+    await googleSignIn.signOut();
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser == null) return; // User cancelled
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -64,6 +65,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn(); // Now prompts account picker
+
+      if (googleUser == null) return; // User cancelled
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Optionally, create user in Firestore if new
+      final userDoc = FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid);
+      final docSnapshot = await userDoc.get();
+      if (!docSnapshot.exists) {
+        await userDoc.set({
+          'fullNames': userCredential.user!.displayName ?? '',
+          'email': userCredential.user!.email ?? '',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      Navigator.pushReplacementNamed(context, '/onboarding_screen1');
+    } catch (e) {
+      print('Google sign-up failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google sign-up failed: $e')),
+      );
     }
   }
 
@@ -168,7 +205,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Center(
                         child: SizedBox(
                           width: 320,
-                          height: 40,
+                          height: 50,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _signUp,
                             style: ElevatedButton.styleFrom(
@@ -256,19 +293,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Center(
                         child: SizedBox(
                           width: 320,
-                          height: 40,
+                          height: 50,
                           child: OutlinedButton(
-                            onPressed: () {
-                              // Handle Google sign up
-                            },
+                            onPressed: _signUpWithGoogle,
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Colors.white,
                               side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
                               shape: RoundedRectangleBorder(
-                                
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              
                               padding: EdgeInsets.zero,
                             ),
                             child: Row(
@@ -346,6 +379,172 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 }
+
+// ...FullNames and Email widgets unchanged...
+
+class Password extends StatefulWidget {
+  final TextEditingController controller;
+  const Password({super.key, required this.controller});
+
+  @override
+  State<Password> createState() => _PasswordState();
+}
+
+class _PasswordState extends State<Password> {
+  bool _isObscured = true;
+  double _strength = 0;
+
+  double _calculateStrength(String password) {
+    if (password.isEmpty) return 0;
+    double strength = 0;
+    if (password.length >= 6) strength += 0.3;
+    if (password.length >= 8) strength += 0.2;
+    if (RegExp(r'[A-Z]').hasMatch(password)) strength += 0.2;
+    if (RegExp(r'[0-9]').hasMatch(password)) strength += 0.2;
+    if (RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) strength += 0.1;
+    return strength.clamp(0.0, 1.0);
+  }
+
+  Color _getStrengthColor(double strength) {
+    if (strength < 0.4) return Colors.red;
+    if (strength < 0.7) return Colors.yellow;
+    return Colors.green;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: 320,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: widget.controller,
+              obscureText: _isObscured,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Enter your password';
+                }
+                if (value.length < 6) {
+                  return 'Password must be at least 6 characters';
+                }
+                return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  _strength = _calculateStrength(value);
+                });
+              },
+              decoration: InputDecoration(
+                labelText: 'Password',
+                labelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                ),
+                hintText: 'Enter Your Password',
+                hintStyle: const TextStyle(
+                  color: Colors.black54,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                prefixIcon: Padding(
+                  padding: const EdgeInsets.only(left: 6),
+                  child: Icon(
+                    Icons.lock,
+                    color: Colors.black,
+                  ),
+                ),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 0,
+                  minHeight: 0,
+                ),
+                suffixIcon: Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
+                    icon: Icon(
+                      _isObscured ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF1EF813),
+                    width: 1,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF1EF813),
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF1EF813),
+                    width: 1.5,
+                  ),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF1EF813),
+                    width: 2,
+                  ),
+                ),
+                errorStyle: const TextStyle(
+                  color: Colors.red,
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                floatingLabelBehavior: FloatingLabelBehavior.auto,
+              ),
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w400,
+                fontSize: 15,
+              ),
+              cursorColor: Color(0xFF1EF813),
+            ),
+            SizedBox(height: 8),
+            SizedBox(
+              width: 910,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: LinearProgressIndicator(
+                  value: _strength,
+                  minHeight: 5,
+                  backgroundColor: Colors.white,
+                  valueColor: AlwaysStoppedAnimation<Color>(_getStrengthColor(_strength)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ...ConfirmPassword widget unchanged...
+
 
 class FullNames extends StatelessWidget {
   final TextEditingController controller;
@@ -543,125 +742,7 @@ class Email extends StatelessWidget {
   }
 }
 
-class Password extends StatefulWidget {
-  final TextEditingController controller;
-  const Password({super.key, required this.controller});
 
-  @override
-  State<Password> createState() => _PasswordState();
-}
-
-class _PasswordState extends State<Password> {
-  bool _isObscured = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 320,
-        child: TextFormField(
-          controller: widget.controller,
-          obscureText: _isObscured,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return 'Enter your password';
-            }
-            if (value.length < 6) {
-              return 'Password must be at least 6 characters';
-            }
-            return null;
-          },
-          decoration: InputDecoration(
-            labelText: 'Password',
-            labelStyle: const TextStyle(
-              color: Colors.black,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w500,
-              fontSize: 16,
-            ),
-            hintText: 'Enter Your Password',
-            hintStyle: const TextStyle(
-              color: Colors.black54,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w400,
-              fontSize: 14,
-            ),
-            filled: true,
-            fillColor: Colors.white,
-            prefixIcon: Padding(
-              padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.lock,
-                color: Colors.black,
-              ),
-            ),
-            prefixIconConstraints: const BoxConstraints(
-              minWidth: 0,
-              minHeight: 0,
-            ),
-            suffixIcon: Padding(
-              padding: const EdgeInsets.only(right: 6),
-              child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _isObscured = !_isObscured;
-                  });
-                },
-                icon: Icon(
-                  _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.black54,
-                ),
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1.5,
-              ),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
-            ),
-            errorStyle: const TextStyle(
-              color: Colors.red,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w500,
-              fontSize: 13,
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-            floatingLabelBehavior: FloatingLabelBehavior.auto,
-          ),
-          style: const TextStyle(
-            color: Colors.black,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w400,
-            fontSize: 15,
-          ),
-          cursorColor: Color(0xFF1EF813),
-        ),
-      ),
-    );
-  }
-}
 
 class ConfirmPassword extends StatefulWidget {
   final TextEditingController controller;
