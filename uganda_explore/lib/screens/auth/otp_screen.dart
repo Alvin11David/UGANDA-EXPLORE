@@ -44,6 +44,27 @@ class OtpScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
+              Container(
+                width: 385,
+                padding: const EdgeInsets.only(left:4, right:4, bottom:0),
+                decoration: const BoxDecoration(
+                  color:Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(40),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Divider(
+                      color: Color(0xFFE0E0E0),
+                      thickness: 1,
+                      height: 32,
+                    ),
+                  ],
+                )
+
+              )
             ],
           ),
         ),
