@@ -76,12 +76,38 @@ class OtpScreen extends StatelessWidget {
                               Color(0xFF1EF813),
                             ],
                             stops: [0.03, 0.63],
-                          )
-                        )
+                          ),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Icon(
+                              Icons.email_outlined,
+                              color: Colors.white,
+                              size: 34
+                            ),
+                            Positioned(
+                              bottom:20,
+                              right:20,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: const EdgeInsets.all(2),
+                                child: Icon(
+                                  Icons.check_circle,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    )
+                    ),
                   ],
-                )
+                ),
 
               )
             ],
