@@ -11,11 +11,12 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 179, 175, 151), // Background color E5E3D4
       body: Stack(
         children: [
+          // Blurred rectangle at the top
           Padding(
             padding: const EdgeInsets.only(top: 0, left: 0, right: 0),
             child: ClipRRect(
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(30)
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(30),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
@@ -33,6 +34,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
+          // Logo at the top center
           Positioned(
             top: 20,
             left: 0,
@@ -45,6 +47,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
+          // Location circle and text
           Positioned(
             top: 80,
             left: 4,
@@ -61,80 +64,114 @@ class HomeScreen extends StatelessWidget {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.2),
                         blurRadius: 8,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.location_on,
+                      color: Colors.black87,
+                      size: 28,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Location',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: const [
+                        Text(
+                          'Kampala',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(width: 4),
+                        Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          size: 20,
+                          color: Colors.black87,
+                        ),
+                      ],
+                    ),
                   ],
-                  ),
-              child: const Center(
-                child: Icon(
-                  Icons.location_on,
-                  color: Colors.black87,
-                  size: 28,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-              const Text(
-                'Location',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 2,),
-            Row(
-              children: [
-                Text(
-                  'Kampala',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: Colors.black87,
-                  ),
-                ),
-                SizedBox(width: 4,),
-                Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 20,
-                  color: Colors.black87,
                 ),
               ],
             ),
-            ],
-            ),
-            ],
           ),
-        ),
-        Positioned(
+          
+          Positioned(
             top: 80,
-            right: 104,
-            child: Container(
-              height: 50,
-              width: 50,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: Offset(0, 4),
+            right: 4,
+            child: Row(
+              children: [
+                Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.sunny,
-                  color: Colors.amber,
-                  size: 28,
+                  child: const Center(
+                    child: Icon(
+                      Icons.sunny,
+                      color: Colors.amber,
+                      size: 28,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [ 
+                    const Text(
+                    'Weather',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 2,),
+                  Row(
+                    children: [
+                      Text(
+                        '20° C',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ]
+                ),
+              ],
             ),
           ),
         ],
