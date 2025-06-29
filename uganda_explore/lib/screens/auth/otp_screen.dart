@@ -65,7 +65,7 @@ class OtpScreen extends StatelessWidget {
                       child: Container(
                         width: 100,
                         height: 100,
-                        margin: const EdgeInsets.only(top: 12, bottom: 28),
+                        margin: const EdgeInsets.only(top: 12, bottom: 8),
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
@@ -84,11 +84,11 @@ class OtpScreen extends StatelessWidget {
                             Icon(
                               Icons.email_outlined,
                               color: Colors.white,
-                              size: 34
+                              size: 34,
                             ),
                             Positioned(
-                              bottom:20,
-                              right:20,
+                              bottom: 20,
+                              right: 20,
                               child: Container(
                                 decoration: const BoxDecoration(
                                   color: Colors.white,
@@ -106,6 +106,19 @@ class OtpScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    const Center(
+                      child: Text(
+                        "Verify Your Email",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
 
