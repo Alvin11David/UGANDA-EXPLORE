@@ -56,53 +56,50 @@ class OtpScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Divider(
-                      color: Color(0xFFE0E0E0),
-                      thickness: 1,
-                      height: 32,
-                    ),
                     Center(
-                      child: Container(
-                        width: 100,
-                        height: 100,
-                        margin: const EdgeInsets.only(top: 12, bottom: 8),
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            center: Alignment.center,
-                            radius: 1.0,
-                            colors: [
-                              Color(0xFF0C0F0A),
-                              Color(0xFF1EF813),
-                            ],
-                            stops: [0.03, 0.63],
-                          ),
-                        ),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            const Icon(
-                              Icons.email_outlined,
-                              color: Colors.white,
-                              size: 34,
+                      child: Transform.translate(
+                        offset: const Offset(0, 10),
+                        child: Container(
+                          width: 100,
+                          height: 100,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              center: Alignment.center,
+                              radius: 1.0,
+                              colors: [
+                                Color(0xFF0C0F0A),
+                                Color(0xFF1EF813),
+                              ],
+                              stops: [0.03, 0.63],
                             ),
-                            Positioned(
-                              bottom: 20,
-                              right: 20,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                padding: const EdgeInsets.all(2),
-                                child: const Icon(
-                                  Icons.check_circle,
-                                  color: Colors.white,
-                                  size: 18,
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              const Icon(
+                                Icons.email_outlined,
+                                color: Colors.white,
+                                size: 34,
+                              ),
+                              Positioned(
+                                bottom: 20,
+                                right: 20,
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  padding: const EdgeInsets.all(2),
+                                  child: const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -194,6 +191,7 @@ class OtpScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         TextButton(
                           onPressed: () {
+                            // TODO: Add resend logic
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF078800),
@@ -215,34 +213,36 @@ class OtpScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: GestureDetector(
                         onTap: () {
-
+                          // TODO: Add verify logic
                         },
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            gradient: const LinearGradient(
-                              colors: [
-                                Color(0xFF000000),
-                                Color(0xFF1FF813),
-                              ],
-                              stops: [0.0, 0.47],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
+                        child: SizedBox(
+                          width: 323,
+                          height: 56,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF000000),
+                                  Color(0xFF1FF813),
+                                ],
+                                stops: [0.0, 0.47],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                             ),
-                          ),
-                          child: const Center(
-                            child: Text(
-                              "Verify Now",
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.black,
+                            child: const Center(
+                              child: Text(
+                                "Verify Now",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: Colors.black,
+                                ),
                               ),
                             ),
                           ),
@@ -252,32 +252,33 @@ class OtpScreen extends StatelessWidget {
                     const SizedBox(height: 32),
                     GestureDetector(
                       onTap: () {
-
+                        // TODO: Navigate to sign in screen
                       },
                       child: RichText(
                         text: TextSpan(
                           style: const TextStyle(
                             fontFamily: "Poppins",
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 20,
                           ),
                           children: [
                             const TextSpan(
-                              text: "Back to",
+                              text: "Back to ",
                               style: TextStyle(
                                 color: Colors.black,
                               ),
                             ),
                             const TextSpan(
-                              text: "  Sign In",
+                              text: "Sign In",
                               style: TextStyle(
-                                color: Color(0xFF0F7709)
+                                color: Color(0xFF0F7709),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
@@ -287,4 +288,4 @@ class OtpScreen extends StatelessWidget {
       ),
     );
   }
-}  
+}    
