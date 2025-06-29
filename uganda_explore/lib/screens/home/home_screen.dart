@@ -19,7 +19,6 @@ class HomeScreen extends StatelessWidget {
       isFilterFocused.value = filterFocusNode.hasFocus;
     });
 
-
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: Column(
@@ -188,114 +187,273 @@ class HomeScreen extends StatelessWidget {
 
           // Search bar
           const SizedBox(height: 20),
-          // Replace your current search bar Padding widget with the following:
 
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 15),
-  child: Align(
-    alignment: Alignment.centerLeft,
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: 400, 
-          child: ValueListenableBuilder<bool>(
-            valueListenable: isSearchFocused,
-            builder: (context, focused, child) {
-              return Container(
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+          // Replace your current search bar Padding widget with the following:
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 400,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: isSearchFocused,
+                      builder: (context, focused, child) {
+                        return Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: focused
+                                  ? const Color(0xFF1FF813)
+                                  : Colors.transparent,
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 16),
+                              const Icon(
+                                Icons.search,
+                                color: Colors.black,
+                                size: 24,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  focusNode: searchFocusNode,
+                                  decoration: const InputDecoration(
+                                    hintText: 'Search Your Place',
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                    contentPadding: EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                  ),
+                                  style: const TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  ],
-                  border: Border.all(
-                    color: focused ? const Color(0xFF1FF813) : Colors.transparent,
-                    width: 1,
                   ),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 16),
-                    const Icon(Icons.search, color: Colors.black, size: 24),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        focusNode: searchFocusNode,
-                        decoration: const InputDecoration(
-                          hintText: 'Search Your Place',
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(width: 10),
+
+                  ValueListenableBuilder<bool>(
+                    valueListenable: isFilterFocused,
+                    builder: (context, focused, child) {
+                      return GestureDetector(
+                        onTap: () {
+                          FocusScope.of(context).requestFocus(filterFocusNode);
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                            child: Container(
+                              height: 50,
+                              width: 70,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(30),
+                                border: Border.all(
+                                  color: focused
+                                      ? const Color(0xFF1FF813)
+                                      : Colors.white,
+                                  width: 1.5,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Focus(
+                                focusNode: filterFocusNode,
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.filter_alt,
+                                    color: Colors.black,
+                                    size: 26,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(width: 10),
-        
-        ValueListenableBuilder<bool>(
-          valueListenable: isFilterFocused,
-          builder: (context, focused, child) {
-            return GestureDetector(
-              onTap: () {
-                FocusScope.of(context).requestFocus(filterFocusNode);
-              },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  height: 50,
-                  width: 70,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: focused ? const Color(0xFF1FF813) : Colors.white,
-                      width: 1.5,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                      );
+                    },
                   ),
                 ],
               ),
-              child: Focus(
-                focusNode: filterFocusNode,
-                  child: const Center(
-                    child: Icon(
-                      Icons.filter_alt,
-                      color: Colors.black,
-                      size: 26,
+            ),
+          ),
+          const SizedBox(height: 25,),
+          Padding(
+            padding: EdgeInsets.only(left: 18),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: const Text(
+                'Popular Place Category',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
+                textAlign: TextAlign.start,
               ),
             ),
           ),
-        ),
-        ),
-        );
-      },
-      ),
-      ],
-    ),
-  ),
-),
+          const SizedBox(height: 25),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Container(
+                  height: 50,
+                  width: 200,
+                  margin: const EdgeInsets.only(left: 15, right: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: const Color(0xFF1FF813),
+                      width: 1,
+                    ),
+                    gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF000000),
+                      Color(0xFF1FF813),
+                    ],
+                    stops: [0.0, 0.47],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      const Icon(
+                        Icons.park,
+                        color: Colors.white,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Game Parks",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  width: 200,
+                  margin: const EdgeInsets.only(right: 18),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: const Color(0xFF1FF813),
+                      width: 1,
+                    ),
+                    color: Colors.white,
+                  ),
+                   child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      const Icon(
+                        Icons.beach_access,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Leisure",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Container(
+                  height: 50,
+                  width: 200,
+                  margin: const EdgeInsets.only(left: 0, right: 12),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: const Color(0xFF1FF813),
+                      width: 1,
+                    ),
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20,),
+                      const Icon(
+                        Icons.terrain,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Adventure",
+                        style: TextStyle(
+                          fontFamily: 'Inter',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 25),
+          Padding(
+            padding: EdgeInsets.only(left: 18),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "The Most Relevant Places",
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              textAlign: TextAlign.start,
+              ),
+            ),
+          ),
         ],
       ),
     );
