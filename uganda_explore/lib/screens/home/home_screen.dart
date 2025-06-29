@@ -7,10 +7,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final FocusNode searchFocusNode = FocusNode();
-    ValueNotifier<bool> isFocused = ValueNotifier(false);
+    final FocusNode filterFocusNode = FocusNode();
+    ValueNotifier<bool> isSearchFocused = ValueNotifier(false);
+    ValueNotifier<bool> isFilterFocused = ValueNotifier(false);
 
     searchFocusNode.addListener(() {
-      isFocused.value = searchFocusNode.hasFocus;
+      isSearchFocused.value = searchFocusNode.hasFocus;
+    });
+
+    filterFocusNode.addListener(() {
+      isFilterFocused.value = filterFocusNode.hasFocus;
     });
 
 
@@ -182,16 +188,86 @@ class HomeScreen extends StatelessWidget {
 
           // Search bar
           const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: isFocused,
-              builder: (context, focused, child) {
-                return Container(
+          // Replace your current search bar Padding widget with the following:
+
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 15),
+  child: Align(
+    alignment: Alignment.centerLeft,
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 400, 
+          child: ValueListenableBuilder<bool>(
+            valueListenable: isSearchFocused,
+            builder: (context, focused, child) {
+              return Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: focused ? const Color(0xFF1FF813) : Colors.transparent,
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 16),
+                    const Icon(Icons.search, color: Colors.black, size: 24),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        focusNode: searchFocusNode,
+                        decoration: const InputDecoration(
+                          hintText: 'Search Your Place',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        ),
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        
+        ValueListenableBuilder<bool>(
+          valueListenable: isFilterFocused,
+          builder: (context, focused, child) {
+            return GestureDetector(
+              onTap: () {
+                FocusScope.of(context).requestFocus(filterFocusNode);
+              },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
                   height: 50,
+                  width: 70,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color: focused ? const Color(0xFF1FF813) : Colors.white,
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.15),
@@ -199,37 +275,27 @@ class HomeScreen extends StatelessWidget {
                         offset: const Offset(0, 4),
                   ),
                 ],
-                border: Border.all(
-                  color: focused ? const Color(0xFF1FF813) : Colors.transparent,
-                  width: 1,
+              ),
+              child: Focus(
+                focusNode: filterFocusNode,
+                  child: const Center(
+                    child: Icon(
+                      Icons.filter_alt,
+                      color: Colors.black,
+                      size: 26,
                 ),
               ),
-              child: Row(
-                children: [
-                  const SizedBox(width: 16),
-                  const Icon(Icons.search, color: Colors.black, size: 24),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      focusNode: searchFocusNode,
-                      decoration: const InputDecoration(
-                        hintText: 'Search Your Place',
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-            },
+            ),
           ),
-          ),
+        ),
+        ),
+        );
+      },
+      ),
+      ],
+    ),
+  ),
+),
         ],
       ),
     );
