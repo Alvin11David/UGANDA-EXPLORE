@@ -250,6 +250,34 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
+                    GestureDetector(
+                      onTap: () {
+
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontFamily: "Poppins",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text: "Back to",
+                              style: TextStyle(
+                                color: Colors.black,
+                              ),
+                            ),
+                            const TextSpan(
+                              text: "  Sign In",
+                              style: TextStyle(
+                                color: Color(0xFF0F7709)
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
