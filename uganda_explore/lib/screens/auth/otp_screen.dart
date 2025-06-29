@@ -154,14 +154,12 @@ class OtpScreen extends StatelessWidget {
                           height: 60,
                           margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
                           decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: Color(0xFF1FF813),
-                                width:2,
-                              ),
+                            color: Colors.white,
+                            border: Border.all(
+                              color: Color(0xFF1FF813),
+                              width: 2,
                             ),
                             borderRadius: BorderRadius.circular(12),
-                            color: Colors.white,
                           ),
                           alignment: Alignment.center,
                           child: Text(
