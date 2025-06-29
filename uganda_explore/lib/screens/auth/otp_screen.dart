@@ -194,7 +194,6 @@ class OtpScreen extends StatelessWidget {
                         const SizedBox(width: 10),
                         TextButton(
                           onPressed: () {
-                            // TODO: Add resend logic
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: const Color(0xFF078800),
@@ -215,6 +214,42 @@ class OtpScreen extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 24),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 24),
+                      child: GestureDetector(
+                        onTap: () {
+
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFF000000),
+                                Color(0xFF1FF813),
+                              ],
+                              stops: [0.0, 0.47],
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Verify Now",
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
