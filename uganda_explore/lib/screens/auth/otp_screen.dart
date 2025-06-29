@@ -30,7 +30,7 @@ class OtpScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "# Uganda",
+                    "Uganda",
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 24,
