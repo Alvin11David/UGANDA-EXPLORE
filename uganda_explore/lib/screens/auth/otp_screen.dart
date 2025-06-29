@@ -54,7 +54,7 @@ class OtpScreen extends StatelessWidget {
                   ),
                 ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Divider(
                       color: Color(0xFFE0E0E0),
@@ -118,7 +118,65 @@ class OtpScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal:24, vertical:0),
+                      child: RichText(
+                        textAlign: TextAlign.center,
+                        text:TextSpan(
+                          style: const TextStyle(
+                            fontFamily: "Poppins",
+                            fontSize: 17,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                            height: 1.5,
+                          ),
+                          children: [
+                            const TextSpan(text: "Please enter the 4-digit code sent to "),
+                            TextSpan(
+                              text: "emailaddress@gmail.com",
+                              style: const TextStyle(
+                                color: Color(0xFF078B00),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        4,
+                        (index) => Container(
+                          width:48,
+                          height: 60,
+                          margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                color: Color(0xFF1FF813),
+                                width:2,
+                              ),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.white,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '',
+                            style: const TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
 
