@@ -26,7 +26,7 @@ class OtpScreen extends StatelessWidget {
               const SizedBox(height: 20),
               Center(
                 child: Image.asset(
-                  'logo/ugandaexplore.png', 
+                  'logo/ugandaexplore.png',
                   width: 268,
                   height: 60,
                   fit: BoxFit.contain,
@@ -46,9 +46,9 @@ class OtpScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Container(
                 width: 385,
-                padding: const EdgeInsets.only(left:4, right:4, bottom:0),
+                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                 decoration: const BoxDecoration(
-                  color:Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.vertical(
                     top: Radius.circular(40),
                   ),
@@ -81,7 +81,7 @@ class OtpScreen extends StatelessWidget {
                         child: Stack(
                           alignment: Alignment.center,
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.email_outlined,
                               color: Colors.white,
                               size: 34,
@@ -95,7 +95,7 @@ class OtpScreen extends StatelessWidget {
                                   shape: BoxShape.circle,
                                 ),
                                 padding: const EdgeInsets.all(2),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.check_circle,
                                   color: Colors.white,
                                   size: 18,
@@ -120,10 +120,10 @@ class OtpScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 10),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal:24, vertical:0),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
                       child: RichText(
                         textAlign: TextAlign.center,
-                        text:TextSpan(
+                        text: TextSpan(
                           style: const TextStyle(
                             fontFamily: "Poppins",
                             fontSize: 17,
@@ -150,7 +150,7 @@ class OtpScreen extends StatelessWidget {
                       children: List.generate(
                         4,
                         (index) => Container(
-                          width:48,
+                          width: 48,
                           height: 60,
                           margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
                           decoration: BoxDecoration(
@@ -175,14 +175,53 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF078800),
+                          ),
+                          child: const Icon(
+                            Icons.refresh,
+                            color: Colors.white,
+                            size: 18,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        TextButton(
+                          onPressed: () {
+                            // TODO: Add resend logic
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color(0xFF078800),
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: const Text(
+                            "Resend",
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Color(0xFF078800),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
                   ],
                 ),
-
-              )
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
+}  
