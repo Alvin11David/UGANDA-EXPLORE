@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,172 +6,229 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final FocusNode searchFocusNode = FocusNode();
+    ValueNotifier<bool> isFocused = ValueNotifier(false);
+
+    searchFocusNode.addListener(() {
+      isFocused.value = searchFocusNode.hasFocus;
+    });
+
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 179, 175, 151), // Background color E5E3D4
-      body: Stack(
+      backgroundColor: const Color(0xFFE5E3D4),
+      body: Column(
         children: [
-          // Blurred rectangle at the top
-          Padding(
-            padding: const EdgeInsets.only(top: 0, left: 0, right: 0),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(30),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  height: 155,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(1),
-                      width: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // Logo at the top center
-          Positioned(
-            top: 20,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Image.asset(
-                'logo/blackugandaexplore.png',
-                height: 60,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          // Location circle and text
-          Positioned(
-            top: 80,
-            left: 4,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+          // Header section with Stack
+          SizedBox(
+            height: 155,
+            child: Stack(
               children: [
-                Container(
-                  height: 50,
-                  width: 50,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(30),
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.black87,
-                      size: 28,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.15),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(1),
+                          width: 1,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Location',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black87,
-                      ),
+                // Logo
+                Positioned(
+                  top: 20,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: Image.asset(
+                      'logo/blackugandaexplore.png',
+                      height: 60,
+                      fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: const [
-                        Text(
-                          'Kampala',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                  ),
+                ),
+                // Location
+                Positioned(
+                  top: 80,
+                  left: 4,
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.location_on,
                             color: Colors.black87,
+                            size: 28,
                           ),
                         ),
-                        SizedBox(width: 4),
-                        Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          size: 20,
-                          color: Colors.black87,
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Location',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: const [
+                              Text(
+                                'Kampala',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              SizedBox(width: 4),
+                              Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                size: 20,
+                                color: Colors.black87,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // Weather
+                Positioned(
+                  top: 80,
+                  right: 4,
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ],
+                        child: const Center(
+                          child: Icon(
+                            Icons.sunny,
+                            color: Colors.amber,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Weather',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            '20° C',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          
-          Positioned(
-            top: 80,
-            right: 4,
-            child: Row(
-              children: [
-                Container(
+
+          // Search bar
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: ValueListenableBuilder<bool>(
+              valueListenable: isFocused,
+              builder: (context, focused, child) {
+                return Container(
                   height: 50,
-                  width: 50,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 8,
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 12,
                         offset: const Offset(0, 4),
-                      ),
-                    ],
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.sunny,
-                      color: Colors.amber,
-                      size: 28,
+                ],
+                border: Border.all(
+                  color: focused ? const Color(0xFF1FF813) : Colors.transparent,
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 16),
+                  const Icon(Icons.search, color: Colors.black, size: 24),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      focusNode: searchFocusNode,
+                      decoration: const InputDecoration(
+                        hintText: 'Search Your Place',
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [ 
-                    const Text(
-                    'Weather',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 2,),
-                  Row(
-                    children: [
-                      Text(
-                        '20° C',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ]
-                ),
-              ],
-            ),
+                ],
+              ),
+            );
+            },
+          ),
           ),
         ],
       ),
