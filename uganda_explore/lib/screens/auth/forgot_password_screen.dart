@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
-  ForgotPasswordScreen({super.key});
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _newPasswordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  const ForgotPasswordScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,96 +15,91 @@ class ForgotPasswordScreen extends StatelessWidget {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
+              Color(0xFF1EF813), 
             ],
-            stops: [0.03, 0.63],
+            stops: [0.03, 0.63], 
           ),
         ),
         child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 60),
-                Center(
-                  child: Container(
+          child: Column(
+            children: [
+              const SizedBox(height: 60),
+              Center(
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'assets/logo/blacklogo.png',
                     width: 100,
                     height: 100,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    child: Image.asset(
-                      'assets/logo/blacklogo.png',
-                      fit: BoxFit.contain,
-                    ),
+                    fit: BoxFit.contain,
+                  )
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                "Let's get you\n sorted!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 37,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: 490,
+                padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(40),
                   ),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  "Let's get you\n sorted!",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontFamily: 'Outfit',
-                    fontSize: 37,
-                    fontWeight: FontWeight.w900,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  width: 490,
-                  padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(40),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [ 
+                    SizedBox(height: 30,),
+                    PasswordResetIcon(),
+                    SizedBox(height: 20),
+                    Text(
+                      "Reset Your Password",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Inter',
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 30),
-                      const PasswordResetIcon(),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Reset Your Password",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Inter',
-                        ),
-                        textAlign: TextAlign.center,
+                    SizedBox(height: 10),
+                    Text(
+                      "Create a new password for your\naccount below.",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'Poppins',
                       ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Create a new password for your\naccount below.",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'Poppins',
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 30),
-                      NewPasswordField(controller: _newPasswordController),
-                      const SizedBox(height: 20),
-                      ConfirmPasswordField(controller: _confirmPasswordController),
-                      const SizedBox(height: 30),
-                      ChangePasswordButton(
-                        formKey: _formKey,
-                        newPasswordController: _newPasswordController,
-                        confirmPasswordController: _confirmPasswordController,
-                      ),
-                      const SizedBox(height: 20),
-                      const BackToSignInLink(),
-                      const SizedBox(height: 30),
-                    ],
-                  ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 30),
+                    NewPasswordField(),
+                    SizedBox(height: 20),
+                    ConfirmPasswordField(),
+                    SizedBox(height: 30),
+                    ChangePasswordButton(),
+                    SizedBox(height: 20),
+                    BackToSignInLink(),
+                    SizedBox(height: 30),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -124,9 +115,9 @@ class PasswordResetIcon extends StatelessWidget {
     return Container(
       width: 80,
       height: 80,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Color(0xFF1EF813),
+        color: const Color(0xFF1EF813),
       ),
       child: const Icon(
         Icons.lock_reset,
@@ -138,32 +129,30 @@ class PasswordResetIcon extends StatelessWidget {
 }
 
 class NewPasswordField extends StatefulWidget {
-  final TextEditingController controller;
-  const NewPasswordField({required this.controller, super.key});
+  const NewPasswordField({super.key});
 
   @override
   State<NewPasswordField> createState() => _NewPasswordFieldState();
 }
 
 class _NewPasswordFieldState extends State<NewPasswordField> {
+  final TextEditingController _passwordController = TextEditingController();
   bool _isObscured = true;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 450, 
         child: TextFormField(
-          controller: widget.controller,
+          controller: _passwordController,
           obscureText: _isObscured,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your new password';
-            } else if (value.length < 6) {
-              return 'Password must be at least 6 characters long';
-            }
-            return null;
-          },
           decoration: InputDecoration(
             labelText: 'New Password',
             labelStyle: const TextStyle(
@@ -181,17 +170,30 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
             ),
             filled: true,
             fillColor: Colors.white,
-            prefixIcon: const Icon(Icons.lock, color: Colors.black),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isObscured ? Icons.visibility_off : Icons.visibility,
-                color: Colors.black54,
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Icon(
+                Icons.lock,
+                color: Colors.black,
               ),
-              onPressed: () {
-                setState(() {
-                  _isObscured = !_isObscured;
-                });
-              },
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                }, 
+                icon: Icon(
+                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black54,
+                ),
+              )
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -208,6 +210,7 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
               ),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
             color: Colors.black,
@@ -223,30 +226,30 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
 }
 
 class ConfirmPasswordField extends StatefulWidget {
-  final TextEditingController controller;
-  const ConfirmPasswordField({required this.controller, super.key});
+  const ConfirmPasswordField({super.key});
 
   @override
   State<ConfirmPasswordField> createState() => _ConfirmPasswordFieldState();
 }
 
 class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
+  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _isObscured = true;
+
+  @override
+  void dispose() {
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 450, 
         child: TextFormField(
-          controller: widget.controller,
+          controller: _confirmPasswordController,
           obscureText: _isObscured,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please confirm your password';
-            }
-            return null;
-          },
           decoration: InputDecoration(
             labelText: 'Confirm Password',
             labelStyle: const TextStyle(
@@ -264,17 +267,30 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
             ),
             filled: true,
             fillColor: Colors.white,
-            prefixIcon: const Icon(Icons.lock_outline, color: Colors.black),
-            suffixIcon: IconButton(
-              icon: Icon(
-                _isObscured ? Icons.visibility_off : Icons.visibility,
-                color: Colors.black54,
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 6),
+              child: Icon(
+                Icons.lock_outline,
+                color: Colors.black,
               ),
-              onPressed: () {
-                setState(() {
-                  _isObscured = !_isObscured;
-                });
-              },
+            ),
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 0,
+              minHeight: 0,
+            ),
+            suffixIcon: Padding(
+              padding: const EdgeInsets.only(right: 6),
+              child: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isObscured = !_isObscured;
+                  });
+                }, 
+                icon: Icon(
+                  _isObscured ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black54,
+                ),
+              )
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -291,6 +307,7 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
               ),
             ),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
             color: Colors.black,
@@ -306,45 +323,30 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
 }
 
 class ChangePasswordButton extends StatelessWidget {
-  final GlobalKey<FormState> formKey;
-  final TextEditingController newPasswordController;
-  final TextEditingController confirmPasswordController;
-
-  const ChangePasswordButton({
-    required this.formKey,
-    required this.newPasswordController,
-    required this.confirmPasswordController,
-    super.key,
-  });
+  const ChangePasswordButton({super.key});
 
   void _onChangePasswordPressed(BuildContext context) {
-    if (formKey.currentState!.validate()) {
-      if (newPasswordController.text != confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Passwords do not match")),
+    // Implement password change logic here
+    // You might want to validate that passwords match
+    // Show success message and navigate back to sign in
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: const Text('Your password has been changed successfully!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                Navigator.pushReplacementNamed(context, '/signin'); // Navigate to sign in
+              },
+              child: const Text('OK'),
+            ),
+          ],
         );
-        return;
-      }
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Your password has been changed successfully!'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.pushReplacementNamed(context, '/signin');
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
+      },
+    );
   }
 
   @override
@@ -356,11 +358,30 @@ class ChangePasswordButton extends StatelessWidget {
           onTap: () => _onChangePasswordPressed(context),
           child: Container(
             height: 50,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               gradient: const LinearGradient(
-                colors: [Color.fromARGB(255, 47, 44, 44), Color(0xFF1EF813)],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromARGB(255, 47, 44, 44), 
+                  Color(0xFF1EF813)],
+                  stops: [0.0, 0.47],
               ),
-              borderRadius: BorderRadius.circular(30),
+              shape: RoundedRectangleBorder(
+                side: const BorderSide(
+                  width: 1,
+                  color: Color(0xFF1EF813),
+                ),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              shadows: const [
+                BoxShadow(
+                  color: Color(0x3F000000),
+                  blurRadius: 4,
+                  offset: Offset(0, 4),
+                  spreadRadius: 0,
+                ),
+              ],
             ),
             alignment: Alignment.center,
             child: const Text(
@@ -387,7 +408,7 @@ class BackToSignInLink extends StatelessWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context);
+          Navigator.pop(context); // Go back to sign in screen
         },
         child: const Text(
           'Back to Sign In',
