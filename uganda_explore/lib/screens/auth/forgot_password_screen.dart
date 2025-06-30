@@ -156,6 +156,14 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscured,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your new password';
+            } else if (value.length < 6) {
+              return 'Password must be at least 6 characters long';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'New Password',
             labelStyle: const TextStyle(
@@ -233,6 +241,12 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
         child: TextFormField(
           controller: widget.controller,
           obscureText: _isObscured,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please confirm your password';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: 'Confirm Password',
             labelStyle: const TextStyle(
@@ -304,25 +318,33 @@ class ChangePasswordButton extends StatelessWidget {
   });
 
   void _onChangePasswordPressed(BuildContext context) {
-    // Validation logic can be added in the next part
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Success'),
-          content: const Text('Your password has been changed successfully!'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.pushReplacementNamed(context, '/signin'); // Navigate to sign in
-              },
-              child: const Text('OK'),
-            ),
-          ],
+    if (formKey.currentState!.validate()) {
+      if (newPasswordController.text != confirmPasswordController.text) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Passwords do not match")),
         );
-      },
-    );
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Success'),
+            content: const Text('Your password has been changed successfully!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pushReplacementNamed(context, '/signin');
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
