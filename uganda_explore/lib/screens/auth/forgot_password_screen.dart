@@ -17,50 +17,52 @@ class ForgotPasswordScreen extends StatelessWidget {
             stops: [0.03, 0.63],
           ),
         ),
-        child: Column(
-          children: [
-            const SizedBox(height: 60),
-            Center(
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: const BoxDecoration(shape: BoxShape.circle),
-                child: Image.asset(
-                  'assets/logo/blacklogo.png',
-                  fit: BoxFit.contain,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 60),
+              Center(
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
+                  child: Image.asset(
+                    'assets/logo/blacklogo.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Let's get you\n sorted!",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Outfit',
-                fontSize: 37,
-                fontWeight: FontWeight.w900,
-                color: Colors.black,
+              const SizedBox(height: 20),
+              const Text(
+                "Let's get you\n sorted!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Outfit',
+                  fontSize: 37,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+          Container(
+            width: 490,
+            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(40),
               ),
             ),
-            const SizedBox(height: 20),
-Container(
-  width: 490,
-  padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.vertical(
-      top: Radius.circular(40),
-    ),
-  ),
-  child: Column(
-    children: const [
-      SizedBox(height: 30),
-      // Form elements will go here
-    ],
-  ),
-),
-
-          ],
+            child: Column(
+              children: const [
+                SizedBox(height: 30),
+                // Form elements will go here
+              ],
+            ),
+          ),
+          
+            ],
+          ),
         ),
       ),
     );
@@ -167,6 +169,24 @@ class ChangePasswordButton extends StatelessWidget {
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class BackToSignInLink extends StatelessWidget {
+  const BackToSignInLink({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pop(context),
+      child: const Text(
+        'Back to Sign In',
+        style: TextStyle(
+          color: Color(0xFF0F7709),
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
