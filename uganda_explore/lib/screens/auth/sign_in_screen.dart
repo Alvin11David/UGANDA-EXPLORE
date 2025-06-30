@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uganda_explore/screens/auth/signup_screen.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -500,15 +501,38 @@ class OrDivider extends StatelessWidget {
 class GoogleSignInButton extends StatelessWidget {
   const GoogleSignInButton({super.key});
 
+  Future<void> _signInWithGoogle(BuildContext context) async {
+  try {
+    final googleSignIn = GoogleSignIn();
+    await googleSignIn.signOut();
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+    if (googleUser == null) return; // User cancelled
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.pushReplacementNamed(context, '/onboarding_screen1');
+  } catch (e) {
+    print('Google sign-in failed: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Google sign-in failed: $e')),
+    );
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
         width: 320,
         child: GestureDetector(
-          onTap: () {
-            // Handle Google sign in
-          },
+          onTap: () => _signInWithGoogle(context),
           child: Container(
             height: 50,
             decoration: ShapeDecoration(
@@ -529,16 +553,16 @@ class GoogleSignInButton extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                  Image(
-                    image: AssetImage('assets/vectors/google.png'),
-                    width: 24,
-                    height: 24,
-                  ),
-                  SizedBox(width: 12),
-                Text(
+                Image(
+                  image: AssetImage('assets/vectors/google.png'),
+                  width: 24,
+                  height: 24,
+                ),
+                const SizedBox(width: 12),
+                const Text(
                   'Sign In With Google',
                   style: TextStyle(
                     color: Colors.black,

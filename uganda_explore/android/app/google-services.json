@@ -12,7 +12,20 @@
           "package_name": "com.example.uganda_explore"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "116601275817-nfopqha2t6jgr26eiv4skvi3clrltfti.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.uganda_explore",
+            "certificate_hash": "582cf93643ea423596e83106c996892dbb6d6d15"
+          }
+        },
+        {
+          "client_id": "116601275817-ipalkriv2jikrv52m2ii6mlbeb5sfhoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBlMhem690sa2rqlfDhCL3-0yVcdTHeWYU"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "116601275817-ipalkriv2jikrv52m2ii6mlbeb5sfhoi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "116601275817-0tuajtsp7dbnbfmft8bk91uk3bo8kdf0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ugandaExplore"
+              }
+            }
+          ]
         }
       }
     }

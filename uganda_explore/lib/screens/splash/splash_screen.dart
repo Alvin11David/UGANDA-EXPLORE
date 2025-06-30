@@ -35,30 +35,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     _logoController.forward();
 
 
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(const Duration(milliseconds: 900), () {
       setState(() {
         ugandaOffset = Offset.zero;
       });
     });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 4), () {
       setState(() {
         ugandaOffset = const Offset(-2, 0);
       });
     });
 
-    Future.delayed(const Duration(milliseconds: 600), () {
+    Future.delayed(const Duration(milliseconds: 900), () {
       setState(() {
         exploreOffset = Offset.zero;
       });
     });
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 4), () {
       setState(() {
         exploreOffset = const Offset(2, 0); 
       });
     });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 7), () {
       Navigator.of(context).pushReplacementNamed('/signin');
     });
   }
@@ -165,18 +165,18 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             ),
             Positioned(
               top: MediaQuery.of(context).size.height/2 + 20,
-              right: 0,
+              right: 4,
               child: AnimatedSlide(
                 offset: exploreOffset,
                 duration: const Duration(milliseconds: 800),
                 curve: Curves.easeInOut,
                 child: Opacity(
-                  opacity: 0.7,
+                  opacity: 0.9,
                 child: Text(
                   "Explore",
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 120,
+                    fontSize: 60,
                     fontWeight: FontWeight.bold,
                     foreground: Paint()
                       ..style = PaintingStyle.stroke
@@ -185,7 +185,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   textAlign: TextAlign.right,
                 )
-                            ),
+              ),
               ),
             ),
             Positioned(
@@ -197,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   "Discover the pearl of Africa in 3D",
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 25,
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
                     color: Colors.white,
                   ),
@@ -219,7 +219,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       "Uganda",
                       style: TextStyle(
                         fontFamily: 'Poppins',
-                        fontSize: 120,
+                        fontSize: 100,
                         fontWeight: FontWeight.bold,
                         foreground: Paint()
                           ..style = PaintingStyle.stroke
@@ -231,7 +231,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       "Uganda",
                       style: TextStyle(
                         fontFamily: "Poppins",
-                        fontSize: 120,
+                        fontSize: 100,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       )
