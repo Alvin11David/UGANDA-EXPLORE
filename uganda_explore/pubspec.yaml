@@ -42,6 +42,11 @@ dependencies:
   google_maps_flutter:
   google_place:
 
+  # Animation
+
+  # Google signin
+  google_sign_in: ^6.2.1
+
   # Location & Permissions
   location: ^5.0.3
   geolocator: 
@@ -57,7 +62,7 @@ dependencies:
   video_player:
 
   # AR support 
-  arcore_flutter_plugin:
+  
 
   #Animations and utilities
   animated_text_kit: 
