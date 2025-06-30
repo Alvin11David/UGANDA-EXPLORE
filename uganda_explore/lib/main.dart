@@ -5,6 +5,7 @@ import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 import 'screens/auth/signup_screen.dart';
+import 'package:uganda_explore/screens/auth/otp_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SignUpScreen(),
+      home: OtpScreen(),
     );
   }
 }
