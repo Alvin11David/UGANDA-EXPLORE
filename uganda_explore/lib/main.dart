@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
-import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
+import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: SignInScreen(),
+      home: ForgotPasswordScreen(),
     );
   }
 }
