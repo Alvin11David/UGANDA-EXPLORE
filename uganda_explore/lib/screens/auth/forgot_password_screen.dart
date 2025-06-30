@@ -66,3 +66,24 @@ Container(
     );
   }
 }
+
+class PasswordResetIcon extends StatelessWidget {
+  const PasswordResetIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF1EF813),
+      ),
+      child: const Icon(
+        Icons.lock_reset,
+        color: Colors.white,
+        size: 40,
+      ),
+    );
+  }
+}
