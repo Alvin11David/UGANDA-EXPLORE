@@ -42,6 +42,24 @@ class ForgotPasswordScreen extends StatelessWidget {
                 color: Colors.black,
               ),
             ),
+            const SizedBox(height: 20),
+Container(
+  width: 490,
+  padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.vertical(
+      top: Radius.circular(40),
+    ),
+  ),
+  child: Column(
+    children: const [
+      SizedBox(height: 30),
+      // Form elements will go here
+    ],
+  ),
+),
+
           ],
         ),
       ),
