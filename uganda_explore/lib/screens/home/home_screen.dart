@@ -197,7 +197,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
-                    width: 400,
+                    width: 390,
                     child: ValueListenableBuilder<bool>(
                       valueListenable: isSearchFocused,
                       builder: (context, focused, child) {
@@ -305,7 +305,7 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 25,),
+          const SizedBox(height: 25),
           Padding(
             padding: EdgeInsets.only(left: 18),
             child: Align(
@@ -338,23 +338,16 @@ class HomeScreen extends StatelessWidget {
                       width: 1,
                     ),
                     gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF000000),
-                      Color(0xFF1FF813),
-                    ],
-                    stops: [0.0, 0.47],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
+                      colors: [Color(0xFF000000), Color(0xFF1FF813)],
+                      stops: [0.0, 0.47],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
                   ),
                   child: Row(
                     children: [
                       const SizedBox(width: 20),
-                      const Icon(
-                        Icons.park,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                      const Icon(Icons.park, color: Colors.white, size: 30),
                       const SizedBox(width: 12),
                       const Text(
                         "Game Parks",
@@ -362,7 +355,7 @@ class HomeScreen extends StatelessWidget {
                           fontFamily: 'Inter',
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -380,9 +373,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                     color: Colors.white,
                   ),
-                   child: Row(
+                  child: Row(
                     children: [
-                      const SizedBox(width: 20,),
+                      const SizedBox(width: 20),
                       const Icon(
                         Icons.beach_access,
                         color: Colors.black,
@@ -397,7 +390,7 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -415,12 +408,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      const SizedBox(width: 20,),
-                      const Icon(
-                        Icons.terrain,
-                        color: Colors.black,
-                        size: 30,
-                      ),
+                      const SizedBox(width: 20),
+                      const Icon(Icons.terrain, color: Colors.black, size: 30),
                       const SizedBox(width: 12),
                       const Text(
                         "Adventure",
@@ -433,7 +422,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  ),
+                ),
               ],
             ),
           ),
@@ -450,10 +439,50 @@ class HomeScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
-              textAlign: TextAlign.start,
+                textAlign: TextAlign.start,
               ),
             ),
           ),
+          const SizedBox(height: 25),
+          Padding(
+            padding: const EdgeInsets.only(right: 290),
+              child: Stack(
+                children: [
+                 ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    'https://abzgfdaafyybodtbhxlp.supabase.co/storage/v1/object/public/images//gorilla.png',
+                    height: 235,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15,),
+                    child: Container(
+                      width: 188,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 0.9,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(20),
+                        bottomRight: Radius.circular(20),
+                      ),
+                      ),
+                    ),
+                  ),
+                ),
+                ],
+              ),
+            ),
         ],
       ),
     );

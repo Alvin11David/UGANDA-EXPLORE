@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/screens/home/home_screen.dart';
 
 class OnboardingScreen3 extends StatelessWidget {
   const OnboardingScreen3({super.key});
@@ -170,7 +171,9 @@ class OnboardingScreen3 extends StatelessWidget {
                           ),
                           child: TextButton(
                             onPressed: () {
-                              // Add navigation or action here
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(builder: (context) => HomeScreen()),
+                              );
                             },
                             style: TextButton.styleFrom(
                               shape: RoundedRectangleBorder(
