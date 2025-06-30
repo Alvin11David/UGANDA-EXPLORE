@@ -87,3 +87,88 @@ class PasswordResetIcon extends StatelessWidget {
     );
   }
 }
+
+class NewPasswordField extends StatefulWidget {
+  const NewPasswordField({super.key});
+
+  @override
+  State<NewPasswordField> createState() => _NewPasswordFieldState();
+}
+
+class _NewPasswordFieldState extends State<NewPasswordField> {
+  bool _isObscured = true;
+  final _controller = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 450,
+      child: TextFormField(
+        controller: _controller,
+        obscureText: _isObscured,
+        decoration: InputDecoration(
+          labelText: 'New Password',
+          suffixIcon: IconButton(
+            icon: Icon(
+              _isObscured ? Icons.visibility_off : Icons.visibility,
+              color: Colors.black54,
+            ),
+            onPressed: () {
+              setState(() {
+                _isObscured = !_isObscured;
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChangePasswordButton extends StatelessWidget {
+  const ChangePasswordButton({super.key});
+
+  void _onPressed(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Success"),
+        content: const Text("Your password has been changed successfully!"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/signin');
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _onPressed(context),
+      child: Container(
+        width: 450,
+        height: 50,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color.fromARGB(255, 47, 44, 44), Color(0xFF1EF813)],
+          ),
+          borderRadius: BorderRadius.circular(30),
+        ),
+        alignment: Alignment.center,
+        child: const Text(
+          'Change Password',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+}
