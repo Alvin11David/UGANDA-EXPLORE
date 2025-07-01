@@ -467,7 +467,7 @@ class HomeScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
-                            blurRadius: 16,
+                            blurRadius: 5,
                             offset: const Offset(0, 8),
                           ),
                         ],
@@ -581,7 +581,7 @@ class HomeScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
-                            blurRadius: 16,
+                            blurRadius: 5,
                             offset: const Offset(0, 8),
                           ),
                         ],
@@ -695,7 +695,7 @@ class HomeScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.5),
-                            blurRadius: 16,
+                            blurRadius: 5,
                             offset: const Offset(0, 8),
                           ),
                         ],
@@ -817,7 +817,7 @@ class HomeScreen extends StatelessWidget {
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.4),
-                          blurRadius: 10,
+                          blurRadius: 5,
                           offset: const Offset(0, 4),
                         ),
                       ],
