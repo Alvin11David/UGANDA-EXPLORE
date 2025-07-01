@@ -22,7 +22,25 @@ class PageNotFoundScreen extends StatelessWidget {
                     color: Colors.black,
                   ),
                 ),
-              )
+              ),
+              Center(
+                child: Card(
+                  margin: EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.green,
+                        child: Icon(
+                          Icons.question_mark,
+                          size: 50,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],),
+                ),
+              ),
               ]
               ),
         );
