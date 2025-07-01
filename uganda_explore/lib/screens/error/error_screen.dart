@@ -36,7 +36,26 @@ class PageNotFoundScreen extends StatelessWidget {
                           Icons.question_mark,
                           size: 50,
                           color: Colors.white,
+                        )
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Oops! Page Not Found',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        'We couldn\'t find the page you were looking for.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle( 
+                          fontSize: 16,
+                          color: Colors.grey[700],
+                          
+                        ),
+
                       ),
                     ],),
                 ),
