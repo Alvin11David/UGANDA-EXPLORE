@@ -102,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                     child: Container(
                       height: 51,
-                      width: 360,
+                      width: 350,
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.3),
                         borderRadius: BorderRadius.circular(30),
@@ -150,7 +150,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                   setState(() {
                                     recentKeywords.insert(0, value.trim());
                                   });
-                                  searchController.clear();
                                 }
                               },
                             ),
@@ -222,25 +221,6 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(right: 10, top: 15),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      recentKeywords.clear();
-                    });
-                  },
-                  child: Text(
-                    "Clear all",
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w300,
-                      fontSize: 13,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 15),
@@ -256,6 +236,342 @@ class _SearchScreenState extends State<SearchScreen> {
                     .toList(),
               ),
             ),
+          ),
+          const SizedBox(height: 15),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: Text(
+                  "Popular Searches",
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+            
+                },
+                child: Container(
+                  height: 50,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    image: const DecorationImage(
+                      image: AssetImage(
+                        'images/waterfall1.png'
+                        ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 25),
+                          child: Icon(
+                            Icons.waterfall_chart,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Waterfall",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 5,
+                                offset: Offset(0,2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ),
+              ),
+            ),
+          const Spacer(),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () {
+              },
+              child: Container(
+                height: 50,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  image: const DecorationImage(
+                    image: AssetImage(
+                      'images/culturalsites.png'
+                      ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 25),
+                        child: Icon(
+                          Icons.museum,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Cultural Sites",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 5,
+                              offset: Offset(0,2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ),
+            ),
+          ),
+            ]
+          ),
+          const SizedBox(height: 25),
+          Row(
+            children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+            
+                },
+                child: Container(
+                  height: 50,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    image: const DecorationImage(
+                      image: AssetImage(
+                        'images/gameparks.png'
+                        ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 25),
+                          child: Icon(
+                            Icons.nature,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Game Parks",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 5,
+                                offset: Offset(0,2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ),
+              ),
+            ),
+            const Spacer(),
+            const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () {
+              },
+              child: Container(
+                height: 50,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  image: const DecorationImage(
+                    image: AssetImage(
+                      'images/forest.png'
+                      ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 45),
+                        child: Icon(
+                          Icons.forest,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Forests",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 5,
+                              offset: Offset(0,2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ),
+            ),
+          ),
+            ]
+          ),
+          const SizedBox(height: 25),
+          Row(
+            children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: GestureDetector(
+                onTap: () {
+            
+                },
+                child: Container(
+                  height: 50,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    image: const DecorationImage(
+                      image: AssetImage(
+                        'images/lakes.png'
+                        ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Row(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(left: 45),
+                          child: Icon(
+                            Icons.water,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Lakes",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white,
+                            shadows: [
+                              Shadow(
+                                color: Colors.black,
+                                blurRadius: 5,
+                                offset: Offset(0,2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                ),
+              ),
+            ),
+            const Spacer(),
+            const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: GestureDetector(
+              onTap: () {
+              },
+              child: Container(
+                height: 50,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  image: const DecorationImage(
+                    image: AssetImage(
+                      'images/wildlife.png'
+                      ),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                child: Row(
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.only(left: 45),
+                        child: Icon(
+                          Icons.pets,
+                          color: Color.fromARGB(255, 255, 255, 255),
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Wildlife",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.white,
+                          shadows: [
+                            Shadow(
+                              color: Colors.black,
+                              blurRadius: 5,
+                              offset: Offset(0,2),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ),
+            ),
+          ),
+            ]
           ),
         ],
       ),
@@ -281,4 +597,3 @@ Widget _buildKeywordChip(String keyword) {
     ),
   );
 }
-
