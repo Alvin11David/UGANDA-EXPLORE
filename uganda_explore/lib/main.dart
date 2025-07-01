@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 import 'package:uganda_explore/screens/home/home_screen.dart';
+import 'package:uganda_explore/screens/profile/profile_screen.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
@@ -49,7 +50,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SplashScreen(),
+      home: ProfileScreen(),
     );
   }
 }
