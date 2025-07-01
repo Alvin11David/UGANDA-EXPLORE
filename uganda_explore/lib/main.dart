@@ -6,7 +6,7 @@ import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
+
 
 
 void main() async {
@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
         // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: SplashScreen(),
+      home: HomeScreen(),
     );
   }
 }
@@ -135,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
