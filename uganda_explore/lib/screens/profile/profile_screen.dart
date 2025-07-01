@@ -100,6 +100,27 @@ class ProfileScreen extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
+                      const SizedBox(height: 32),
+                      Container(
+                        padding: const EdgeInsets.only(left:4, right:4, bottom:0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(40),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 60),
+
+                          ],
+                        )
+                      )
                     ],
                   ),
                 ),
