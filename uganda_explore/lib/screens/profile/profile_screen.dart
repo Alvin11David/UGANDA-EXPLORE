@@ -45,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 Center(
                   child: Column(
                     children: [
@@ -61,7 +61,23 @@ class ProfileScreen extends StatelessWidget {
                               offset: const Offset(0, 4),
                             ),
                           ],
-                          
+                          border: Border.all(
+                            color: Color(0xFF1FF813),
+                            width: 1,
+                          ),
+                        ),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor:  Colors.white,
+                          child: Text(
+                            "j".toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
                         ),
                       ),
                     ],
