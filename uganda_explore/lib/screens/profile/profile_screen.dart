@@ -10,7 +10,7 @@ class ProfileScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            margin:const EdgeInsets.symmetric(horizontal:0, vertical: 0),
+            margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             decoration: BoxDecoration(
               color: const Color(0xFFE5E3D4),
               borderRadius: BorderRadius.circular(40),
@@ -34,7 +34,10 @@ class ProfileScreen extends StatelessWidget {
                         ],
                       ),
                       child: IconButton(
-                        icon: const Icon(Icons.chevron_left, color: Colors.black),
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.black,
+                        ),
                         onPressed: () {
                           //add navigation
                         },
@@ -42,12 +45,33 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
+                const SizedBox(height: 24),
+                Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-            )
-          )
-        )
-      )
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
