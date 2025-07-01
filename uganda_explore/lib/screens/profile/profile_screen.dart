@@ -45,7 +45,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 1),
                 Center(
                   child: Column(
                     children: [
@@ -78,6 +78,26 @@ class ProfileScreen extends StatelessWidget {
                               fontFamily: 'Poppins',
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 1),
+                      const Text(
+                        "John Doe",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.bold,
+                          fontSize:25,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      const Text(
+                        "example.@gmail.com",
+                        style: TextStyle(
+                          fontFamily: "Poppins",
+                          fontWeight: FontWeight.w500,
+                          fontSize: 20,
+                          color: Colors.black,
                         ),
                       ),
                     ],
