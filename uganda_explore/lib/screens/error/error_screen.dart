@@ -53,7 +53,7 @@ class PageNotFoundScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      // Placeholder for NotFoundIcon (to be added in Part 4)
+                      NotFoundIcon(),
                       SizedBox(height: 30),
                       Text(
                         "Oops! Place Not\nFound",
@@ -77,7 +77,7 @@ class PageNotFoundScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 40),
-                      // Placeholder for buttons (to be added in Part 5–6)
+                      // Buttons will be added in Part 5–6
                     ],
                   ),
                 ),
@@ -99,6 +99,27 @@ class WiFiOffIcon extends StatelessWidget {
       Icons.wifi_off,
       color: Colors.black,
       size: 120,
+    );
+  }
+}
+
+class NotFoundIcon extends StatelessWidget {
+  const NotFoundIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF1EF813),
+      ),
+      child: const Icon(
+        Icons.help_outline,
+        color: Colors.white,
+        size: 40,
+      ),
     );
   }
 }
