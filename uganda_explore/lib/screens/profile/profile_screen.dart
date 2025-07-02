@@ -145,6 +145,14 @@ class ProfileScreen extends StatelessWidget {
                               
                             },
                           ),
+                          const SizedBox(height: 12),
+                          _ProfileOptionButton(
+                            icon: Icons.logout,
+                            label: 'Logout',
+                            onTap: () {
+                              //Handle Logout tap here
+                            },
+                          )
                         ],
                       ),
                     ),
