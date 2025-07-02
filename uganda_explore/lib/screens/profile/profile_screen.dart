@@ -137,6 +137,14 @@ class ProfileScreen extends StatelessWidget {
                               //Handle terms & privacy tap here
                             },
                           ),
+                          const SizedBox(height: 12),
+                          _ProfileOptionButton(
+                            icon: Icons.share,
+                            label: 'Share App',
+                            onTap:() {
+                              
+                            },
+                          ),
                         ],
                       ),
                     ),
