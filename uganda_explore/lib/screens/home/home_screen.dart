@@ -51,12 +51,12 @@ class HomeScreen extends StatelessWidget {
                   ),
                   // Logo
                   Positioned(
-                    top: 20,
+                    top: 35,
                     left: 0,
                     right: 0,
                     child: Center(
                       child: Image.asset(
-                        'logo/blackugandaexplore.png',
+                        'assets/logo/blackugandaexplore.png',
                         height: 60,
                         fit: BoxFit.contain,
                       ),
@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   // Location
                   Positioned(
-                    top: 80,
+                    top: 95,
                     left: 4,
                     child: Row(
                       children: [
@@ -130,7 +130,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   // Weather
                   Positioned(
-                    top: 80,
+                    top: 95,
                     right: 4,
                     child: Row(
                       children: [
@@ -210,7 +210,7 @@ class HomeScreen extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(
-                          width: 390,
+                          width: 250,
                           child: ValueListenableBuilder<bool>(
                             valueListenable: isSearchFocused,
                             builder: (context, focused, child) {
@@ -719,7 +719,7 @@ class HomeScreen extends StatelessWidget {
                         child: Stack(
                           children: [
                             Image.asset(
-                              'images/mount.png',
+                              'assets/images/mount.png',
                               height: 250,
                               width: 220,
                               fit: BoxFit.cover,
@@ -854,7 +854,7 @@ class HomeScreen extends StatelessWidget {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: Container(
-                    width: 400,
+                    width: 330,
                     height: 61,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),

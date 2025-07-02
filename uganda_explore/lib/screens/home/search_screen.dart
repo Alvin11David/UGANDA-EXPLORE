@@ -40,7 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 30),
             Center(
               child: Image.asset(
                 'assets/logo/blackugandaexplore.png',
@@ -93,7 +93,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 1),
                 Padding(
                   padding: EdgeInsets.only(left: 10),
                   child: ClipRRect(
@@ -102,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                       child: Container(
                         height: 51,
-                        width: 350,
+                        width: 220,
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.3),
                           borderRadius: BorderRadius.circular(30),
@@ -160,7 +160,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 1),
                 GestureDetector(
                   onTapDown: (_) => setState(() => isFilterFocused = true),
                   onTapUp: (_) => setState(() => isFilterFocused = false),
@@ -283,11 +283,11 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/waterfall1.png'),
+                          image: AssetImage('assets/images/waterfall1.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -326,23 +326,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 const Spacer(),
                 const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/culturalsites.png'),
+                          image: AssetImage('assets/images/culturalsites.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(left: 18),
                             child: Icon(
                               Icons.museum,
                               color: Colors.white,
@@ -351,7 +351,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10),
                           const Text(
-                            "Cultural Sites",
+                            "Cultural",
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
@@ -382,18 +382,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/gameparks.png'),
+                          image: AssetImage('assets/images/gameparks.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(left: 5),
                             child: Icon(
                               Icons.nature,
                               color: Colors.white,
@@ -402,7 +402,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                           const SizedBox(width: 10),
                           const Text(
-                            "Game Parks",
+                            "GameParks",
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
@@ -425,23 +425,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 const Spacer(),
                 const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/forest.png'),
+                          image: AssetImage('assets/images/forest.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 45),
+                            padding: EdgeInsets.only(left: 25),
                             child: Icon(
                               Icons.forest,
                               color: Colors.white,
@@ -481,18 +481,18 @@ class _SearchScreenState extends State<SearchScreen> {
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/lakes.png'),
+                          image: AssetImage('assets/images/lakes.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 45),
+                            padding: EdgeInsets.only(left: 25),
                             child: Icon(
                               Icons.water,
                               color: Colors.white,
@@ -524,23 +524,23 @@ class _SearchScreenState extends State<SearchScreen> {
                 const Spacer(),
                 const SizedBox(height: 20),
                 Padding(
-                  padding: const EdgeInsets.only(right: 20),
+                  padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
                     onTap: () {},
                     child: Container(
                       height: 50,
-                      width: 180,
+                      width: 150,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(30),
                         image: const DecorationImage(
-                          image: AssetImage('images/wildlife.png'),
+                          image: AssetImage('assets/images/wildlife.png'),
                           fit: BoxFit.cover,
                         ),
                       ),
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 45),
+                            padding: EdgeInsets.only(left: 25),
                             child: Icon(
                               Icons.pets,
                               color: Color.fromARGB(255, 255, 255, 255),
