@@ -128,7 +128,15 @@ class ProfileScreen extends StatelessWidget {
                             onTap:() {
                               //Handle app theme tap here
                             },
-                          )
+                          ),
+                          const SizedBox(height: 12),
+                          _ProfileOptionButton(
+                            icon: Icons.description,
+                            label: 'Terms & Privacy',
+                            onTap: () {
+                              //Handle terms & privacy tap here
+                            },
+                          ),
                         ],
                       ),
                     ),
