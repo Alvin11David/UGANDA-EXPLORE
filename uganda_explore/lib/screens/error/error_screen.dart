@@ -35,7 +35,7 @@ class PageNotFoundScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 40),
-                // Placeholder for WiFiOffIcon (to be added later)
+                const WiFiOffIcon(),
                 const SizedBox(height: 40),
                 Container(
                   width: double.infinity,
@@ -53,7 +53,7 @@ class PageNotFoundScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      // Placeholder for NotFoundIcon (to be added later)
+                      // Placeholder for NotFoundIcon (to be added in Part 4)
                       SizedBox(height: 30),
                       Text(
                         "Oops! Place Not\nFound",
@@ -77,7 +77,7 @@ class PageNotFoundScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 40),
-                      // Placeholder for buttons (to be added later)
+                      // Placeholder for buttons (to be added in Part 5–6)
                     ],
                   ),
                 ),
@@ -86,6 +86,19 @@ class PageNotFoundScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class WiFiOffIcon extends StatelessWidget {
+  const WiFiOffIcon({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(
+      Icons.wifi_off,
+      color: Colors.black,
+      size: 120,
     );
   }
 }
