@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -89,32 +90,51 @@ class ProfileScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(40),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      _ProfileOptionButton(
-                        icon: Icons.person,
-                        label: 'Edit Profile',
-                        onTap: () {
-                          //Handle edit profile tap here
-                        },
+                      child: Column(
+                        children: [
+                          _ProfileOptionButton(
+                            icon: Icons.person,
+                            label: 'Edit Profile',
+                            onTap: () {
+                              // Handle edit profile tap here
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          _ProfileOptionButton(
+                            icon: Icons.brightness_6,
+                            label: 'App Theme',
+                            onTap:() {
+                              //Handle app theme tap here
+                            },
+                          )
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
+                const SizedBox(height: 30),
               ],
             ),
           ),
@@ -123,3 +143,55 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
+class _ProfileOptionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _ProfileOptionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Container(
+            height: 59,
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.22),
+              border: Border.all(color: Color(0xFF1FF813).withOpacity(0.7), width: 1),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.black),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontFamily: 'Poppins'
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: Colors.black),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}  
