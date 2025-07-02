@@ -77,7 +77,14 @@ class PageNotFoundScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 40),
-                      // Buttons will be added in Part 5–6
+                      Row(
+                        children: [
+                          Expanded(child: HomeButton()),
+                          SizedBox(width: 16),
+                          Expanded(child: ReloadButton()),
+                        ],
+                      ),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -119,6 +126,88 @@ class NotFoundIcon extends StatelessWidget {
         Icons.help_outline,
         color: Colors.white,
         size: 40,
+      ),
+    );
+  }
+}
+
+class HomeButton extends StatelessWidget {
+  const HomeButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: ShapeDecoration(
+        color: const Color(0xFF1EF813),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        shadows: const [
+          BoxShadow(
+            color: Color(0x3F000000),
+            blurRadius: 4,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.home, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            'Home',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ReloadButton extends StatelessWidget {
+  const ReloadButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: ShapeDecoration(
+        color: const Color(0xFF0F7709),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        shadows: const [
+          BoxShadow(
+            color: Color(0x3F000000),
+            blurRadius: 4,
+            offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.refresh, color: Colors.white, size: 20),
+          SizedBox(width: 8),
+          Text(
+            'Reload',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
