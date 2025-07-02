@@ -5,122 +5,113 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String email = 'john.doe@email.com';
+    final String name = 'John Doe';
+
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
             decoration: BoxDecoration(
-              color: const Color(0xFFE5E3D4),
+              color: const Color(0xFFEFE9DE),
               borderRadius: BorderRadius.circular(40),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_left, color: Colors.black),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF1FF813),
+                        width: 3,
                       ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.chevron_left,
-                          color: Colors.black,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        onPressed: () {
-                          //add navigation
-                        },
+                      ],
+                      color: Colors.white,
+                    ),
+                    child: CircleAvatar(
+                      radius: 56,
+                      backgroundColor: Colors.white,
+                      backgroundImage: null,
+                      child: Text(
+                        email[0].toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 36,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-                const SizedBox(height: 1),
-                Center(
+                const SizedBox(height: 20),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  email,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 30),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2)
+                      ),
+                    ],
+                  ),
                   child: Column(
                     children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                          border: Border.all(
-                            color: Color(0xFF1FF813),
-                            width: 1,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor:  Colors.white,
-                          child: Text(
-                            "j".toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                        ),
+                      _ProfileOptionButton(
+                        icon: Icons.person,
+                        label: 'Edit Profile',
+                        onTap: () {
+                          //Handle edit profile tap here
+                        },
                       ),
-                      const SizedBox(height: 1),
-                      const Text(
-                        "John Doe",
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.bold,
-                          fontSize:25,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      const Text(
-                        "example.@gmail.com",
-                        style: TextStyle(
-                          fontFamily: "Poppins",
-                          fontWeight: FontWeight.w500,
-                          fontSize: 20,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      Container(
-                        padding: const EdgeInsets.only(left:4, right:4, bottom:0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(40),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 60),
-
-                          ],
-                        )
-                      )
                     ],
                   ),
                 ),
