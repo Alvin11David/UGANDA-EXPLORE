@@ -52,10 +52,10 @@ class PageNotFoundScreen extends StatelessWidget {
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      NotFoundIcon(),
-                      SizedBox(height: 30),
-                      Text(
+                    children: [
+                      const NotFoundIcon(),
+                      const SizedBox(height: 30),
+                      const Text(
                         "Oops! Place Not\nFound",
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -65,8 +65,8 @@ class PageNotFoundScreen extends StatelessWidget {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Text(
+                      const SizedBox(height: 20),
+                      const Text(
                         "We couldn't find what you are looking for.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -76,15 +76,15 @@ class PageNotFoundScreen extends StatelessWidget {
                           fontFamily: 'Poppins',
                         ),
                       ),
-                      SizedBox(height: 40),
+                      const SizedBox(height: 40),
                       Row(
-                        children: [
+                        children: const [
                           Expanded(child: HomeButton()),
                           SizedBox(width: 16),
                           Expanded(child: ReloadButton()),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -134,39 +134,50 @@ class NotFoundIcon extends StatelessWidget {
 class HomeButton extends StatelessWidget {
   const HomeButton({super.key});
 
+  void _onHomePressed(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      decoration: ShapeDecoration(
-        color: const Color(0xFF1EF813),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 4,
-            offset: Offset(0, 4),
-            spreadRadius: 0,
+    return GestureDetector(
+      onTap: () => _onHomePressed(context),
+      child: Container(
+        height: 50,
+        decoration: ShapeDecoration(
+          color: const Color(0xFF1EF813),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
-        ],
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.home, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Text(
-            'Home',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
+          shadows: const [
+            BoxShadow(
+              color: Color(0x3F000000),
+              blurRadius: 4,
+              offset: Offset(0, 4),
+              spreadRadius: 0,
             ),
-          ),
-        ],
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.home,
+              color: Colors.white,
+              size: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Home',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -175,39 +186,55 @@ class HomeButton extends StatelessWidget {
 class ReloadButton extends StatelessWidget {
   const ReloadButton({super.key});
 
+  void _onReloadPressed(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Reloading...'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      decoration: ShapeDecoration(
-        color: const Color(0xFF0F7709),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x3F000000),
-            blurRadius: 4,
-            offset: Offset(0, 4),
-            spreadRadius: 0,
+    return GestureDetector(
+      onTap: () => _onReloadPressed(context),
+      child: Container(
+        height: 50,
+        decoration: ShapeDecoration(
+          color: const Color(0xFF0F7709),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
-        ],
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.refresh, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Text(
-            'Reload',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
+          shadows: const [
+            BoxShadow(
+              color: Color(0x3F000000),
+              blurRadius: 4,
+              offset: Offset(0, 4),
+              spreadRadius: 0,
             ),
-          ),
-        ],
+          ],
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.refresh,
+              color: Colors.white,
+              size: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Reload',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
