@@ -18,32 +18,50 @@ class ForgotPasswordScreen extends StatelessWidget {
             stops: [0.03, 0.63],
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.only(top: 30),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Image.asset(
-                  "assets/logo/whiteugandaexplore.png",
-                  height: 80,
-                  fit: BoxFit.contain,
-                ),
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(top: 30),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Image.asset(
+                      "assets/logo/whiteugandaexplore.png",
+                      height: 80,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Let's get you\n sorted",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Let's get you\n sorted",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+            ),
+            const SizedBox(height: 20),
+            Positioned(
+              left: 4,
+              right: 4,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
                   color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
+                height: 450,
+                width: double.infinity,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
