@@ -130,31 +130,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _ProfileOptionButton(
                             icon: Icons.person,
                             label: 'Edit Profile',
-                            onTap: () {},
+                            onTap: () => print("Edit Profile tapped"),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.brightness_6,
                             label: 'App Theme',
-                            onTap: () {},
+                            onTap: () => print("App Theme tapped"),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () {},
+                            onTap: () => print("Terms & Privacy tapped"),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.share,
                             label: 'Share App',
-                            onTap: () {},
+                            onTap: () => print("Share App tapped"),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.logout,
                             label: 'Logout',
-                            onTap: () {},
+                            onTap: () => print("Logout tapped"),
                           ),
                         ],
                       ),
@@ -186,11 +186,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _NavIcon(icon: Icons.home, selected: _selectedIndex == 0, onTap: () => _onItemTapped(0)),
-                  _NavIcon(icon: Icons.person, selected: _selectedIndex == 1, label: 'Profile', onTap: () => _onItemTapped(1)),
-                  _NavIcon(icon: Icons.settings, selected: _selectedIndex == 2, onTap: () => _onItemTapped(2)),
-                  _NavIcon(icon: Icons.notifications, selected: _selectedIndex == 3, onTap: () => _onItemTapped(3)),
-                  _NavIcon(icon: Icons.map, selected: _selectedIndex == 4, onTap: () => _onItemTapped(4)),
+                  _NavIcon(
+                    icon: Icons.home,
+                    label: 'Home',
+                    selected: _selectedIndex == 0,
+                    onTap: () => _onItemTapped(0),
+                  ),
+                  _NavIcon(
+                    icon: Icons.person,
+                    label: 'Profile',
+                    selected: _selectedIndex == 1,
+                    onTap: () => _onItemTapped(1),
+                  ),
+                  _NavIcon(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
+                  ),
+                  _NavIcon(
+                    icon: Icons.notifications,
+                    label: 'Alerts',
+                    selected: _selectedIndex == 3,
+                    onTap: () => _onItemTapped(3),
+                  ),
+                  _NavIcon(
+                    icon: Icons.map,
+                    label: 'Map',
+                    selected: _selectedIndex == 4,
+                    onTap: () => _onItemTapped(4),
+                  ),
                 ],
               ),
             ),
@@ -203,14 +228,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class _NavIcon extends StatelessWidget {
   final IconData icon;
+  final String label;
   final bool selected;
-  final String? label;
   final VoidCallback onTap;
 
   const _NavIcon({
     required this.icon,
-    this.selected = false,
-    this.label,
+    required this.label,
+    required this.selected,
     required this.onTap,
   });
 
@@ -218,7 +243,8 @@ class _NavIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: selected ? const Color(0xFF1FF813) : Colors.white,
@@ -227,12 +253,12 @@ class _NavIcon extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
-            if (label != null) ...[
+            if (selected) ...[
               const SizedBox(width: 6),
               Text(
-                label!,
-                style: TextStyle(
-                  color: selected ? Colors.white : Colors.black,
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
               ),
