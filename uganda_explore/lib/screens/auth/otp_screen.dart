@@ -11,7 +11,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(
     4, (_) => TextEditingController());
-    
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +24,7 @@ class _OtpScreenState extends State<OtpScreen> {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
+              Color(0xFF235347),
             ],
             stops: [0.03, 0.63],
           ),
@@ -32,16 +32,16 @@ class _OtpScreenState extends State<OtpScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Center(
                 child: Image.asset(
-                  'logo/ugandaexplore.png',
+                  'assets/logo/ugandaexplore.png',
                   width: 268,
                   height: 60,
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 25),
               const Text(
                 "Let’s get you \nsorted!",
                 style: TextStyle(
@@ -52,7 +52,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                 child: Container(

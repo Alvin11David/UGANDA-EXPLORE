@@ -44,7 +44,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 30),
+              padding: const EdgeInsets.only(top: 40),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
@@ -53,16 +53,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Image.asset(
                       "assets/logo/whiteugandaexplore.png",
                       height: 80,
+                      width: 330,
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 40),
                   const Text(
                     "Let's get you\nsorted!",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 30,
+                      fontSize: 45,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -139,7 +140,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         "Please enter your email address below\n to receive an OTP code.",
                         style: const TextStyle(
                           fontFamily: 'Poppins',
-                          fontWeight: FontWeight.w300,
+                          fontWeight: FontWeight.w400,
                           fontSize: 18,
                           color: Colors.black,
                         ),
