@@ -42,6 +42,7 @@ Widget build(BuildContext context) {
         'You have successfully completed your profile',
         style: TextStyle(
           fontFamily: 'Poppins',
+          fontWeight: FontWeight.w500, // Medium weight
           
     
         ),
