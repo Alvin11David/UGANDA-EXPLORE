@@ -156,7 +156,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                 radius: 1.0,
                                 colors: [
                                   Color(0xFF0C0F0A),
-                                  Color(0xFF1EF813),
+                                  Color.fromARGB(255, 16, 164, 8),
                                 ],
                                 stops: [0.03, 0.63],
                               ),
@@ -229,35 +229,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          4,
-                          (index) => Container(
-                            width: 48,
-                            height: 60,
-                            margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Color(0xFF1FF813),
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '',
-                              style: const TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                      _buildOtpFields(),
                       const SizedBox(height: 32),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
