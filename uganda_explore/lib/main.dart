@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
+import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
