@@ -35,7 +35,7 @@ class _OtpScreenState extends State<OtpScreen> {
               const SizedBox(height: 40),
               Center(
                 child: Image.asset(
-                  'assets/logo/ugandaexplore.png',
+                  'assets/logo/whiteugandaexplore.png',
                   width: 268,
                   height: 60,
                   fit: BoxFit.contain,
@@ -48,7 +48,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   fontFamily: 'Poppins',
                   fontSize: 38,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
