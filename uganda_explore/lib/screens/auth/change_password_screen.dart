@@ -409,17 +409,26 @@ class BackToSignInLink extends StatelessWidget {
     return Center(
       child: GestureDetector(
         onTap: () {
-          Navigator.pop(context); // Go back to sign in screen
+          Navigator.pushReplacementNamed(context, '/signin');
         },
-        child: const Text(
-          'Back to Sign In',
-          style: TextStyle(
-            color: Color(0xFF0F7709),
-            fontSize: 16,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w600,
+        child: RichText(
+          text: TextSpan(
+            style: const TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+            children: [
+              const TextSpan(
+                text: "Back to ",
+                style: TextStyle(color: Colors.black),
+              ),
+              const TextSpan(
+                text: "Sign In",
+                style: TextStyle(color: Color(0xFF0F7709)),
+              ),
+            ],
           ),
-          textAlign: TextAlign.center,
         ),
       ),
     );
