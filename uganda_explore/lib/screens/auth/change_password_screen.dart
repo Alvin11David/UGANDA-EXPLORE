@@ -150,7 +150,7 @@ class _NewPasswordFieldState extends State<NewPasswordField> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 320, 
         child: TextFormField(
           controller: _passwordController,
           obscureText: _isObscured,
@@ -247,7 +247,7 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450, 
+        width: 320, 
         child: TextFormField(
           controller: _confirmPasswordController,
           obscureText: _isObscured,
@@ -354,7 +354,7 @@ class ChangePasswordButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        width: 450,
+        width: 320,
         child: GestureDetector(
           onTap: () => _onChangePasswordPressed(context),
           child: Container(
