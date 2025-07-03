@@ -345,7 +345,7 @@ class ForgotPasswordLink extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: GestureDetector(
         onTap: () {
-          // Handle forgot password
+          Navigator.pushNamed(context, '/forgot_password');
         },
         child: const Text(
           'Forgot Password?',

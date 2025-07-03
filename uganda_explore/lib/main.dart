@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
         // '/error': (context) => const ErrorScreen()
       },
       // Set the initial screen you want to load
-      home: const ForgotPasswordScreen(), // Change to SplashScreen(), SignInScreen(), etc. as needed
+      home: const OtpScreen(email: '', otp: ''), // Change to SplashScreen(), SignInScreen(), etc. as needed
     );
   }
 }
