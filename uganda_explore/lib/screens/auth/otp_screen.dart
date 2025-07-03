@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
-class OtpScreen extends StatelessWidget {
+class OtpScreen extends StatefulWidget {
   final String email;
   const OtpScreen({super.key, required this.email});
 
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
+  final List<TextEditingController> _otpControllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +142,7 @@ class OtpScreen extends StatelessWidget {
                             children: [
                               const TextSpan(text: "Please enter the 4-digit code sent to "),
                               TextSpan(
-                                text: email,
+                                text: widget.email,
                                 style: const TextStyle(
                                   color: Color(0xFF078B00),
                                   fontWeight: FontWeight.w500,
