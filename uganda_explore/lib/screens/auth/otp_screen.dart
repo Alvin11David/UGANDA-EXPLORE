@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -46,6 +49,66 @@ class _OtpScreenState extends State<OtpScreen> {
       });
     }
   }
+
+  Future<void> _resendOtp() async {
+  setState(() {
+    _errorText = null;
+  });
+
+  final newOtp = (1000 + (9999 * (new DateTime.now().millisecondsSinceEpoch % 10000) / 10000)).floor().toString();
+
+  // Optionally show loading indicator
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final response = await http.post(
+      Uri.parse("https://api.emailjs.com/api/v1.0/email/send"),
+      headers: {
+        'origin': 'http://localhost',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'service_id': 'Uganda_Explore',
+        'template_id': 'template_b6hthi8',
+        'user_id': 'r1x2A2YyfHtXLLHR0', // This is the public key from EmailJS
+        'template_params': {
+          'email': widget.email,
+          'otp': newOtp,
+        },
+      }),
+    );
+
+    Navigator.of(context).pop(); // Remove the loading indicator
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _errorText = null;
+        // Replace old OTP with new OTP
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OtpScreen(email: widget.email, otp: newOtp),
+          ),
+        );
+      });
+    } else {
+      setState(() {
+        _errorText = 'Failed to send OTP. Try again.';
+      });
+    }
+  } catch (e) {
+    Navigator.of(context).pop(); // Remove loading
+    setState(() {
+      _errorText = 'An error occurred. Please try again.';
+    });
+  }
+}
+
+  
 
   Widget _buildOtpFields() {
     return Row(
@@ -278,9 +341,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           ),
                           const SizedBox(width: 10),
                           TextButton(
-                            onPressed: () {
-                              // TODO: Add resend logic
-                            },
+                            onPressed: _resendOtp,
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF078800),
                               padding: EdgeInsets.zero,

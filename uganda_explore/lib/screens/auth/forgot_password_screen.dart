@@ -14,13 +14,13 @@ class ForgotPasswordScreen extends StatefulWidget {
   class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     String generateOtp() {
     final random = Random();
-    return (random.nextInt(9000) + 1000).toString(); // generates 1000-9999
+    return (random.nextInt(9000) + 1000).toString(); 
   }
 
 Future<bool> sendOtpEmail({required String email, required String otp}) async {
   const serviceId = 'Uganda_Explore';      // your EmailJS service ID
   const templateId = 'template_b6hthi8';        // your EmailJS OTP template ID
-  const userId = 'r1x2A2YyfHtXLLHR0';        // EmailJS public key (e.g. VXXkS_WO9...)
+  const userId = 'r1x2A2YyfHtXLLHR0';        // EmailJS public key 
 
   final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
 
