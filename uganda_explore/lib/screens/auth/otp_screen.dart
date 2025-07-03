@@ -399,7 +399,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       const SizedBox(height: 32),
                       GestureDetector(
                         onTap: () {
-                          // TODO: Navigate to sign in screen
+                          Navigator.pushReplacementNamed(context, '/signin');
                         },
                         child: RichText(
                           text: TextSpan(
