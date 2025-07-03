@@ -37,6 +37,8 @@ Widget build(BuildContext context) {
           color: Color(0xFFFFFFFF),
         ),
       ),
+      const SizedBox(height: 10), 
+      const Text(
     ],
   ),
 ),
