@@ -43,6 +43,7 @@ Widget build(BuildContext context) {
         style: TextStyle(
           fontFamily: 'Poppins',
           fontWeight: FontWeight.w500, // Medium weight
+          fontSize: 16,
           
     
         ),
