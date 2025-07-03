@@ -41,6 +41,8 @@ Widget build(BuildContext context) {
       const Text(
         'You have successfully completed your profile',
         style: TextStyle(
+          fontFamily: 'Poppins',
+          
     
         ),
       ),
