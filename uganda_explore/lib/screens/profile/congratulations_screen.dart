@@ -39,6 +39,11 @@ Widget build(BuildContext context) {
       ),
       const SizedBox(height: 10), 
       const Text(
+        'You have successfully completed your profile',
+        style: TextStyle(
+    
+        ),
+      ),
     ],
   ),
 ),
