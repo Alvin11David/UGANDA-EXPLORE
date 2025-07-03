@@ -10,9 +10,8 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(
-    4,
-    (_) => TextEditingController(),
-  );
+    4, (_) => TextEditingController());
+    
   @override
   Widget build(BuildContext context) {
     return Scaffold(

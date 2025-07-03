@@ -124,14 +124,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.bold,
-                          fontSize: 28,
+                          fontSize: 25,
                           color: Colors.black,
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: 190,
+                    top: 180,
                     left: 0,
                     right: 0,
                     child: Center(
@@ -140,7 +140,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: FontWeight.w300,
-                          fontSize: 20,
+                          fontSize: 18,
                           color: Colors.black,
                         ),
                         textAlign: TextAlign.center,
