@@ -11,12 +11,12 @@ import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
+
 
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_screen.dart';
-// import 'package:uganda_explore/screens/error/error_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         '/onboarding_screen2': (context) => const OnboardingScreen2(),
         '/onboarding_screen3': (context) => const OnboardingScreen3(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
-        '/otp': (context) => const OtpScreen(email: ''), // Provide a default or actual email value here
+        '/otp': (context) => const OtpScreen(email: '', otp: ''), // Provide a default or actual email value here
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
         // '/error': (context) => const ErrorScreen()

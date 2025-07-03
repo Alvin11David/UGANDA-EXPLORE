@@ -43,7 +43,7 @@ class _SignInScreenState extends State<SignInScreen> {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
+              Color(0xFF235347),
             ],
             stops: [0.03, 0.63],
           ),

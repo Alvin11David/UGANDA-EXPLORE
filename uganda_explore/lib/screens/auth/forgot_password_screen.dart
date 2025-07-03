@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 
@@ -8,26 +11,79 @@ class ForgotPasswordScreen extends StatefulWidget {
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+    String generateOtp() {
+    final random = Random();
+    return (random.nextInt(9000) + 1000).toString(); // generates 1000-9999
+  }
+
+Future<bool> sendOtpEmail({required String email, required String otp}) async {
+  const serviceId = 'Uganda_Explore';      // your EmailJS service ID
+  const templateId = 'template_b6hthi8';        // your EmailJS OTP template ID
+  const userId = 'r1x2A2YyfHtXLLHR0';        // EmailJS public key (e.g. VXXkS_WO9...)
+
+  final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+
+  final response = await http.post(
+    url,
+    headers: {
+      'origin': 'http://localhost',
+      'Content-Type': 'application/json',
+    },
+    body: json.encode({
+      'service_id': serviceId,
+      'template_id': templateId,
+      'user_id': userId,
+      'template_params': {
+        'email': email,
+        'otp': otp,
+      },
+    }),
+  );
+
+  print('STATUS: ${response.statusCode}');
+  print('BODY: ${response.body}');
+
+  return response.statusCode == 200;
+}
+
+
+
+
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   void _signUp() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() {
-      _isLoading = true;
-    });
-    // Simulate a network call
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _isLoading = false;
-    });
+  if (!_formKey.currentState!.validate()) return;
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  final email = emailController.text.trim();
+  final otp = generateOtp();
+
+  final emailSent = await sendOtpEmail(email: email, otp: otp);
+
+  setState(() {
+    _isLoading = false;
+  });
+
+  if (emailSent) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => OtpScreen(email: emailController.text.trim(),)),
+      MaterialPageRoute(
+        builder: (context) => OtpScreen(email: email, otp: otp),
+      ),
+    );
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to send OTP email. Please try again.')),
     );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

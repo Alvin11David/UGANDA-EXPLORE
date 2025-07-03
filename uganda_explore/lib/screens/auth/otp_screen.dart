@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String email;
-  const OtpScreen({super.key, required this.email});
+  final String otp;
+
+  const OtpScreen({Key? key, required this.email, required this.otp}) : super(key: key);
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -12,9 +15,11 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(
     4, (_) => TextEditingController());
-    final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
-    @override
+  String? _errorText;
+
+  @override
   void dispose() {
     for (final c in _otpControllers) {
       c.dispose();
@@ -23,6 +28,23 @@ class _OtpScreenState extends State<OtpScreen> {
       f.dispose();
     }
     super.dispose();
+  }
+
+  void _verifyOtp() {
+    final enteredOtp = _otpControllers.map((c) => c.text).join();
+    if (enteredOtp == widget.otp) {
+      // OTP is correct, navigate to Change Password screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangePasswordScreen(email: widget.email),
+        ),
+      );
+    } else {
+      setState(() {
+        _errorText = "Invalid code. Please try again.";
+      });
+    }
   }
 
   Widget _buildOtpFields() {
@@ -230,6 +252,13 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                       const SizedBox(height: 24),
                       _buildOtpFields(),
+                      if (_errorText != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorText!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
                       const SizedBox(height: 32),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -263,7 +292,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
-                                fontSize: 16,
+                                fontSize: 20,
                                 color: Color(0xFF078800),
                               ),
                             ),
@@ -274,9 +303,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: GestureDetector(
-                          onTap: () {
-                            // TODO: Add verify logic
-                          },
+                          onTap: _verifyOtp,
                           child: SizedBox(
                             width: 323,
                             height: 56,
@@ -348,4 +375,4 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
     );
   }
-}    
+}

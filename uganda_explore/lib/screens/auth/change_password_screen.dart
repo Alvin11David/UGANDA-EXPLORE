@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
-  const ChangePasswordScreen({super.key});
+   final String email;
+    const ChangePasswordScreen({Key? key, required this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

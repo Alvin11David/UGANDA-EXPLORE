@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1FF813),
+              Color(0xFF235347),
             ],
             stops: [
               0.03,
