@@ -21,6 +21,7 @@ class _OtpScreenState extends State<OtpScreen> {
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   String? _errorText;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -33,10 +34,16 @@ class _OtpScreenState extends State<OtpScreen> {
     super.dispose();
   }
 
-  void _verifyOtp() {
+  void _verifyOtp() async {
+    setState(() {
+      _isLoading = true; // 2. Start loading
+    });
     final enteredOtp = _otpControllers.map((c) => c.text).join();
+    await Future.delayed(const Duration(milliseconds: 500)); // Optional: simulate delay
     if (enteredOtp == widget.otp) {
-      // OTP is correct, navigate to Change Password screen
+      setState(() {
+        _isLoading = false;
+      });
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -45,6 +52,7 @@ class _OtpScreenState extends State<OtpScreen> {
       );
     } else {
       setState(() {
+        _isLoading = false; // 2. Stop loading on error
         _errorText = "Invalid code. Please try again.";
       });
     }
@@ -364,11 +372,12 @@ class _OtpScreenState extends State<OtpScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: GestureDetector(
-                          onTap: _verifyOtp,
+                          onTap: _isLoading ? null : _verifyOtp,
                           child: SizedBox(
                             width: 323,
                             height: 56,
                             child: Container(
+                              alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
                                 gradient: const LinearGradient(
