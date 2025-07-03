@@ -57,7 +57,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: const Color(0xFF1FF813),
-                        width: 3,
+                        width: 1,
                       ),
                       boxShadow: [
                         BoxShadow(
@@ -206,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   _NavIcon(
                     icon: Icons.notifications,
-                    label: 'Alerts',
+                    label: 'Notifications',
                     selected: _selectedIndex == 3,
                     onTap: () => _onItemTapped(3),
                   ),
