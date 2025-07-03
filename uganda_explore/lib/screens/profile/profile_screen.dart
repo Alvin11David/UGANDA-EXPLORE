@@ -117,42 +117,32 @@ class ProfileScreen extends StatelessWidget {
                           _ProfileOptionButton(
                             icon: Icons.person,
                             label: 'Edit Profile',
-                            onTap: () {
-                              // Handle edit profile tap here
-                            },
+                            onTap: () {},
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.brightness_6,
                             label: 'App Theme',
-                            onTap:() {
-                              //Handle app theme tap here
-                            },
+                            onTap: () {},
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () {
-                              //Handle terms & privacy tap here
-                            },
+                            onTap: () {},
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.share,
                             label: 'Share App',
-                            onTap:() {
-                              
-                            },
+                            onTap: () {},
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
                             icon: Icons.logout,
                             label: 'Logout',
-                            onTap: () {
-                              //Handle Logout tap here
-                            },
-                          )
+                            onTap: () {},
+                          ),
                         ],
                       ),
                     ),
@@ -163,6 +153,74 @@ class ProfileScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavIcon(icon: Icons.home, selected: false),
+                  _NavIcon(icon: Icons.person, selected: true, label: 'Profile'),
+                  _NavIcon(icon: Icons.settings, selected: false),
+                  _NavIcon(icon: Icons.notifications, selected: false),
+                  _NavIcon(icon: Icons.map, selected: false),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavIcon extends StatelessWidget {
+  final IconData icon;
+  final bool selected;
+  final String? label;
+
+  const _NavIcon({
+    required this.icon,
+    this.selected = false,
+    this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: selected ? const Color(0xFF1FF813) : Colors.white,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+          if (label != null) ...[
+            const SizedBox(width: 6),
+            Text(
+              label!,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ]
+        ],
       ),
     );
   }
@@ -206,7 +264,7 @@ class _ProfileOptionButton extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 20,
                       color: Colors.black,
-                      fontFamily: 'Poppins'
+                      fontFamily: 'Poppins',
                     ),
                   ),
                 ),
@@ -218,4 +276,4 @@ class _ProfileOptionButton extends StatelessWidget {
       ),
     );
   }
-}  
+}
