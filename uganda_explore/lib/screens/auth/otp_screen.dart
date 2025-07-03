@@ -9,7 +9,8 @@ class OtpScreen extends StatefulWidget {
   final String email;
   final String otp;
 
-  const OtpScreen({Key? key, required this.email, required this.otp}) : super(key: key);
+  const OtpScreen({Key? key, required this.email, required this.otp})
+    : super(key: key);
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -17,7 +18,9 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   final List<TextEditingController> _otpControllers = List.generate(
-    4, (_) => TextEditingController());
+    4,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
 
   String? _errorText;
@@ -39,7 +42,9 @@ class _OtpScreenState extends State<OtpScreen> {
       _isLoading = true; // 2. Start loading
     });
     final enteredOtp = _otpControllers.map((c) => c.text).join();
-    await Future.delayed(const Duration(milliseconds: 500)); // Optional: simulate delay
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    ); // Optional: simulate delay
     if (enteredOtp == widget.otp) {
       setState(() {
         _isLoading = false;
@@ -59,64 +64,65 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Future<void> _resendOtp() async {
-  setState(() {
-    _errorText = null;
-  });
+    setState(() {
+      _errorText = null;
+    });
 
-  final newOtp = (1000 + (9999 * (new DateTime.now().millisecondsSinceEpoch % 10000) / 10000)).floor().toString();
+    final newOtp =
+        (1000 +
+                (9999 *
+                    (new DateTime.now().millisecondsSinceEpoch % 10000) /
+                    10000))
+            .floor()
+            .toString();
 
-  // Optionally show loading indicator
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (_) => const Center(child: CircularProgressIndicator()),
-  );
-
-  try {
-    final response = await http.post(
-      Uri.parse("https://api.emailjs.com/api/v1.0/email/send"),
-      headers: {
-        'origin': 'http://localhost',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        'service_id': 'Uganda_Explore',
-        'template_id': 'template_b6hthi8',
-        'user_id': 'r1x2A2YyfHtXLLHR0', // This is the public key from EmailJS
-        'template_params': {
-          'email': widget.email,
-          'otp': newOtp,
-        },
-      }),
+    // Optionally show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
     );
 
-    Navigator.of(context).pop(); // Remove the loading indicator
+    try {
+      final response = await http.post(
+        Uri.parse("https://api.emailjs.com/api/v1.0/email/send"),
+        headers: {
+          'origin': 'http://localhost',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'service_id': 'Uganda_Explore',
+          'template_id': 'template_b6hthi8',
+          'user_id': 'r1x2A2YyfHtXLLHR0', // This is the public key from EmailJS
+          'template_params': {'email': widget.email, 'otp': newOtp},
+        }),
+      );
 
-    if (response.statusCode == 200) {
+      Navigator.of(context).pop(); // Remove the loading indicator
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _errorText = null;
+          // Replace old OTP with new OTP
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OtpScreen(email: widget.email, otp: newOtp),
+            ),
+          );
+        });
+      } else {
+        setState(() {
+          _errorText = 'Failed to send OTP. Try again.';
+        });
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Remove loading
       setState(() {
-        _errorText = null;
-        // Replace old OTP with new OTP
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => OtpScreen(email: widget.email, otp: newOtp),
-          ),
-        );
-      });
-    } else {
-      setState(() {
-        _errorText = 'Failed to send OTP. Try again.';
+        _errorText = 'An error occurred. Please try again.';
       });
     }
-  } catch (e) {
-    Navigator.of(context).pop(); // Remove loading
-    setState(() {
-      _errorText = 'An error occurred. Please try again.';
-    });
   }
-}
-
-  
 
   Widget _buildOtpFields() {
     return Row(
@@ -192,10 +198,7 @@ class _OtpScreenState extends State<OtpScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [
-              Color(0xFF0C0F0A),
-              Color(0xFF235347),
-            ],
+            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
             stops: [0.03, 0.63],
           ),
         ),
@@ -297,7 +300,10 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 0,
+                        ),
                         child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
@@ -309,7 +315,9 @@ class _OtpScreenState extends State<OtpScreen> {
                               height: 1.5,
                             ),
                             children: [
-                              const TextSpan(text: "Please enter the 4-digit code sent to "),
+                              const TextSpan(
+                                text: "Please enter the 4-digit code sent to ",
+                              ),
                               TextSpan(
                                 text: widget.email,
                                 style: const TextStyle(
@@ -390,17 +398,23 @@ class _OtpScreenState extends State<OtpScreen> {
                                   end: Alignment.centerRight,
                                 ),
                               ),
-                              child: const Center(
-                                child: Text(
-                                  "Verify Now",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black,
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: Text(
+                                        "Verify Now",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -420,15 +434,11 @@ class _OtpScreenState extends State<OtpScreen> {
                             children: [
                               const TextSpan(
                                 text: "Back to ",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                style: TextStyle(color: Colors.black),
                               ),
                               const TextSpan(
                                 text: "Sign In",
-                                style: TextStyle(
-                                  color: Color(0xFF0F7709),
-                                ),
+                                style: TextStyle(color: Color(0xFF0F7709)),
                               ),
                             ],
                           ),
