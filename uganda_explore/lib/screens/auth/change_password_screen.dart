@@ -114,16 +114,16 @@ class PasswordResetIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 80,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: const Color(0xFF1EF813),
       ),
       child: const Icon(
-        Icons.lock_reset,
+        Icons.lock,
         color: Colors.white,
-        size: 40,
+        size: 50,
       ),
     );
   }

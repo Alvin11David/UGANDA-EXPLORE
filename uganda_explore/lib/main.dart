@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
+import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
 // Auth Screens
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
         // '/error': (context) => const ErrorScreen()
       },
       // Set the initial screen you want to load
-      home: const OtpScreen(email: '', otp: ''), // Change to SplashScreen(), SignInScreen(), etc. as needed
+      home: const ChangePasswordScreen(email: ''), // Change to SplashScreen(), SignInScreen(), etc. as needed
     );
   }
 }
