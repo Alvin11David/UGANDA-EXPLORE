@@ -64,16 +64,16 @@ class ChangePasswordScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: const [ 
-                    SizedBox(height: 30,),
+                    SizedBox(height: 20,),
                     PasswordResetIcon(),
                     SizedBox(height: 20),
                     Text(
                       "Reset Your Password",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 24,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Inter',
+                        fontFamily: 'Poppins',
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -82,7 +82,7 @@ class ChangePasswordScreen extends StatelessWidget {
                       "Create a new password for your\naccount below.",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 18,
                         fontWeight: FontWeight.w400,
                         fontFamily: 'Poppins',
                       ),
