@@ -1,8 +1,21 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,11 +186,11 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _NavIcon(icon: Icons.home, selected: false),
-                  _NavIcon(icon: Icons.person, selected: true, label: 'Profile'),
-                  _NavIcon(icon: Icons.settings, selected: false),
-                  _NavIcon(icon: Icons.notifications, selected: false),
-                  _NavIcon(icon: Icons.map, selected: false),
+                  _NavIcon(icon: Icons.home, selected: _selectedIndex == 0, onTap: () => _onItemTapped(0)),
+                  _NavIcon(icon: Icons.person, selected: _selectedIndex == 1, label: 'Profile', onTap: () => _onItemTapped(1)),
+                  _NavIcon(icon: Icons.settings, selected: _selectedIndex == 2, onTap: () => _onItemTapped(2)),
+                  _NavIcon(icon: Icons.notifications, selected: _selectedIndex == 3, onTap: () => _onItemTapped(3)),
+                  _NavIcon(icon: Icons.map, selected: _selectedIndex == 4, onTap: () => _onItemTapped(4)),
                 ],
               ),
             ),
@@ -192,35 +205,40 @@ class _NavIcon extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final String? label;
+  final VoidCallback onTap;
 
   const _NavIcon({
     required this.icon,
     this.selected = false,
     this.label,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFF1FF813) : Colors.white,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
-          if (label != null) ...[
-            const SizedBox(width: 6),
-            Text(
-              label!,
-              style: TextStyle(
-                color: selected ? Colors.white : Colors.black,
-                fontWeight: FontWeight.w500,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            if (label != null) ...[
+              const SizedBox(width: 6),
+              Text(
+                label!,
+                style: TextStyle(
+                  color: selected ? Colors.white : Colors.black,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ]
-        ],
+            ]
+          ],
+        ),
       ),
     );
   }
@@ -251,7 +269,7 @@ class _ProfileOptionButton extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.22),
-              border: Border.all(color: Color(0xFF1FF813).withOpacity(0.7), width: 1),
+              border: Border.all(color: const Color(0xFF1FF813).withOpacity(0.7), width: 1),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Row(
