@@ -506,7 +506,7 @@ class GoogleSignInButton extends StatelessWidget {
     final googleSignIn = GoogleSignIn();
     await googleSignIn.signOut();
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return; // User cancelled
+    if (googleUser == null) return; 
 
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 

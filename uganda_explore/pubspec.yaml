@@ -43,6 +43,7 @@ dependencies:
   google_place:
 
   # Animation
+  
 
   # Google signin
   google_sign_in: ^6.2.1
