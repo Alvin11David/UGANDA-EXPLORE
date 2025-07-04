@@ -31,11 +31,13 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
-                        // 🌫️ Header
+                        // Header Section
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: ClipRRect(
@@ -47,10 +49,14 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(32),
-                                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
+                                    // Back Button
                                     Container(
                                       width: 40,
                                       height: 40,
@@ -64,12 +70,14 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 16),
+              
+                                    // Center Logo/Text
                                     Expanded(
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         mainAxisSize: MainAxisSize.min,
-                                        children: const [
-                                          Text(
+                                        children: [
+                                          const Text(
                                             'Uganda',
                                             style: TextStyle(
                                               color: Colors.white,
@@ -78,10 +86,10 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                               letterSpacing: 1.1,
                                             ),
                                           ),
-                                          SizedBox(width: 6),
-                                          Icon(Icons.travel_explore, color: Colors.white),
-                                          SizedBox(width: 6),
-                                          Text(
+                                          const SizedBox(width: 6),
+                                          const Icon(Icons.travel_explore, color: Colors.white, size: 24),
+                                          const SizedBox(width: 6),
+                                          const Text(
                                             'Explore',
                                             style: TextStyle(
                                               color: Colors.white,
@@ -93,6 +101,8 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                         ],
                                       ),
                                     ),
+              
+                                    // Placeholder space to balance alignment
                                     const SizedBox(width: 56),
                                   ],
                                 ),
@@ -100,9 +110,12 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                             ),
                           ),
                         ),
-
-                        Expanded(child: Container()),
-
+              
+                        // Flexible spacer - grows to fill available space
+                        Expanded(
+                          child: Container(),
+                        ),
+              
                         // 🎨 Theme Selector Card
                         Container(
                           margin: const EdgeInsets.all(20),
@@ -115,7 +128,10 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 1,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -137,13 +153,17 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 32),
-
-                                    // 🌙🌞 Toggle Buttons
+              
+                                    // Dark & Light Mode
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         GestureDetector(
-                                          onTap: () => setState(() => isDarkMode = true),
+                                          onTap: () {
+                                            setState(() {
+                                              isDarkMode = true;
+                                            });
+                                          },
                                           child: Column(
                                             children: [
                                               Container(
@@ -176,7 +196,11 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                           ),
                                         ),
                                         GestureDetector(
-                                          onTap: () => setState(() => isDarkMode = false),
+                                          onTap: () {
+                                            setState(() {
+                                              isDarkMode = false;
+                                            });
+                                          },
                                           child: Column(
                                             children: [
                                               Container(
@@ -210,9 +234,9 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                         ),
                                       ],
                                     ),
-
+              
                                     const SizedBox(height: 32),
-
+              
                                     // ✅ Continue Button
                                     Container(
                                       width: double.infinity,
@@ -266,7 +290,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                             ),
                           ),
                         ),
-
+              
                         const SizedBox(height: 24),
                       ],
                     ),
