@@ -37,7 +37,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
-                        // 🌫️ Glassmorphic Header
+                        // 🌫️ Header
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: ClipRRect(
@@ -56,7 +56,6 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // 🔙 Back Button
                                     Container(
                                       width: 40,
                                       height: 40,
@@ -70,8 +69,6 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       ),
                                     ),
                                     const SizedBox(width: 16),
-
-                                    // 🌍 Center Text and Icon
                                     Expanded(
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
@@ -101,8 +98,6 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                         ],
                                       ),
                                     ),
-
-                                    // Placeholder for symmetry
                                     const SizedBox(width: 56),
                                   ],
                                 ),
@@ -110,6 +105,54 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                             ),
                           ),
                         ),
+
+                        // Spacer to push card to bottom
+                        Expanded(child: Container()),
+
+                        // 🎨 Theme Selector Card
+                        Container(
+                          margin: const EdgeInsets.all(20),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.2),
+                                    width: 1,
+                                  ),
+                                ),
+                                child: const Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Choose Mode',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'Choose your preferred app theme',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
