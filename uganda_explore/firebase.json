@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"uganda-explore-935e5","appId":"1:73784585693:android:2b79bc292afa4f37a31a34","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"uganda-explore-935e5","configurations":{"android":"1:73784585693:android:2b79bc292afa4f37a31a34","ios":"1:73784585693:ios:c06b9336d9c36a16a31a34","macos":"1:73784585693:ios:c06b9336d9c36a16a31a34","web":"1:73784585693:web:eb2b7b6ba4f43bdba31a34","windows":"1:73784585693:web:878cfedadb8d8ca9a31a34"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "uganda-explore-935e5",
+          "appId": "1:73784585693:android:2b79bc292afa4f37a31a34",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "uganda-explore-935e5",
+          "configurations": {
+            "android": "1:73784585693:android:2b79bc292afa4f37a31a34",
+            "ios": "1:73784585693:ios:c06b9336d9c36a16a31a34",
+            "macos": "1:73784585693:ios:c06b9336d9c36a16a31a34",
+            "web": "1:73784585693:web:eb2b7b6ba4f43bdba31a34",
+            "windows": "1:73784585693:web:878cfedadb8d8ca9a31a34"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}

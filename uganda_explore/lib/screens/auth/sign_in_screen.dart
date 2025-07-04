@@ -43,7 +43,7 @@ class _SignInScreenState extends State<SignInScreen> {
             radius: 1.0,
             colors: [
               Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
+              Color(0xFF235347),
             ],
             stops: [0.03, 0.63],
           ),
@@ -60,7 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    'assets/logo/blacklogo.png',
+                    'assets/logo/whitelogo.png',
                     width: 100,
                     height: 100,
                     fit: BoxFit.contain,
@@ -75,7 +75,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 20),
@@ -345,7 +345,7 @@ class ForgotPasswordLink extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: GestureDetector(
         onTap: () {
-          // Handle forgot password
+          Navigator.pushNamed(context, '/forgot_password');
         },
         child: const Text(
           'Forgot Password?',
