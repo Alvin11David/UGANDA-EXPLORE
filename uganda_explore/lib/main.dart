@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 // import 'sign_in_screen.dart';
 // import 'forgot_password_screen.dart';
 //import 'screens/error/error_screen.dart';
-import 'apptheme/apptheme.dart';
+//import 'apptheme/apptheme.dart';
+ import 'screens/profile/termsandprivacy_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       // Replace with whatever page you're working on
-      home: const AppThemeScreen(),
+      home: const TermsPrivacyScreen(),
     );
   }
 }
