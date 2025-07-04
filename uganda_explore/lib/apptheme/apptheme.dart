@@ -31,9 +31,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
@@ -106,7 +104,6 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                           ),
                         ),
 
-                        // Spacer to push card to bottom
                         Expanded(child: Container()),
 
                         // 🎨 Theme Selector Card
@@ -126,10 +123,10 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                     width: 1,
                                   ),
                                 ),
-                                child: const Column(
+                                child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Choose Mode',
                                       style: TextStyle(
                                         color: Colors.white,
@@ -137,13 +134,95 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(height: 8),
+                                    const SizedBox(height: 8),
                                     Text(
                                       'Choose your preferred app theme',
                                       style: TextStyle(
-                                        color: Colors.white70,
+                                        color: Colors.white.withOpacity(0.8),
                                         fontSize: 16,
                                       ),
+                                    ),
+                                    const SizedBox(height: 32),
+
+                                    // 🌙🌞 Theme Toggles
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              isDarkMode = true;
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                width: 70,
+                                                height: 70,
+                                                decoration: BoxDecoration(
+                                                  color: isDarkMode ? Colors.black : Colors.white.withOpacity(0.2),
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: isDarkMode ? Colors.white : Colors.white.withOpacity(0.3),
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                child: Icon(
+                                                  Icons.nightlight_round,
+                                                  color: isDarkMode ? Colors.white : Colors.white.withOpacity(0.7),
+                                                  size: 30,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Text(
+                                                'Dark Mode',
+                                                style: TextStyle(
+                                                  color: Colors.white.withOpacity(0.9),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              isDarkMode = false;
+                                            });
+                                          },
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                width: 70,
+                                                height: 70,
+                                                decoration: BoxDecoration(
+                                                  color: !isDarkMode ? Colors.white : Colors.white.withOpacity(0.2),
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: !isDarkMode ? Colors.orange : Colors.white.withOpacity(0.3),
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                child: Icon(
+                                                  Icons.wb_sunny,
+                                                  color: !isDarkMode ? Colors.orange : Colors.white.withOpacity(0.7),
+                                                  size: 30,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 12),
+                                              Text(
+                                                'Light Mode',
+                                                style: TextStyle(
+                                                  color: Colors.white.withOpacity(0.9),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
