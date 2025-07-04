@@ -81,7 +81,7 @@ class TermsPrivacyScreen extends StatelessWidget {
               ),
             ),
 
-            // Styled content container
+            // Content container with title
             Expanded(
               child: Container(
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -100,7 +100,18 @@ class TermsPrivacyScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title and terms content will come next
+                    // Title
+                    const Text(
+                      'Terms & Privacy',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Content sections come next
                   ],
                 ),
               ),
