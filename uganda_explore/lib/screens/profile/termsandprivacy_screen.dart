@@ -7,11 +7,11 @@ class TermsPrivacyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0), // Cream background
+      backgroundColor: const Color(0xFFF5F5F0),
       body: SafeArea(
         child: Column(
           children: [
-            // Header with back button and logo
+            // Header
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: ClipRRect(
@@ -73,14 +73,38 @@ class TermsPrivacyScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 48), // Spacer to balance the back button width
+                        const SizedBox(width: 48),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-            // Content will be added in next parts
+
+            // Styled content container
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title and terms content will come next
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
