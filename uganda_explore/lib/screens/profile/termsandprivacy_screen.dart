@@ -81,7 +81,7 @@ class TermsPrivacyScreen extends StatelessWidget {
               ),
             ),
 
-            // Content container with title
+            // Content container with title and sections
             Expanded(
               child: Container(
                 margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -100,7 +100,6 @@ class TermsPrivacyScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Title
                     const Text(
                       'Terms & Privacy',
                       style: TextStyle(
@@ -111,7 +110,32 @@ class TermsPrivacyScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
 
-                    // Content sections come next
+                    // Scrollable sections
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSection(
+                              'Introduction',
+                              'By using Uganda Explore, you agree to the following terms and conditions governing your use of the application and its services.',
+                            ),
+                            const SizedBox(height: 24),
+
+                            _buildSection(
+                              'Account & Data',
+                              'Responsibility for account security.\nHandling of user data.\nHow the app uses location and content.',
+                            ),
+                            const SizedBox(height: 24),
+
+                            _buildSection(
+                              'Third-Party Services',
+                              'Use of Google Maps, Firebase, or other tools\nLinks to their own terms (optional)',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -119,6 +143,36 @@ class TermsPrivacyScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSection(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          content,
+          style: const TextStyle(
+            fontSize: 16,
+            color: Colors.black87,
+            height: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          height: 1,
+          color: Colors.grey.withOpacity(0.3),
+        ),
+      ],
     );
   }
 }
