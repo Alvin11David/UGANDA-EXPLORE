@@ -136,7 +136,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 60),
               Center(
                 child: Image.asset(
-                  'assets/logo/blacklogo.png',
+                  'assets/logo/whitelogo.png',
                   width: 80,
                   height: 80,
                   fit: BoxFit.contain,
@@ -150,7 +150,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 20),

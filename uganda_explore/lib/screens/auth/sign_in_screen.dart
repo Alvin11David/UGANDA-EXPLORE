@@ -60,7 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
-                    'assets/logo/blacklogo.png',
+                    'assets/logo/whitelogo.png',
                     width: 100,
                     height: 100,
                     fit: BoxFit.contain,
@@ -75,7 +75,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 20),

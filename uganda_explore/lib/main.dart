@@ -17,6 +17,7 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_screen.dart';
+import 'package:uganda_explore/screens/splash/splash_screen.dart';
 
 
 void main() async {
@@ -45,13 +46,13 @@ class MyApp extends StatelessWidget {
         '/onboarding_screen2': (context) => const OnboardingScreen2(),
         '/onboarding_screen3': (context) => const OnboardingScreen3(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
-        '/otp': (context) => const OtpScreen(email: '', otp: ''), // Provide a default or actual email value here
+        '/otp': (context) => const OtpScreen(email: '', otp: ''), 
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
-        // '/error': (context) => const ErrorScreen()
+        
       },
-      // Set the initial screen you want to load
-      home: const ChangePasswordScreen(email: ''), // Change to SplashScreen(), SignInScreen(), etc. as needed
+      
+      home: const SplashScreen(), 
     );
   }
 }
