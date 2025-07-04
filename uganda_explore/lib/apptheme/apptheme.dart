@@ -47,10 +47,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(32),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                    width: 1,
-                                  ),
+                                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                                 ),
                                 child: Row(
                                   children: [
@@ -82,7 +79,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                             ),
                                           ),
                                           SizedBox(width: 6),
-                                          Icon(Icons.travel_explore, color: Colors.white, size: 24),
+                                          Icon(Icons.travel_explore, color: Colors.white),
                                           SizedBox(width: 6),
                                           Text(
                                             'Explore',
@@ -118,10 +115,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.2),
-                                    width: 1,
-                                  ),
+                                  border: Border.all(color: Colors.white.withOpacity(0.2)),
                                 ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -144,16 +138,12 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                     ),
                                     const SizedBox(height: 32),
 
-                                    // 🌙🌞 Theme Toggles
+                                    // 🌙🌞 Toggle Buttons
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              isDarkMode = true;
-                                            });
-                                          },
+                                          onTap: () => setState(() => isDarkMode = true),
                                           child: Column(
                                             children: [
                                               Container(
@@ -186,11 +176,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                           ),
                                         ),
                                         GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              isDarkMode = false;
-                                            });
-                                          },
+                                          onTap: () => setState(() => isDarkMode = false),
                                           child: Column(
                                             children: [
                                               Container(
@@ -223,6 +209,56 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                           ),
                                         ),
                                       ],
+                                    ),
+
+                                    const SizedBox(height: 32),
+
+                                    // ✅ Continue Button
+                                    Container(
+                                      width: double.infinity,
+                                      height: 56,
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(28),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.2),
+                                            blurRadius: 8,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                isDarkMode ? 'Dark Mode Selected' : 'Light Mode Selected',
+                                              ),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(28),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Continue',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
