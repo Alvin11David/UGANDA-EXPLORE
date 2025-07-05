@@ -168,7 +168,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 15,
+            top: 38,
             left: 8,
             child: GestureDetector(
               onTap: () {
@@ -180,8 +180,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: Container(
-                    width: 51,
-                    height: 51,
+                    width: 50,
+                    height: 50,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),
                       shape: BoxShape.circle,
@@ -201,7 +201,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ),
           Positioned(
             top: 90,
-            right: 180,
+            right: 100,
             child: Row(
               children: [
                 // 360° Tour
@@ -319,8 +319,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ),
           Positioned(
             top: 170, // adjust as needed to appear below the circles
-            left: 20,
-            right: 20,
+            left: 10,
+            right: 10,
             child: FutureBuilder<String?>(
               future: fetchSiteName(widget.siteName),
               builder: (context, snapshot) {
@@ -345,8 +345,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ),
           Positioned(
             top: 210, // adjust as needed to appear below the name
-            left: 20,
-            right: 20,
+            left: 10,
+            right: 10,
             child: FutureBuilder<String?>(
               future: fetchSiteLocation(widget.siteName),
               builder: (context, snapshot) {
@@ -384,11 +384,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ),
           Positioned(
             // Position at the bottom right border of the big image circle
-            top:
-                290, 
-            left:
-                MediaQuery.of(context).size.width / 2 +
-                135, 
+            top: 290,
+            left: MediaQuery.of(context).size.width / 2 + 85,
             child: ClipOval(
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
@@ -405,6 +402,30 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                       Icons.star_border,
                       color: Colors.white,
                       size: 60,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 4,
+            right: 4,
+            bottom: 0,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  height: 320,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 6, 5, 5).withOpacity(0.3),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
                     ),
                   ),
                 ),

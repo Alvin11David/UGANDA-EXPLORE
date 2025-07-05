@@ -18,6 +18,7 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_screen.dart';
+import 'package:uganda_explore/screens/splash/splash_screen.dart';
 
 
 void main() async {
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
         
       },
 
-      home: const SearchScreen(),
+      home: const PlaceDetailsScreen(siteName: 'Default Site'),
     );
   }
 }
