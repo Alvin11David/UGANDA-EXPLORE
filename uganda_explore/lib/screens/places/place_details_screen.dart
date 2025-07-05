@@ -136,6 +136,42 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     return null;
   }
 
+  Future<String?> fetchSiteDescription(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+        return data['description']?.toString();
+      }
+    }
+    return null;
+  }
+
+  Future<Map<String, String>> fetchQuickInfo(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+        return {
+          'entryfee': data['entryfee']?.toString() ?? '',
+          'openingHours': data['openingHours']?.toString() ?? '',
+          'closingHours': data['closingHours']?.toString() ?? '',
+        };
+      }
+    }
+    return {};
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -463,7 +499,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                 child: Container(
-                  height: 320,
+                  height: 400,
                   decoration: BoxDecoration(
                     color: const Color.fromARGB(
                       255,
@@ -477,135 +513,324 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     ),
                     border: Border.all(color: Colors.white, width: 2),
                   ),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 16,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Video Preview label
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 8),
+                          child: Text(
+                            "Video Preview",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        // Videos row
+                        FutureBuilder<List<String>>(
+                          future: fetchSiteVideos(widget.siteName),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            }
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            final videos = snapshot.data!;
+                            if (_videoControllers.length != videos.length) {
+                              for (var controller in _videoControllers) {
+                                controller.dispose();
+                              }
+                              _videoControllers = videos
+                                  .map(
+                                    (url) => VideoPlayerController.network(url)
+                                      ..setLooping(true)
+                                      ..initialize(),
+                                  )
+                                  .toList();
+                              Future.wait(
+                                _videoControllers.map((c) => c.initialize()),
+                              ).then((_) {
+                                if (mounted) _autoPlayVideos();
+                              });
+                            }
+                            return SizedBox(
+                              height: 80,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: videos.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(width: 16),
+                                itemBuilder: (context, index) {
+                                  final controller = _videoControllers[index];
+                                  return GestureDetector(
+                                    onTap: () async {
+                                      for (var c in _videoControllers) {
+                                        await c.pause();
+                                        await c.seekTo(Duration.zero);
+                                      }
+                                      setState(() {
+                                        _playingIndex = index;
+                                      });
+                                      await controller.play();
+                                    },
+                                    child: Container(
+                                      width: 100,
+                                      height: 80,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.2),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child:
+                                                controller.value.isInitialized
+                                                ? SizedBox(
+                                                    width: 100,
+                                                    height: 80,
+                                                    child: FittedBox(
+                                                      fit: BoxFit.cover,
+                                                      child: SizedBox(
+                                                        width: controller
+                                                            .value
+                                                            .size
+                                                            .width,
+                                                        height: controller
+                                                            .value
+                                                            .size
+                                                            .height,
+                                                        child: VideoPlayer(
+                                                          controller,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 100,
+                                                    height: 80,
+                                                    color: Colors.black12,
+                                                  ),
+                                          ),
+                                          if (_playingIndex != index)
+                                            const Icon(
+                                              Icons.play_circle_outline,
+                                              color: Colors.white,
+                                              size: 40,
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        // Black line
+                        Container(height: 1, color: Colors.black),
+                        const SizedBox(height: 12),
+                        // Place Description label
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4, bottom: 8),
+                          child: Text(
+                            "Place Description",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        // Place Description text
+                        FutureBuilder<String?>(
+                          future: fetchSiteDescription(widget.siteName),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            }
+                            if (!snapshot.hasData || snapshot.data == null) {
+                              return const SizedBox.shrink();
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  snapshot.data!,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 0,
+                                  ),
+                                  child: Container(
+                                    height: 1,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 4),
+                                  child: Text(
+                                    "Quick Information",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                FutureBuilder<Map<String, String>>(
+                                  future: fetchQuickInfo(widget.siteName),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    if (!snapshot.hasData ||
+                                        snapshot.data!.isEmpty) {
+                                      return const Text(
+                                        "No quick information available.",
+                                        style: TextStyle(
+                                          color: Colors.black54,
+                                          fontFamily: 'Poppins',
+                                          fontSize: 14,
+                                        ),
+                                      );
+                                    }
+                                    final info = snapshot.data!;
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.attach_money,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Entry Fee: ",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              info['entryfee'] ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.access_time,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Opening: ",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              info['openingHours'] ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.lock_clock,
+                                              color: Colors.black,
+                                              size: 20,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              "Closing: ",
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              info['closingHours'] ?? '',
+                                              style: const TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            left: 20,
-            bottom:
-                320 -
-                45, // 320 is the height of the rectangle, 20 is the height of the label
-            child: Text(
-              "Video Preview",
-              style: const TextStyle(
-                color: Colors.black,
-                fontFamily: 'Poppins',
-                fontWeight: FontWeight.w600,
-                fontSize: 20,
-              ),
-            ),
-          ),
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom: 320 - 45 - 100, // Adjust to place below "Video Preview"
-            child: FutureBuilder<List<String>>(
-              future: fetchSiteVideos(widget.siteName),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox.shrink();
-                }
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const SizedBox.shrink();
-                }
-                final videos = snapshot.data!;
-                // Initialize controllers if not already done
-                if (_videoControllers.length != videos.length) {
-                  for (var controller in _videoControllers) {
-                    controller.dispose();
-                  }
-                  _videoControllers = videos
-                      .map(
-                        (url) => VideoPlayerController.network(url)
-                          ..setLooping(true)
-                          ..initialize(),
-                      )
-                      .toList();
-                  // Start auto-play when controllers are ready
-                  Future.wait(
-                    _videoControllers.map((c) => c.initialize()),
-                  ).then((_) {
-                    if (mounted) _autoPlayVideos();
-                  });
-                }
-                return SizedBox(
-                  height: 80,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: videos.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 16),
-                    itemBuilder: (context, index) {
-                      final controller = _videoControllers[index];
-                      return GestureDetector(
-                        onTap: () async {
-                          for (var c in _videoControllers) {
-                            await c.pause();
-                            await c.seekTo(Duration.zero);
-                          }
-                          setState(() {
-                            _playingIndex = index;
-                          });
-                          await controller.play();
-                        },
-                        child: Container(
-                          width: 100,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: controller.value.isInitialized
-                                    ? SizedBox(
-                                        width: 100,
-                                        height: 80,
-                                        child: FittedBox(
-                                          fit: BoxFit.cover,
-                                          child: SizedBox(
-                                            width: controller.value.size.width,
-                                            height:
-                                                controller.value.size.height,
-                                            child: VideoPlayer(controller),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        width: 100,
-                                        height: 80,
-                                        color: Colors.black12,
-                                      ),
-                              ),
-                              if (_playingIndex != index)
-                                const Icon(
-                                  Icons.play_circle_outline,
-                                  color: Colors.white,
-                                  size: 40,
-                                ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-          Positioned(
-            left: 20,
-            right: 20,
-            bottom:
-                320 -
-                45 -
-                100 -
-                12, // Adjust so it sits just below the videos row
-            child: Container(height: 1, color: Colors.black),
           ),
         ],
       ),
