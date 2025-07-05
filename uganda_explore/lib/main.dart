@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
         
       },
 
-      home: const PlaceDetailsScreen(siteName: 'Default Site'),
+      home: const SearchScreen(),
     );
   }
 }

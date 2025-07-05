@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -16,9 +16,20 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  List<VideoPlayerController> _videoControllers = [];
+  int _playingIndex = -1;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _videoControllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   void _startAutoScroll() async {
@@ -42,6 +53,38 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         });
       }
     }
+  }
+
+  Future<List<String>> fetchSiteVideos(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+        final videos = List<String>.from(data['videos'] ?? []);
+        return videos.take(3).toList();
+      }
+    }
+    return [];
+  }
+
+  void _autoPlayVideos() async {
+    for (int i = 0; i < _videoControllers.length; i++) {
+      setState(() {
+        _playingIndex = i;
+      });
+      await _videoControllers[i].play();
+      await Future.delayed(const Duration(seconds: 2));
+      await _videoControllers[i].pause();
+      await _videoControllers[i].seekTo(Duration.zero);
+    }
+    setState(() {
+      _playingIndex = -1;
+    });
   }
 
   Future<List<String>> fetchSiteImages(String siteName) async {
@@ -418,19 +461,151 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 topRight: Radius.circular(40),
               ),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
                 child: Container(
                   height: 320,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 6, 5, 5).withOpacity(0.3),
+                    color: const Color.fromARGB(
+                      255,
+                      255,
+                      255,
+                      255,
+                    ).withOpacity(0.3),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
                     ),
+                    border: Border.all(color: Colors.white, width: 2),
                   ),
                 ),
               ),
             ),
+          ),
+          Positioned(
+            left: 20,
+            bottom:
+                320 -
+                45, // 320 is the height of the rectangle, 20 is the height of the label
+            child: Text(
+              "Video Preview",
+              style: const TextStyle(
+                color: Colors.black,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.w600,
+                fontSize: 20,
+              ),
+            ),
+          ),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 320 - 45 - 100, // Adjust to place below "Video Preview"
+            child: FutureBuilder<List<String>>(
+              future: fetchSiteVideos(widget.siteName),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox.shrink();
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                final videos = snapshot.data!;
+                // Initialize controllers if not already done
+                if (_videoControllers.length != videos.length) {
+                  for (var controller in _videoControllers) {
+                    controller.dispose();
+                  }
+                  _videoControllers = videos
+                      .map(
+                        (url) => VideoPlayerController.network(url)
+                          ..setLooping(true)
+                          ..initialize(),
+                      )
+                      .toList();
+                  // Start auto-play when controllers are ready
+                  Future.wait(
+                    _videoControllers.map((c) => c.initialize()),
+                  ).then((_) {
+                    if (mounted) _autoPlayVideos();
+                  });
+                }
+                return SizedBox(
+                  height: 80,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: videos.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 16),
+                    itemBuilder: (context, index) {
+                      final controller = _videoControllers[index];
+                      return GestureDetector(
+                        onTap: () async {
+                          for (var c in _videoControllers) {
+                            await c.pause();
+                            await c.seekTo(Duration.zero);
+                          }
+                          setState(() {
+                            _playingIndex = index;
+                          });
+                          await controller.play();
+                        },
+                        child: Container(
+                          width: 100,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: controller.value.isInitialized
+                                    ? SizedBox(
+                                        width: 100,
+                                        height: 80,
+                                        child: FittedBox(
+                                          fit: BoxFit.cover,
+                                          child: SizedBox(
+                                            width: controller.value.size.width,
+                                            height:
+                                                controller.value.size.height,
+                                            child: VideoPlayer(controller),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        width: 100,
+                                        height: 80,
+                                        color: Colors.black12,
+                                      ),
+                              ),
+                              if (_playingIndex != index)
+                                const Icon(
+                                  Icons.play_circle_outline,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom:
+                320 -
+                45 -
+                100 -
+                12, // Adjust so it sits just below the videos row
+            child: Container(height: 1, color: Colors.black),
           ),
         ],
       ),
