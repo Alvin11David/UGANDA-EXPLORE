@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final String email;
-  const ChangePasswordScreen({Key? key, required this.email}) : super(key: key);
+  const ChangePasswordScreen({super.key, required this.email});
 
   @override
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
@@ -57,13 +57,16 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Enter your password';
     if (value.length < 8) return 'Password must be at least 8 characters';
-    if (!RegExp(r'[A-Z]').hasMatch(value))
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
       return 'Include at least one uppercase letter';
-    if (!RegExp(r'[a-z]').hasMatch(value))
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
       return 'Include at least one lowercase letter';
+    }
     if (!RegExp(r'[0-9]').hasMatch(value)) return 'Include at least one number';
-    if (!RegExp(r'[!@#\$&*~._-]').hasMatch(value))
+    if (!RegExp(r'[!@#\$&*~._-]').hasMatch(value)) {
       return 'Include at least one special character';
+    }
     return null;
   }
 

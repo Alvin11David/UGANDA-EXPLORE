@@ -1,9 +1,61 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _district = 'Kampala';
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentDistrict();
+  }
+
+  Future<void> _getCurrentDistrict() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return; // Permission denied, keep default
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        return; // Permissions are denied forever, keep default
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          // Use subAdministrativeArea for district, fallback to locality
+          _district =
+              placemarks.first.subAdministrativeArea ??
+              placemarks.first.locality ??
+              "Unknown";
+        });
+      }
+    } catch (e) {
+      // If any error, keep default
+      print("Location error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,18 +157,18 @@ class HomeScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Row(
-                              children: const [
+                              children: [
                                 Text(
-                                  'Kampala',
-                                  style: TextStyle(
+                                  _district,
+                                  style: const TextStyle(
                                     fontFamily: 'Poppins',
                                     fontWeight: FontWeight.w600,
                                     fontSize: 16,
                                     color: Colors.black87,
                                   ),
                                 ),
-                                SizedBox(width: 4),
-                                Icon(
+                                const SizedBox(width: 4),
+                                const Icon(
                                   Icons.keyboard_arrow_down_rounded,
                                   size: 20,
                                   color: Colors.black87,
@@ -196,9 +248,7 @@ class HomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const SearchScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const SearchScreen()),
                 );
               },
               child: Padding(
@@ -267,7 +317,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 10),
-                                  
+
                         ValueListenableBuilder<bool>(
                           valueListenable: isFilterFocused,
                           builder: (context, focused, child) {
@@ -280,7 +330,10 @@ class HomeScreen extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
                                 child: BackdropFilter(
-                                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 30,
+                                    sigmaY: 30,
+                                  ),
                                   child: Container(
                                     height: 50,
                                     width: 70,

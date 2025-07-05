@@ -51,6 +51,7 @@ dependencies:
   # Location & Permissions
   location: ^5.0.3
   geolocator: 
+  geocoding:
   permission_handler:
 
   # Firebase core & services

@@ -9,8 +9,7 @@ class OtpScreen extends StatefulWidget {
   final String email;
   final String otp;
 
-  const OtpScreen({Key? key, required this.email, required this.otp})
-    : super(key: key);
+  const OtpScreen({super.key, required this.email, required this.otp});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -71,7 +70,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final newOtp =
         (1000 +
                 (9999 *
-                    (new DateTime.now().millisecondsSinceEpoch % 10000) /
+                    (DateTime.now().millisecondsSinceEpoch % 10000) /
                     10000))
             .floor()
             .toString();

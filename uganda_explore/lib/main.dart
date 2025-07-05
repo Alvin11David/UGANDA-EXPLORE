@@ -1,12 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/firebase_options.dart';
-import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
 // Auth Screens
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
+import 'package:uganda_explore/screens/home/search_screen.dart';
+import 'package:uganda_explore/screens/places/place_details_screen.dart';
 
 // Splash Screens
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
@@ -17,7 +18,6 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_screen.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
 
 
 void main() async {
@@ -51,8 +51,8 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         
       },
-      
-      home: const SplashScreen(), 
+
+      home: const SearchScreen(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/screens/places/place_details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -145,11 +146,23 @@ class _SearchScreenState extends State<SearchScreen> {
                                   fontSize: 16,
                                 ),
                                 onSubmitted: (value) {
-                                  if (value.trim().isNotEmpty &&
-                                      !recentKeywords.contains(value.trim())) {
+                                  final trimmed = value.trim();
+                                  if (trimmed.isNotEmpty &&
+                                      !recentKeywords.contains(trimmed)) {
                                     setState(() {
-                                      recentKeywords.insert(0, value.trim());
+                                      recentKeywords.insert(0, trimmed);
                                     });
+                                  }
+                                  if (trimmed.isNotEmpty) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PlaceDetailsScreen(
+                                              siteName: trimmed,
+                                            ),
+                                      ),
+                                    );
                                   }
                                 },
                               ),

@@ -558,8 +558,8 @@ class GoogleSignInButton extends StatelessWidget {
               children: [
                 Image(
                   image: AssetImage('assets/vectors/google.png'),
-                  width: 24,
-                  height: 24,
+                  width: 20,
+                  height: 20,
                 ),
                 const SizedBox(width: 12),
                 const Text(
