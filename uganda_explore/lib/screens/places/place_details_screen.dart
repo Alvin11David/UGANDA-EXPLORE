@@ -140,8 +140,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top:
-                350, 
+            top: 350,
             left: 0,
             right: 0,
             child: Row(
@@ -381,6 +380,35 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 );
               },
+            ),
+          ),
+          Positioned(
+            // Position at the bottom right border of the big image circle
+            top:
+                290, 
+            left:
+                MediaQuery.of(context).size.width / 2 +
+                135, 
+            child: ClipOval(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.star_border,
+                      color: Colors.white,
+                      size: 60,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
