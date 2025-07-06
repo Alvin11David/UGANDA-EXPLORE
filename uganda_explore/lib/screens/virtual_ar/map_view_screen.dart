@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart' as latlng;
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
@@ -11,7 +12,7 @@ class MapViewScreen extends StatefulWidget {
 }
 
 class _MapViewScreenState extends State<MapViewScreen> {
-  LatLng? siteLatLng;
+  latlng.LatLng? siteLatLng;
   String? error;
 
   @override
@@ -21,28 +22,52 @@ class _MapViewScreenState extends State<MapViewScreen> {
   }
 
   Future<void> fetchCoordinates() async {
-    final query = await FirebaseFirestore.instance
-        .collection('tourismsites')
-        .where('name', isEqualTo: widget.siteName)
-        .limit(1)
-        .get();
+    print('Searching for site: "${widget.siteName}"');
+    try {
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: widget.siteName.trim())
+          .limit(1)
+          .get();
 
-    if (query.docs.isNotEmpty) {
-      final doc = query.docs.first;
-      final lat = doc['latitude'];
-      final lng = doc['longitude'];
-      if (lat != null && lng != null) {
-        setState(() {
-          siteLatLng = LatLng(lat, lng);
-        });
+      print('Query docs found: ${query.docs.length}');
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        print('Doc data: ${doc.data()}');
+        final lat = doc['latitude'];
+        final lng = doc['longitude'];
+        double? latitude;
+        double? longitude;
+
+        if (lat is double && lng is double) {
+          latitude = lat;
+          longitude = lng;
+        } else if (lat is int && lng is int) {
+          latitude = lat.toDouble();
+          longitude = lng.toDouble();
+        } else if (lat is String && lng is String) {
+          latitude = double.tryParse(lat);
+          longitude = double.tryParse(lng);
+        }
+
+        if (latitude != null && longitude != null) {
+          setState(() {
+            siteLatLng = latlng.LatLng(latitude!, longitude!);
+            error = null;
+          });
+        } else {
+          setState(() {
+            error = 'Location not found for this site.';
+          });
+        }
       } else {
         setState(() {
-          error = 'Location not found for this site.';
+          error = 'Site not found.';
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        error = 'Site not found.';
+        error = 'Error finding location: $e';
       });
     }
   }
@@ -52,18 +77,29 @@ class _MapViewScreenState extends State<MapViewScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.siteName)),
       body: siteLatLng != null
-          ? GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: siteLatLng!,
-                zoom: 14,
-              ),
-              markers: {
-                Marker(
-                  markerId: const MarkerId('site'),
-                  position: siteLatLng!,
-                  infoWindow: InfoWindow(title: widget.siteName),
+          ? FlutterMap(
+              options: MapOptions(center: siteLatLng, zoom: 14),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  subdomains: const ['a', 'b', 'c'],
                 ),
-              },
+                MarkerLayer(
+                  markers: [
+                    Marker(
+                      width: 40,
+                      height: 40,
+                      point: siteLatLng!,
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Colors.red,
+                        size: 40,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             )
           : Center(
               child: error != null

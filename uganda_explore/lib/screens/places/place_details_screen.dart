@@ -369,7 +369,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                MapViewScreen(siteName: widget.siteName),
+                                MapViewScreen(siteName: widget.siteName.trim()),
                           ),
                         );
                       },
