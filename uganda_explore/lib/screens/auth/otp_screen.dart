@@ -1,8 +1,191 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
-class OtpScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:uganda_explore/screens/auth/change_password_screen.dart';
+
+class OtpScreen extends StatefulWidget {
   final String email;
-  const OtpScreen({super.key, required this.email});
+  final String otp;
+
+  const OtpScreen({super.key, required this.email, required this.otp});
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
+  final List<TextEditingController> _otpControllers = List.generate(
+    4,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+
+  String? _errorText;
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    for (final c in _otpControllers) {
+      c.dispose();
+    }
+    for (final f in _focusNodes) {
+      f.dispose();
+    }
+    super.dispose();
+  }
+
+  void _verifyOtp() async {
+    setState(() {
+      _isLoading = true; // 2. Start loading
+    });
+    final enteredOtp = _otpControllers.map((c) => c.text).join();
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    ); // Optional: simulate delay
+    if (enteredOtp == widget.otp) {
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangePasswordScreen(email: widget.email),
+        ),
+      );
+    } else {
+      setState(() {
+        _isLoading = false; // 2. Stop loading on error
+        _errorText = "Invalid code. Please try again.";
+      });
+    }
+  }
+
+  Future<void> _resendOtp() async {
+    setState(() {
+      _errorText = null;
+    });
+
+    final newOtp =
+        (1000 +
+                (9999 *
+                    (DateTime.now().millisecondsSinceEpoch % 10000) /
+                    10000))
+            .floor()
+            .toString();
+
+    // Optionally show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response = await http.post(
+        Uri.parse("https://api.emailjs.com/api/v1.0/email/send"),
+        headers: {
+          'origin': 'http://localhost',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'service_id': 'Uganda_Explore',
+          'template_id': 'template_b6hthi8',
+          'user_id': 'r1x2A2YyfHtXLLHR0', // This is the public key from EmailJS
+          'template_params': {'email': widget.email, 'otp': newOtp},
+        }),
+      );
+
+      Navigator.of(context).pop(); // Remove the loading indicator
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _errorText = null;
+          // Replace old OTP with new OTP
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => OtpScreen(email: widget.email, otp: newOtp),
+            ),
+          );
+        });
+      } else {
+        setState(() {
+          _errorText = 'Failed to send OTP. Try again.';
+        });
+      }
+    } catch (e) {
+      Navigator.of(context).pop(); // Remove loading
+      setState(() {
+        _errorText = 'An error occurred. Please try again.';
+      });
+    }
+  }
+
+  Widget _buildOtpFields() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(4, (index) {
+        return Container(
+          width: 48,
+          height: 60,
+          margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
+          child: TextFormField(
+            controller: _otpControllers[index],
+            focusNode: _focusNodes[index],
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            maxLength: 1,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(1),
+            ],
+            decoration: InputDecoration(
+              counterText: '',
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1FF813),
+                  width: 2,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1FF813),
+                  width: 2,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(
+                  color: Color(0xFF1FF813),
+                  width: 2,
+                ),
+              ),
+            ),
+            onChanged: (value) {
+              if (value.isNotEmpty && index < 3) {
+                FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
+              }
+              if (value.isEmpty && index > 0) {
+                FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
+              }
+            },
+          ),
+        );
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,37 +197,34 @@ class OtpScreen extends StatelessWidget {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [
-              Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
-            ],
+            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
             stops: [0.03, 0.63],
           ),
         ),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Center(
                 child: Image.asset(
-                  'logo/ugandaexplore.png',
+                  'assets/logo/whiteugandaexplore.png',
                   width: 268,
                   height: 60,
                   fit: BoxFit.contain,
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 25),
               const Text(
                 "Let’s get you \nsorted!",
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 38,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 50),
               Padding(
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                 child: Container(
@@ -71,7 +251,7 @@ class OtpScreen extends StatelessWidget {
                                 radius: 1.0,
                                 colors: [
                                   Color(0xFF0C0F0A),
-                                  Color(0xFF1EF813),
+                                  Color.fromARGB(255, 16, 164, 8),
                                 ],
                                 stops: [0.03, 0.63],
                               ),
@@ -119,7 +299,10 @@ class OtpScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 0,
+                        ),
                         child: RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
@@ -131,9 +314,11 @@ class OtpScreen extends StatelessWidget {
                               height: 1.5,
                             ),
                             children: [
-                              const TextSpan(text: "Please enter the 4-digit code sent to "),
+                              const TextSpan(
+                                text: "Please enter the 4-digit code sent to ",
+                              ),
                               TextSpan(
-                                text: email,
+                                text: widget.email,
                                 style: const TextStyle(
                                   color: Color(0xFF078B00),
                                   fontWeight: FontWeight.w500,
@@ -144,35 +329,14 @@ class OtpScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(
-                          4,
-                          (index) => Container(
-                            width: 48,
-                            height: 60,
-                            margin: EdgeInsets.only(right: index < 3 ? 8 : 0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(
-                                color: Color(0xFF1FF813),
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              '',
-                              style: const TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
+                      _buildOtpFields(),
+                      if (_errorText != null) ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          _errorText!,
+                          style: const TextStyle(color: Colors.red),
                         ),
-                      ),
+                      ],
                       const SizedBox(height: 32),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -192,9 +356,7 @@ class OtpScreen extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
                           TextButton(
-                            onPressed: () {
-                              // TODO: Add resend logic
-                            },
+                            onPressed: _resendOtp,
                             style: TextButton.styleFrom(
                               foregroundColor: const Color(0xFF078800),
                               padding: EdgeInsets.zero,
@@ -206,7 +368,7 @@ class OtpScreen extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
-                                fontSize: 16,
+                                fontSize: 20,
                                 color: Color(0xFF078800),
                               ),
                             ),
@@ -217,13 +379,12 @@ class OtpScreen extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: GestureDetector(
-                          onTap: () {
-                            // TODO: Add verify logic
-                          },
+                          onTap: _isLoading ? null : _verifyOtp,
                           child: SizedBox(
                             width: 323,
                             height: 56,
                             child: Container(
+                              alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
                                 gradient: const LinearGradient(
@@ -236,17 +397,23 @@ class OtpScreen extends StatelessWidget {
                                   end: Alignment.centerRight,
                                 ),
                               ),
-                              child: const Center(
-                                child: Text(
-                                  "Verify Now",
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black,
+                                      ),
+                                    )
+                                  : const Center(
+                                      child: Text(
+                                        "Verify Now",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -254,7 +421,7 @@ class OtpScreen extends StatelessWidget {
                       const SizedBox(height: 32),
                       GestureDetector(
                         onTap: () {
-                          // TODO: Navigate to sign in screen
+                          Navigator.pushReplacementNamed(context, '/signin');
                         },
                         child: RichText(
                           text: TextSpan(
@@ -266,15 +433,11 @@ class OtpScreen extends StatelessWidget {
                             children: [
                               const TextSpan(
                                 text: "Back to ",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                style: TextStyle(color: Colors.black),
                               ),
                               const TextSpan(
                                 text: "Sign In",
-                                style: TextStyle(
-                                  color: Color(0xFF0F7709),
-                                ),
+                                style: TextStyle(color: Color(0xFF0F7709)),
                               ),
                             ],
                           ),
@@ -291,4 +454,4 @@ class OtpScreen extends StatelessWidget {
       ),
     );
   }
-}    
+}
