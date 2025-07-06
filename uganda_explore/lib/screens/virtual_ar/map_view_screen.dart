@@ -16,6 +16,7 @@ class MapViewScreen extends StatefulWidget {
 
 class _MapViewScreenState extends State<MapViewScreen> {
   latlng.LatLng? siteLatLng;
+  latlng.LatLng? userLatLng;
   String? error;
   String? userDistrict = "Fetching...";
   bool isEditingDestination = false;
@@ -62,18 +63,14 @@ class _MapViewScreenState extends State<MapViewScreen> {
         position.latitude,
         position.longitude,
       );
-      if (placemarks.isNotEmpty) {
-        setState(() {
-          userDistrict =
-              placemarks.first.subAdministrativeArea ??
-              placemarks.first.locality ??
-              "Unknown District";
-        });
-      } else {
-        setState(() {
-          userDistrict = "District not found";
-        });
-      }
+      setState(() {
+        userLatLng = latlng.LatLng(position.latitude, position.longitude);
+        userDistrict = placemarks.isNotEmpty
+            ? (placemarks.first.subAdministrativeArea ??
+                  placemarks.first.locality ??
+                  "Unknown District")
+            : "District not found";
+      });
     } catch (e) {
       setState(() {
         userDistrict = "Error: $e";
@@ -147,18 +144,41 @@ class _MapViewScreenState extends State<MapViewScreen> {
                           'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                       subdomains: const ['a', 'b', 'c'],
                     ),
+                    // Draw the line between user and site
+                    PolylineLayer(
+                      polylines: [
+                        if (userLatLng != null && siteLatLng != null)
+                          Polyline(
+                            points: [userLatLng!, siteLatLng!],
+                            color: const Color(0xFF1FF813),
+                            strokeWidth: 4,
+                          ),
+                      ],
+                    ),
                     MarkerLayer(
                       markers: [
-                        Marker(
-                          width: 40,
-                          height: 40,
-                          point: siteLatLng!,
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Colors.red,
-                            size: 40,
+                        if (siteLatLng != null)
+                          Marker(
+                            width: 40,
+                            height: 40,
+                            point: siteLatLng!,
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
                           ),
-                        ),
+                        if (userLatLng != null)
+                          Marker(
+                            width: 40,
+                            height: 40,
+                            point: userLatLng!,
+                            child: const Icon(
+                              Icons.my_location,
+                              color: Colors.blue,
+                              size: 30,
+                            ),
+                          ),
                       ],
                     ),
                   ],
@@ -355,7 +375,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
           ),
           Positioned(
             // Adjust 'top' as needed to position below the rectangle
-            top: 555, 
+            top: 555,
             right: 5,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
