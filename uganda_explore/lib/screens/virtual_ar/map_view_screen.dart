@@ -18,6 +18,8 @@ class _MapViewScreenState extends State<MapViewScreen> {
   latlng.LatLng? siteLatLng;
   String? error;
   String? userDistrict = "Fetching...";
+  bool isEditingDestination = false;
+  final TextEditingController _destinationController = TextEditingController();
 
   @override
   void initState() {
@@ -79,12 +81,13 @@ class _MapViewScreenState extends State<MapViewScreen> {
     }
   }
 
-  Future<void> fetchCoordinates() async {
-    print('Searching for site: "${widget.siteName}"');
+  Future<void> fetchCoordinates({String? customDestination}) async {
+    final searchName = customDestination ?? widget.siteName;
+    print('Searching for site: "$searchName"');
     try {
       final query = await FirebaseFirestore.instance
           .collection('tourismsites')
-          .where('name', isEqualTo: widget.siteName.trim())
+          .where('name', isEqualTo: searchName.trim())
           .limit(1)
           .get();
 
@@ -274,27 +277,66 @@ class _MapViewScreenState extends State<MapViewScreen> {
                                     color: Colors.black,
                                   ),
                                 ),
-                                // Tourism site location below the line with swap_vert icon
+                                // Tourism site location below the line with swap_vert icon or text input
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 20, top: 8),
+                                  padding: const EdgeInsets.only(
+                                    left: 20,
+                                    top: 8,
+                                  ),
                                   child: Row(
                                     children: [
                                       Expanded(
-                                        child: Text(
-                                          widget.siteName,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
+                                        child: isEditingDestination
+                                            ? TextField(
+                                                controller:
+                                                    _destinationController,
+                                                autofocus: true,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                      hintText:
+                                                          "Enter destination...",
+                                                      border: InputBorder.none,
+                                                      isDense: true,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                    ),
+                                                onSubmitted: (value) {
+                                                  if (value.trim().isNotEmpty) {
+                                                    fetchCoordinates(
+                                                      customDestination: value
+                                                          .trim(),
+                                                    );
+                                                  }
+                                                },
+                                              )
+                                            : Text(
+                                                widget.siteName,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                       ),
                                       const SizedBox(width: 1),
-                                      const Icon(
-                                        Icons.swap_vert,
-                                        size: 28,
-                                        color: Colors.black,
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isEditingDestination = true;
+                                            _destinationController.clear();
+                                          });
+                                        },
+                                        child: const Icon(
+                                          Icons.swap_vert,
+                                          size: 28,
+                                          color: Colors.black,
+                                        ),
                                       ),
                                     ],
                                   ),
