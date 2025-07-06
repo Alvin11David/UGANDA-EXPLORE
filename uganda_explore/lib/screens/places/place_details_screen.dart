@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -358,24 +359,37 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 ),
                 const SizedBox(width: 15),
                 // Location
+                // Find this section for the Location circle:
                 Column(
                   children: [
-                    ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
+                    GestureDetector(
+                      onTap: () {
+                        print('Location button tapped for: ${widget.siteName}');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                MapViewScreen(siteName: widget.siteName),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.location_on, // Location icon
-                              color: Colors.white,
-                              size: 30,
+                        );
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.location_on,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),

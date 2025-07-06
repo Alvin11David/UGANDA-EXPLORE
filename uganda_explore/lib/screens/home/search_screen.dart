@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 
-
-
-
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
@@ -57,6 +54,11 @@ class _SearchScreenState extends State<SearchScreen> {
             Row(
               children: [
                 GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/home');
+                    // Or, if you use MaterialPageRoute:
+                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+                  },
                   onTapDown: (_) => setState(() => isBackFocused = true),
                   onTapUp: (_) => setState(() => isBackFocused = false),
                   onTapCancel: () => setState(() => isBackFocused = false),

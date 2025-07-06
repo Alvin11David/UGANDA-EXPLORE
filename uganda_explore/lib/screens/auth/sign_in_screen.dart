@@ -41,10 +41,7 @@ class _SignInScreenState extends State<SignInScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [
-              Color(0xFF0C0F0A),
-              Color(0xFF235347),
-            ],
+            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
             stops: [0.03, 0.63],
           ),
         ),
@@ -56,9 +53,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: Image.asset(
                     'assets/logo/whitelogo.png',
                     width: 100,
@@ -84,16 +79,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(40),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 10),
                       const Text(
                         "Sign In",
                         style: TextStyle(
@@ -199,10 +192,7 @@ class EmailField extends StatelessWidget {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.mail,
-                color: Colors.black,
-              ),
+              child: Icon(Icons.mail, color: Colors.black),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -210,19 +200,16 @@ class EmailField extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
@@ -282,10 +269,7 @@ class _PasswordFieldState extends State<PasswordField> {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.lock,
-                color: Colors.black,
-              ),
+              child: Icon(Icons.lock, color: Colors.black),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -303,23 +287,20 @@ class _PasswordFieldState extends State<PasswordField> {
                   _isObscured ? Icons.visibility_off : Icons.visibility,
                   color: Colors.black54,
                 ),
-              )
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
@@ -386,7 +367,7 @@ class SignInButton extends StatelessWidget {
         email: emailController.text.trim(),
         password: passwordController.text,
       );
-      Navigator.pushReplacementNamed(context, '/onboarding_screen1');
+      Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         setError('No user found for that email.');
@@ -396,7 +377,9 @@ class SignInButton extends StatelessWidget {
         setError(e.message);
       }
     } catch (e) {
-      print('Sign in error: $e'); // <-- This will show the real error in your debug console
+      print(
+        'Sign in error: $e',
+      ); // <-- This will show the real error in your debug console
       setError('An error occurred. Please try again.');
     } finally {
       isLoading.value = false;
@@ -421,15 +404,12 @@ class SignInButton extends StatelessWidget {
                     end: Alignment.centerRight,
                     colors: [
                       Color.fromARGB(255, 47, 44, 44),
-                      Color(0xFF1EF813)
+                      Color(0xFF1EF813),
                     ],
                     stops: [0.0, 0.47],
                   ),
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(
-                      width: 1,
-                      color: Color(0xFF1EF813),
-                    ),
+                    side: const BorderSide(width: 1, color: Color(0xFF1EF813)),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   shadows: const [
@@ -447,7 +427,9 @@ class SignInButton extends StatelessWidget {
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.black,
+                          ),
                           strokeWidth: 3,
                         ),
                       )
@@ -502,29 +484,29 @@ class GoogleSignInButton extends StatelessWidget {
   const GoogleSignInButton({super.key});
 
   Future<void> _signInWithGoogle(BuildContext context) async {
-  try {
-    final googleSignIn = GoogleSignIn();
-    await googleSignIn.signOut();
-    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-    if (googleUser == null) return; 
+    try {
+      final googleSignIn = GoogleSignIn();
+      await googleSignIn.signOut();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return;
 
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
 
-    await FirebaseAuth.instance.signInWithCredential(credential);
-    Navigator.pushReplacementNamed(context, '/onboarding_screen1');
-  } catch (e) {
-    print('Google sign-in failed: $e');
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Google sign-in failed: $e')),
-    );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      print('Google sign-in failed: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -538,10 +520,7 @@ class GoogleSignInButton extends StatelessWidget {
             decoration: ShapeDecoration(
               color: Colors.white,
               shape: RoundedRectangleBorder(
-                side: const BorderSide(
-                  width: 1,
-                  color: Color(0xFF1EF813),
-                ),
+                side: const BorderSide(width: 1, color: Color(0xFF1EF813)),
                 borderRadius: BorderRadius.circular(30),
               ),
               shadows: const [
