@@ -1,8 +1,10 @@
-import 'dart:ui'; // Add this import for ImageFilter
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlng;
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
@@ -15,11 +17,66 @@ class MapViewScreen extends StatefulWidget {
 class _MapViewScreenState extends State<MapViewScreen> {
   latlng.LatLng? siteLatLng;
   String? error;
+  String? userDistrict = "Fetching...";
 
   @override
   void initState() {
     super.initState();
     fetchCoordinates();
+    fetchUserDistrict();
+  }
+
+  Future<void> fetchUserDistrict() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          userDistrict = "Location services are disabled.";
+        });
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() {
+            userDistrict = "Location permission denied.";
+          });
+          return;
+        }
+      }
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          userDistrict = "Location permission permanently denied.";
+        });
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      if (placemarks.isNotEmpty) {
+        setState(() {
+          userDistrict =
+              placemarks.first.subAdministrativeArea ??
+              placemarks.first.locality ??
+              "Unknown District";
+        });
+      } else {
+        setState(() {
+          userDistrict = "District not found";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        userDistrict = "Error: $e";
+      });
+    }
   }
 
   Future<void> fetchCoordinates() async {
@@ -185,12 +242,29 @@ class _MapViewScreenState extends State<MapViewScreen> {
                               ],
                             ),
                           ),
-                          // The rest of the rectangle can be filled with your content or left empty
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Spacer(),
+                                // User's district above the line
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 20,
+                                    bottom: 8,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      userDistrict ?? "Fetching...",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                // Black line
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 30,
@@ -198,6 +272,31 @@ class _MapViewScreenState extends State<MapViewScreen> {
                                   child: Container(
                                     height: 1,
                                     color: Colors.black,
+                                  ),
+                                ),
+                                // Tourism site location below the line with swap_vert icon
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20, top: 8),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          widget.siteName,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 1),
+                                      const Icon(
+                                        Icons.swap_vert,
+                                        size: 28,
+                                        color: Colors.black,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const Spacer(),

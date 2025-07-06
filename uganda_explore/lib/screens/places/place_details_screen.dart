@@ -19,6 +19,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
   List<VideoPlayerController> _videoControllers = [];
   int _playingIndex = -1;
+  int _selectedIndex = 0; // Add this for nav bar selection
 
   @override
   void initState() {
@@ -171,6 +172,13 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       }
     }
     return {};
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // Add navigation logic here if needed
   }
 
   @override
@@ -846,7 +854,113 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ),
             ),
           ),
+          // Add the custom nav bar at the bottom
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(40),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                  child: Container(
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(40),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.4),
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _NavIcon(
+                          icon: Icons.home,
+                          label: 'Home',
+                          selected: _selectedIndex == 0,
+                          onTap: () => _onItemTapped(0),
+                        ),
+                        _NavIcon(
+                          icon: Icons.person,
+                          label: 'Profile',
+                          selected: _selectedIndex == 1,
+                          onTap: () => _onItemTapped(1),
+                        ),
+                        _NavIcon(
+                          icon: Icons.settings,
+                          label: 'Settings',
+                          selected: _selectedIndex == 2,
+                          onTap: () => _onItemTapped(2),
+                        ),
+                        _NavIcon(
+                          icon: Icons.notifications,
+                          label: 'Notifications',
+                          selected: _selectedIndex == 3,
+                          onTap: () => _onItemTapped(3),
+                        ),
+                        _NavIcon(
+                          icon: Icons.map,
+                          label: 'Map',
+                          selected: _selectedIndex == 4,
+                          onTap: () => _onItemTapped(4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// Add this widget at the bottom of your file if not already present
+class _NavIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavIcon({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            if (selected) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }
