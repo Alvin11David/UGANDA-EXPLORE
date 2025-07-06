@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:uganda_explore/components/bottom_navbar.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -17,6 +16,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _showNavBar = true;
   String _district = 'Kampala';
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    // Add navigation logic here if needed
+  }
 
   @override
   void initState() {
@@ -269,7 +276,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SearchScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => const SearchScreen(),
+                        ),
                       );
                     },
                     child: Padding(
@@ -292,7 +301,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                         borderRadius: BorderRadius.circular(30),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.15),
+                                            color: Colors.black.withOpacity(
+                                              0.15,
+                                            ),
                                             blurRadius: 12,
                                             offset: const Offset(0, 4),
                                           ),
@@ -320,9 +331,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 hintText: 'Search Your Place',
                                                 border: InputBorder.none,
                                                 isDense: true,
-                                                contentPadding: EdgeInsets.symmetric(
-                                                  vertical: 14,
-                                                ),
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                      vertical: 14,
+                                                    ),
                                               ),
                                               style: const TextStyle(
                                                 fontFamily: 'Poppins',
@@ -359,8 +371,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 50,
                                           width: 70,
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.3),
-                                            borderRadius: BorderRadius.circular(30),
+                                            color: Colors.white.withOpacity(
+                                              0.3,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
                                             border: Border.all(
                                               color: focused
                                                   ? const Color(0xFF1FF813)
@@ -369,7 +385,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ),
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.black.withOpacity(0.15),
+                                                color: Colors.black.withOpacity(
+                                                  0.15,
+                                                ),
                                                 blurRadius: 12,
                                                 offset: const Offset(0, 4),
                                               ),
@@ -439,7 +457,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             children: [
                               const SizedBox(width: 20),
-                              const Icon(Icons.park, color: Colors.white, size: 30),
+                              const Icon(
+                                Icons.park,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                               const SizedBox(width: 12),
                               const Text(
                                 "Game Parks",
@@ -590,15 +612,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 80,
                                           width: 220,
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.5),
+                                            color: Colors.white.withOpacity(
+                                              0.5,
+                                            ),
                                             border: Border.all(
                                               color: Colors.white,
                                               width: 1,
                                             ),
-                                            borderRadius: const BorderRadius.only(
-                                              bottomLeft: Radius.circular(25),
-                                              bottomRight: Radius.circular(25),
-                                            ),
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(
+                                                    25,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    25,
+                                                  ),
+                                                ),
                                           ),
                                           child: Align(
                                             alignment: Alignment.topLeft,
@@ -616,7 +645,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     "Bwindi Impenetrable N.P",
                                                     style: TextStyle(
                                                       fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 15,
                                                       color: Colors.white,
                                                     ),
@@ -625,10 +655,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Row(
                                                     children: [
                                                       Padding(
-                                                        padding: EdgeInsets.only(
-                                                          left: 1,
-                                                          top: 1,
-                                                        ),
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                              left: 1,
+                                                              top: 1,
+                                                            ),
                                                         child: Icon(
                                                           Icons.location_on,
                                                           color: Colors.black,
@@ -639,7 +670,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         "90km Kanungu District",
                                                         style: TextStyle(
                                                           fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                           fontSize: 15,
                                                           color: Colors.white,
                                                         ),
@@ -704,15 +736,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 80,
                                           width: 220,
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.5),
+                                            color: Colors.white.withOpacity(
+                                              0.5,
+                                            ),
                                             border: Border.all(
                                               color: Colors.white,
                                               width: 1,
                                             ),
-                                            borderRadius: const BorderRadius.only(
-                                              bottomLeft: Radius.circular(25),
-                                              bottomRight: Radius.circular(25),
-                                            ),
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(
+                                                    25,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    25,
+                                                  ),
+                                                ),
                                           ),
                                           child: Align(
                                             alignment: Alignment.topLeft,
@@ -730,7 +769,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     "Kazinga Channel",
                                                     style: TextStyle(
                                                       fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 15,
                                                       color: Colors.white,
                                                     ),
@@ -739,10 +779,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Row(
                                                     children: [
                                                       Padding(
-                                                        padding: EdgeInsets.only(
-                                                          left: 1,
-                                                          top: 1,
-                                                        ),
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                              left: 1,
+                                                              top: 1,
+                                                            ),
                                                         child: Icon(
                                                           Icons.location_on,
                                                           color: Colors.black,
@@ -753,7 +794,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         "120km Kasese District",
                                                         style: TextStyle(
                                                           fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                           fontSize: 15,
                                                           color: Colors.white,
                                                         ),
@@ -818,15 +860,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                           height: 80,
                                           width: 220,
                                           decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(0.5),
+                                            color: Colors.white.withOpacity(
+                                              0.5,
+                                            ),
                                             border: Border.all(
                                               color: Colors.white,
                                               width: 1,
                                             ),
-                                            borderRadius: const BorderRadius.only(
-                                              bottomLeft: Radius.circular(25),
-                                              bottomRight: Radius.circular(25),
-                                            ),
+                                            borderRadius:
+                                                const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(
+                                                    25,
+                                                  ),
+                                                  bottomRight: Radius.circular(
+                                                    25,
+                                                  ),
+                                                ),
                                           ),
                                           child: Align(
                                             alignment: Alignment.topLeft,
@@ -844,7 +893,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     "Mountain Elgon",
                                                     style: TextStyle(
                                                       fontFamily: 'Poppins',
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                       fontSize: 15,
                                                       color: Colors.white,
                                                     ),
@@ -853,10 +903,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   Row(
                                                     children: [
                                                       Padding(
-                                                        padding: EdgeInsets.only(
-                                                          left: 1,
-                                                          top: 1,
-                                                        ),
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                              left: 1,
+                                                              top: 1,
+                                                            ),
                                                         child: Icon(
                                                           Icons.location_on,
                                                           color: Colors.black,
@@ -867,7 +918,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         "320km Mbale District",
                                                         style: TextStyle(
                                                           fontFamily: 'Poppins',
-                                                          fontWeight: FontWeight.w500,
+                                                          fontWeight:
+                                                              FontWeight.w500,
                                                           fontSize: 15,
                                                           color: Colors.white,
                                                         ),
@@ -926,17 +978,107 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Bottom Navigation Bar
-          AnimatedSlide(
-            duration: const Duration(milliseconds: 300),
-            offset: _showNavBar ? Offset.zero : const Offset(0.0, 1.0),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: _showNavBar ? 1 : 0,
-              child: const BottomNavBar(),
+          // Custom Bottom Navigation Bar (copied from ProfileScreen)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(40),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.4),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _NavIcon(
+                        icon: Icons.home,
+                        label: 'Home',
+                        selected: _selectedIndex == 0,
+                        onTap: () => _onItemTapped(0),
+                      ),
+                      _NavIcon(
+                        icon: Icons.person,
+                        label: 'Profile',
+                        selected: _selectedIndex == 1,
+                        onTap: () => _onItemTapped(1),
+                      ),
+                      _NavIcon(
+                        icon: Icons.settings,
+                        label: 'Settings',
+                        selected: _selectedIndex == 2,
+                        onTap: () => _onItemTapped(2),
+                      ),
+                      _NavIcon(
+                        icon: Icons.notifications,
+                        label: 'Notifications',
+                        selected: _selectedIndex == 3,
+                        onTap: () => _onItemTapped(3),
+                      ),
+                      _NavIcon(
+                        icon: Icons.map,
+                        label: 'Map',
+                        selected: _selectedIndex == 4,
+                        onTap: () => _onItemTapped(4),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NavIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavIcon({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            if (selected) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
