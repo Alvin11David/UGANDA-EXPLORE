@@ -124,7 +124,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
                                 gradient: const LinearGradient(
-                                  colors: [Colors.black, Colors.greenAccent],
+                                  colors: [Colors.black, Color(0xFF1FF813)],
+                                  stops: [0.0, 0.47],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                 ),
