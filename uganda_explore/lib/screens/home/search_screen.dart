@@ -419,7 +419,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Game Parks"),
+                              ResultsScreen(selectedText: "National Park"),
                         ),
                       );
                     },
