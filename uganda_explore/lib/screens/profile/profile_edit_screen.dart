@@ -219,8 +219,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(
-            color: Colors.green,
-            fontWeight: FontWeight.w600,
+            color: Colors.black,
+            fontWeight: FontWeight.w300,
             fontSize: 16,
             fontFamily: 'Poppins',
           ),
