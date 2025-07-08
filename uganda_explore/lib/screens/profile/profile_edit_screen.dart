@@ -15,10 +15,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    // Navigation logic (example)
     if (index == 0) Navigator.pushReplacementNamed(context, '/home');
     if (index == 1) Navigator.pushReplacementNamed(context, '/profile');
     // Add more navigation as needed
+  }
+
+  void _onChangePicture() {
+    // TODO: Implement image picker logic here
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Change picture tapped!')),
+    );
   }
 
   @override
@@ -47,26 +53,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // Profile avatar with green border
+                // Profile avatar with green border and camera icon
                 Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF1FF813), width: 1),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF1FF813), width: 1),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          color: Colors.white,
                         ),
-                      ],
-                      color: Colors.white,
-                    ),
-                    child: const CircleAvatar(
-                      radius: 56,
-                      backgroundImage: AssetImage('assets/profile.jpg'), // Replace as needed
-                    ),
+                        child: const CircleAvatar(
+                          radius: 56,
+                          backgroundImage: AssetImage('assets/profile.jpg'), // Replace as needed
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _onChangePicture,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            padding: const EdgeInsets.all(6),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              color: Color(0xFF1FF813),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -145,7 +175,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Bottom Nav Bar
+                          // Bottom Nav Bar (4 icons only)
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
                             child: ClipRRect(
@@ -181,16 +211,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         onTap: () => _onItemTapped(2),
                                       ),
                                       _NavIcon(
-                                        icon: Icons.notifications,
-                                        label: 'Notify',
-                                        selected: _selectedIndex == 3,
-                                        onTap: () => _onItemTapped(3),
-                                      ),
-                                      _NavIcon(
                                         icon: Icons.map,
                                         label: 'Map',
-                                        selected: _selectedIndex == 4,
-                                        onTap: () => _onItemTapped(4),
+                                        selected: _selectedIndex == 3,
+                                        onTap: () => _onItemTapped(3),
                                       ),
                                     ],
                                   ),
