@@ -25,6 +25,12 @@ class _MapViewScreenState extends State<MapViewScreen> {
   final TextEditingController _destinationController = TextEditingController();
   List<LatLng> routePolyline = [];
 
+  // Add these fields to your _MapViewScreenState class:
+  String? walkingDuration;
+  String? drivingDuration;
+  String? bicyclingDuration;
+  String? routeDistance;
+
   @override
   void initState() {
     super.initState();
@@ -209,6 +215,42 @@ class _MapViewScreenState extends State<MapViewScreen> {
       poly.add(LatLng(lat / 1E5, lng / 1E5));
     }
     return poly;
+  }
+
+  // Add this function to fetch durations and distance for all modes:
+  Future<void> fetchDurationsAndDistance() async {
+    if (userLatLng == null || siteLatLng == null) return;
+    const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+    final modes = ['walking', 'driving', 'bicycling'];
+    final results = <String, Map<String, String>>{};
+
+    for (final mode in modes) {
+      final url =
+          'https://maps.googleapis.com/maps/api/directions/json?origin=${userLatLng!.latitude},${userLatLng!.longitude}&destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&mode=$mode&key=$apiKey';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['routes'] != null && data['routes'].isNotEmpty) {
+          final leg = data['routes'][0]['legs'][0];
+          results[mode] = {
+            'duration': leg['duration']['text'],
+            'distance': leg['distance']['text'],
+          };
+        }
+      }
+    }
+
+    setState(() {
+      walkingDuration = results['walking']?['duration'] ?? '-';
+      drivingDuration = results['driving']?['duration'] ?? '-';
+      bicyclingDuration = results['bicycling']?['duration'] ?? '-';
+      // Prefer driving distance, else walking, else bicycling
+      routeDistance =
+          results['driving']?['distance'] ??
+          results['walking']?['distance'] ??
+          results['bicycling']?['distance'] ??
+          '-';
+    });
   }
 
   @override
@@ -443,10 +485,46 @@ class _MapViewScreenState extends State<MapViewScreen> {
           Positioned(
             // Adjust 'top' as needed to position below the rectangle
             top: 555,
+            left: 5, // Add left padding of 5
             right: 5,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // NEW: Add your custom circle on the left
+                GestureDetector(
+                  //onTap: () {
+                  // TODO: Replace 'Your360Screen' with your actual 360 screen widget/class
+                  //Navigator.push(
+                  //context,
+                  //MaterialPageRoute(
+                  //builder: (context) => Your360Screen(siteName: widget.siteName),
+                  //),
+                  //);
+                  //},
+                  child: Container(
+                    height: 55,
+                    width: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 5,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.threesixty,
+                        color: Colors.black,
+                        size: 25,
+                      ),
+                    ),
+                  ),
+                ),
+                // Existing location circle on the right
                 GestureDetector(
                   onTap: () {
                     if (userLatLng != null && mapController != null) {
@@ -494,7 +572,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                 child: Container(
-                  height: 100,
+                  height: 150,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.3),
                     borderRadius: const BorderRadius.only(
@@ -502,6 +580,152 @@ class _MapViewScreenState extends State<MapViewScreen> {
                       topRight: Radius.circular(40),
                     ),
                     border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: Stack(
+                    children: [
+                      // Place name in the top left corner
+                      Positioned(
+                        top: 16,
+                        left: 20,
+                        child: Text(
+                          widget.siteName,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            fontFamily: 'Poppins',
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Durations and distance row
+                      Positioned(
+                        top: 50,
+                        left: 20,
+                        right: 20,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            // Walking
+                            Icon(
+                              Icons.directions_walk,
+                              color: Colors.black,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              walkingDuration ?? '-',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // Bicycling
+                            Icon(
+                              Icons.directions_bike,
+                              color: Colors.black,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              bicyclingDuration ?? '-',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // Car
+                            Icon(
+                              Icons.directions_car,
+                              color: Colors.black,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              drivingDuration ?? '-',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            // Distance
+                            Icon(
+                              Icons.straighten,
+                              color: Colors.black,
+                              size: 22,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              routeDistance ?? '-',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 8,
+                        left: 20,
+                        right: 20,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            print('User: $userLatLng, Site: $siteLatLng');
+                            // When pressed, fetch and draw the route polyline in green
+                            await fetchAndSetRoute();
+                            print(
+                              'Polyline after fetch: ${routePolyline.length}',
+                            );
+                            if (routePolyline.isNotEmpty &&
+                                mapController != null) {
+                              final bounds = LatLngBounds(
+                                southwest: LatLng(
+                                  routePolyline
+                                      .map((p) => p.latitude)
+                                      .reduce((a, b) => a < b ? a : b),
+                                  routePolyline
+                                      .map((p) => p.longitude)
+                                      .reduce((a, b) => a < b ? a : b),
+                                ),
+                                northeast: LatLng(
+                                  routePolyline
+                                      .map((p) => p.latitude)
+                                      .reduce((a, b) => a > b ? a : b),
+                                  routePolyline
+                                      .map((p) => p.longitude)
+                                      .reduce((a, b) => a > b ? a : b),
+                                ),
+                              );
+                              await mapController!.animateCamera(
+                                CameraUpdate.newLatLngBounds(bounds, 60),
+                              );
+                            } else {
+                              print('No polyline to show!');
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1FF813),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Start',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

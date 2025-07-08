@@ -301,14 +301,14 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         print(
                           '360° Tour button tapped for: ${widget.siteName}',
                         );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => VirtualTourScreen(
-                              placeName: widget.siteName.trim(),
-                            ),
-                          ),
-                        );
+                        //.push(
+                          //context,
+                          //MaterialPageRoute(
+                            //builder: (_) => VirtualTourScreen(
+                              //placeName: widget.siteName.trim(),
+                            //),
+                          //),
+                        //);
                       },
                       child: ClipOval(
                         child: BackdropFilter(

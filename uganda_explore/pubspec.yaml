@@ -54,7 +54,7 @@ dependencies:
   permission_handler:
   
   # Virtual tour
-  panorama: 0.4.1
+
 
   # Firebase core & services
   firebase_core:
