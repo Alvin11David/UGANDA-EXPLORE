@@ -1,238 +1,224 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  int _selectedIndex = 1;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: SafeArea(
-        child: Stack(
-          children: [
-            // Top Glass Container
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              children: [
+                // Back button
+                Align(
+                  alignment: Alignment.topLeft,
                   child: Container(
-                    height: 120,
-                    color: Colors.white.withOpacity(0.1),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.chevron_left, color: Colors.black),
+                      onPressed: () => Navigator.pop(context),
+                    ),
                   ),
                 ),
-              ),
-            ),
+                const SizedBox(height: 10),
 
-            // Main Content
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 20),
-
-                  // Back Button
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, size: 22),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
-
-                  // Profile Picture
-                  Center(
-                    child: Stack(
-                      children: [
-                        const CircleAvatar(
-                          radius: 60,
-                          backgroundImage: AssetImage('assets/profile.jpg'), // replace with your asset
+                // Profile avatar with green border
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFF1FF813), width: 1),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
-                        Positioned(
-                          bottom: 0,
-                          right: 4,
-                          child: CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Colors.green,
-                            child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
-                          ),
-                        )
                       ],
+                      color: Colors.white,
+                    ),
+                    child: const CircleAvatar(
+                      radius: 56,
+                      backgroundImage: AssetImage('assets/profile.jpg'), // Replace as needed
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 20),
 
-                  // Title & Subtitle
-                  const Text(
-                    "Edit Profile",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                // Title
+                const Text(
+                  "Edit Profile",
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    color: Colors.black,
                   ),
-                  const Text(
-                    "Fill in the fields below",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                ),
+                const SizedBox(height: 3),
+                const Text(
+                  "Fill in the fields below",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black54,
+                    fontFamily: 'Poppins',
                   ),
+                ),
+                const SizedBox(height: 20),
 
-                  const SizedBox(height: 20),
-
-                  // Glass Form Container
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                      child: Container(
-                        width: double.infinity,
-                        color: Colors.white.withOpacity(0.1),
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            _buildFloatingField(Icons.person, "Full Names"),
-                            _buildFloatingField(Icons.email, "Email"),
-                            _buildFloatingField(Icons.phone, "Phone Contact"),
-                            _buildFloatingField(Icons.location_on, "Location"),
-
-                            // Bio Field with floating label
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: TextFormField(
-                                maxLines: 3,
-                                decoration: InputDecoration(
-                                  labelText: 'Bio',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.15),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: const BorderSide(color: Colors.green, width: 1),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
-                                    borderSide: const BorderSide(color: Colors.green, width: 2),
-                                  ),
-                                  suffixIcon: const Icon(Icons.edit, color: Colors.black54, size: 18),
-                                ),
-                                style: const TextStyle(color: Colors.black87, fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Update Button
-                  GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        gradient: const LinearGradient(
-                          colors: [Colors.black, Colors.greenAccent],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Update',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 100), // Space for nav bar
-                ],
-              ),
-            ),
-
-            // Bottom Navigation Bar
-            Positioned(
-              bottom: 20,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
+                // Glass Container for Fields
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
-                      height: 60,
-                      color: Colors.white.withOpacity(0.1),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+                      ),
+                      child: Column(
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.home, color: Colors.black),
-                            onPressed: () => Navigator.pushNamed(context, '/home'),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            child: Row(
-                              children: const [
-                                Icon(Icons.person, color: Colors.white),
-                                SizedBox(width: 6),
-                                Text("Profile", style: TextStyle(color: Colors.white)),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.settings, color: Colors.black),
-                            onPressed: () {},
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.map, color: Colors.black),
-                            onPressed: () {},
-                          ),
+                          _buildFloatingField(Icons.person, "Full Names"),
+                          _buildFloatingField(Icons.email, "Email"),
+                          _buildFloatingField(Icons.phone, "Phone Contact"),
+                          _buildFloatingField(Icons.location_on, "Location"),
+                          _buildFloatingField(Icons.edit, "Bio", isMultiline: true),
                         ],
                       ),
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 24),
+
+                // Update Button
+                GestureDetector(
+                  onTap: () {},
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      gradient: const LinearGradient(
+                        colors: [Colors.black, Colors.greenAccent],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'Update',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+        ),
+      ),
+
+      // Bottom Nav Bar
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.2),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavIcon(
+                    icon: Icons.home,
+                    label: 'Home',
+                    selected: _selectedIndex == 0,
+                    onTap: () => _onItemTapped(0),
+                  ),
+                  _NavIcon(
+                    icon: Icons.person,
+                    label: 'Profile',
+                    selected: _selectedIndex == 1,
+                    onTap: () => _onItemTapped(1),
+                  ),
+                  _NavIcon(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
+                  ),
+                  _NavIcon(
+                    icon: Icons.notifications,
+                    label: 'Notify',
+                    selected: _selectedIndex == 3,
+                    onTap: () => _onItemTapped(3),
+                  ),
+                  _NavIcon(
+                    icon: Icons.map,
+                    label: 'Map',
+                    selected: _selectedIndex == 4,
+                    onTap: () => _onItemTapped(4),
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildFloatingField(IconData icon, String label) {
+  Widget _buildFloatingField(IconData icon, String label, {bool isMultiline = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
+        maxLines: isMultiline ? 3 : 1,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(
             color: Colors.green,
             fontWeight: FontWeight.w600,
             fontSize: 16,
+            fontFamily: 'Poppins',
           ),
           prefixIcon: Icon(icon, color: Colors.black),
           filled: true,
@@ -247,7 +233,52 @@ class EditProfileScreen extends StatelessWidget {
           ),
           suffixIcon: const Icon(Icons.edit, size: 18, color: Colors.black54),
         ),
-        style: const TextStyle(color: Colors.black87, fontSize: 16),
+        style: const TextStyle(color: Colors.black87, fontSize: 16, fontFamily: 'Poppins'),
+      ),
+    );
+  }
+}
+
+class _NavIcon extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _NavIcon({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            if (selected) ...[
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ]
+          ],
+        ),
       ),
     );
   }

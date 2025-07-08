@@ -11,7 +11,6 @@ import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
-
 // Splash Screens
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
