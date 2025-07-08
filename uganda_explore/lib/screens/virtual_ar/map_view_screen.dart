@@ -1,10 +1,11 @@
+import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart' as latlng;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:http/http.dart' as http;
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
@@ -15,12 +16,14 @@ class MapViewScreen extends StatefulWidget {
 }
 
 class _MapViewScreenState extends State<MapViewScreen> {
-  latlng.LatLng? siteLatLng;
-  latlng.LatLng? userLatLng;
+  LatLng? siteLatLng;
+  LatLng? userLatLng;
+  GoogleMapController? mapController;
   String? error;
   String? userDistrict = "Fetching...";
   bool isEditingDestination = false;
   final TextEditingController _destinationController = TextEditingController();
+  List<LatLng> routePolyline = [];
 
   @override
   void initState() {
@@ -64,13 +67,17 @@ class _MapViewScreenState extends State<MapViewScreen> {
         position.longitude,
       );
       setState(() {
-        userLatLng = latlng.LatLng(position.latitude, position.longitude);
+        userLatLng = LatLng(position.latitude, position.longitude);
         userDistrict = placemarks.isNotEmpty
             ? (placemarks.first.subAdministrativeArea ??
                   placemarks.first.locality ??
                   "Unknown District")
             : "District not found";
       });
+      // If both locations are available, fetch the route
+      if (userLatLng != null && siteLatLng != null) {
+        fetchAndSetRoute();
+      }
     } catch (e) {
       setState(() {
         userDistrict = "Error: $e";
@@ -110,9 +117,13 @@ class _MapViewScreenState extends State<MapViewScreen> {
 
         if (latitude != null && longitude != null) {
           setState(() {
-            siteLatLng = latlng.LatLng(latitude!, longitude!);
+            siteLatLng = LatLng(latitude!, longitude!);
             error = null;
           });
+          // If both locations are available, fetch the route
+          if (userLatLng != null) {
+            fetchAndSetRoute();
+          }
         } else {
           setState(() {
             error = 'Location not found for this site.';
@@ -130,64 +141,120 @@ class _MapViewScreenState extends State<MapViewScreen> {
     }
   }
 
+  Future<void> fetchAndSetRoute() async {
+    // Replace with your actual Google Maps Directions API key
+    const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+    if (userLatLng != null && siteLatLng != null) {
+      try {
+        final polyline = await fetchRoutePolyline(
+          userLatLng!,
+          siteLatLng!,
+          apiKey,
+        );
+        setState(() {
+          routePolyline = polyline;
+        });
+      } catch (e) {
+        setState(() {
+          error = 'Failed to fetch route: $e';
+        });
+      }
+    }
+  }
+
+  Future<List<LatLng>> fetchRoutePolyline(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
+  ) async {
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=$apiKey';
+
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final points = data['routes'][0]['overview_polyline']['points'];
+      return decodePolyline(points);
+    } else {
+      throw Exception('Failed to fetch route');
+    }
+  }
+
+  // Polyline decoder (no external package needed)
+  List<LatLng> decodePolyline(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      poly.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+    return poly;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          siteLatLng != null
-              ? FlutterMap(
-                  options: MapOptions(center: siteLatLng, zoom: 14),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      subdomains: const ['a', 'b', 'c'],
+          if (siteLatLng != null)
+            GoogleMap(
+              initialCameraPosition: CameraPosition(
+                target: siteLatLng!,
+                zoom: 14,
+              ),
+              markers: {
+                if (siteLatLng != null)
+                  Marker(
+                    markerId: const MarkerId('site'),
+                    position: siteLatLng!,
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueRed,
                     ),
-                    // Draw the line between user and site
-                    PolylineLayer(
-                      polylines: [
-                        if (userLatLng != null && siteLatLng != null)
-                          Polyline(
-                            points: [userLatLng!, siteLatLng!],
-                            color: const Color(0xFF1FF813),
-                            strokeWidth: 4,
-                          ),
-                      ],
+                  ),
+                if (userLatLng != null)
+                  Marker(
+                    markerId: const MarkerId('user'),
+                    position: userLatLng!,
+                    icon: BitmapDescriptor.defaultMarkerWithHue(
+                      BitmapDescriptor.hueAzure,
                     ),
-                    MarkerLayer(
-                      markers: [
-                        if (siteLatLng != null)
-                          Marker(
-                            width: 40,
-                            height: 40,
-                            point: siteLatLng!,
-                            child: const Icon(
-                              Icons.location_on,
-                              color: Colors.red,
-                              size: 40,
-                            ),
-                          ),
-                        if (userLatLng != null)
-                          Marker(
-                            width: 40,
-                            height: 40,
-                            point: userLatLng!,
-                            child: const Icon(
-                              Icons.my_location,
-                              color: Colors.blue,
-                              size: 30,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                )
-              : Center(
-                  child: error != null
-                      ? Text(error!)
-                      : const CircularProgressIndicator(),
-                ),
+                  ),
+              },
+              polylines: {
+                if (routePolyline.isNotEmpty)
+                  Polyline(
+                    polylineId: const PolylineId('route'),
+                    points: routePolyline,
+                    color: const Color(0xFF1FF813),
+                    width: 4,
+                  ),
+              },
+              onMapCreated: (controller) => mapController = controller,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+            )
+          else
+            const Center(child: CircularProgressIndicator()),
           // Custom back arrow and rectangle in the same row
           Positioned(
             top: 38,
@@ -380,29 +447,64 @@ class _MapViewScreenState extends State<MapViewScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(
-                  height: 55,
-                  width: 55,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.4),
-                        blurRadius: 5,
-                        offset: const Offset(0, 4),
+                GestureDetector(
+                  onTap: () {
+                    if (userLatLng != null && mapController != null) {
+                      mapController!.animateCamera(
+                        CameraUpdate.newLatLng(userLatLng!),
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: 55,
+                    width: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.4),
+                          blurRadius: 5,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.my_location,
+                        color: Colors.black,
+                        size: 25,
                       ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.my_location,
-                      color: Colors.black,
-                      size: 25,
                     ),
                   ),
                 ),
               ],
+            ),
+          ),
+          // Bottom rectangle
+          Positioned(
+            left: 4,
+            right: 4,
+            bottom: 0,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(40),
+                      topRight: Radius.circular(40),
+                    ),
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -295,22 +296,37 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 // 360° Tour
                 Column(
                   children: [
-                    ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
+                    GestureDetector(
+                      onTap: () {
+                        print(
+                          '360° Tour button tapped for: ${widget.siteName}',
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => VirtualTourScreen(
+                              placeName: widget.siteName.trim(),
+                            ),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.threesixty, // 360 arrow icon
-                              color: Colors.white,
-                              size: 30,
+                        );
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.threesixty,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -958,7 +974,7 @@ class _NavIcon extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
