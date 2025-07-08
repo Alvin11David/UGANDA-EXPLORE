@@ -1,5 +1,7 @@
 import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -10,6 +12,8 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   int _selectedIndex = 1;
+  File? _profileImage;
+  final String email = "user@email.com"; // Replace with actual user email
 
   void _onItemTapped(int index) {
     setState(() {
@@ -20,15 +24,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Add more navigation as needed
   }
 
-  void _onChangePicture() {
-    // TODO: Implement image picker logic here
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Change picture tapped!')),
-    );
+  Future<void> _onChangePicture() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      setState(() {
+        _profileImage = File(picked.path);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final Color mainGreen = const Color(0xFF1FF813);
+
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: SafeArea(
@@ -61,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF1FF813), width: 1),
+                          border: Border.all(color: mainGreen, width: 1),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
@@ -71,9 +80,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ],
                           color: Colors.white,
                         ),
-                        child: const CircleAvatar(
+                        child: CircleAvatar(
                           radius: 60,
-                          backgroundImage: AssetImage('assets/profile.jpg'), // Replace as needed
+                          backgroundColor: mainGreen.withOpacity(0.15),
+                          backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                          child: _profileImage == null
+                              ? Text(
+                                  email.isNotEmpty ? email[0].toUpperCase() : '',
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    color: mainGreen,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                )
+                              : null,
                         ),
                       ),
                       Positioned(
@@ -88,9 +109,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               border: Border.all(color: Colors.white, width: 2),
                             ),
                             padding: const EdgeInsets.all(6),
-                            child: const Icon(
+                            child: Icon(
                               Icons.camera_alt,
-                              color: Color(0xFF1FF813),
+                              color: mainGreen,
                               size: 20,
                             ),
                           ),
@@ -138,11 +159,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Column(
                         children: [
                           const SizedBox(height: 20),
-                          _buildFloatingField(Icons.person, "Full Names"),
-                          _buildFloatingField(Icons.email, "Email"),
-                          _buildFloatingField(Icons.phone, "Phone Contact"),
-                          _buildFloatingField(Icons.location_on, "Location"),
-                          _buildFloatingField(Icons.edit, "Bio", isMultiline: true),
+                          _buildFloatingField(Icons.person, "Full Names", iconColor: mainGreen),
+                          _buildFloatingField(Icons.email, "Email", iconColor: mainGreen),
+                          _buildFloatingField(Icons.phone, "Phone Contact", iconColor: mainGreen),
+                          _buildFloatingField(Icons.location_on, "Location", iconColor: mainGreen),
+                          _buildFloatingField(Icons.edit, "Bio", isMultiline: true, iconColor: mainGreen),
                           const SizedBox(height: 24),
 
                           // Update Button
@@ -153,9 +174,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
-                                gradient: const LinearGradient(
-                                  colors: [Colors.black, Color(0xFF1FF813)],
-                                  stops: [0.0, 0.47],
+                                gradient: LinearGradient(
+                                  colors: [Colors.black, mainGreen],
+                                  stops: const [0.0, 0.47],
                                   begin: Alignment.centerLeft,
                                   end: Alignment.centerRight,
                                 ),
@@ -197,24 +218,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         label: 'Home',
                                         selected: _selectedIndex == 0,
                                         onTap: () => _onItemTapped(0),
+                                        color: mainGreen,
                                       ),
                                       _NavIcon(
                                         icon: Icons.person,
                                         label: 'Profile',
                                         selected: _selectedIndex == 1,
                                         onTap: () => _onItemTapped(1),
+                                        color: mainGreen,
                                       ),
                                       _NavIcon(
                                         icon: Icons.settings,
                                         label: 'Settings',
                                         selected: _selectedIndex == 2,
                                         onTap: () => _onItemTapped(2),
+                                        color: mainGreen,
                                       ),
                                       _NavIcon(
                                         icon: Icons.map,
                                         label: 'Map',
                                         selected: _selectedIndex == 3,
                                         onTap: () => _onItemTapped(3),
+                                        color: mainGreen,
                                       ),
                                     ],
                                   ),
@@ -236,7 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildFloatingField(IconData icon, String label, {bool isMultiline = false}) {
+  Widget _buildFloatingField(IconData icon, String label, {bool isMultiline = false, Color? iconColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
@@ -249,7 +274,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             fontSize: 16,
             fontFamily: 'Poppins',
           ),
-          prefixIcon: Icon(icon, color: Colors.black),
+          prefixIcon: Icon(icon, color: icon == Icons.edit ? Colors.black : (iconColor ?? Colors.black)),
           filled: true,
           fillColor: Colors.white.withOpacity(0.15),
           enabledBorder: OutlineInputBorder(
@@ -273,12 +298,14 @@ class _NavIcon extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final Color color;
 
   const _NavIcon({
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
+    required this.color,
   });
 
   @override
@@ -289,12 +316,12 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? color : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            Icon(icon, color: selected ? Colors.white : color, size: 24),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(
