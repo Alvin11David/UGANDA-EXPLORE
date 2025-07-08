@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/screens/home/results_screen.dart';
+import 'package:uganda_explore/screens/places/place_details_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -52,6 +54,11 @@ class _SearchScreenState extends State<SearchScreen> {
             Row(
               children: [
                 GestureDetector(
+                  onTap: () {
+                    Navigator.pushReplacementNamed(context, '/home');
+                    // Or, if you use MaterialPageRoute:
+                    // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+                  },
                   onTapDown: (_) => setState(() => isBackFocused = true),
                   onTapUp: (_) => setState(() => isBackFocused = false),
                   onTapCancel: () => setState(() => isBackFocused = false),
@@ -145,11 +152,23 @@ class _SearchScreenState extends State<SearchScreen> {
                                   fontSize: 16,
                                 ),
                                 onSubmitted: (value) {
-                                  if (value.trim().isNotEmpty &&
-                                      !recentKeywords.contains(value.trim())) {
+                                  final trimmed = value.trim();
+                                  if (trimmed.isNotEmpty &&
+                                      !recentKeywords.contains(trimmed)) {
                                     setState(() {
-                                      recentKeywords.insert(0, value.trim());
+                                      recentKeywords.insert(0, trimmed);
                                     });
+                                  }
+                                  if (trimmed.isNotEmpty) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            PlaceDetailsScreen(
+                                              siteName: trimmed,
+                                            ),
+                                      ),
+                                    );
                                   }
                                 },
                               ),
@@ -280,7 +299,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ResultsScreen(selectedText: "Waterfalls"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
@@ -328,7 +355,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ResultsScreen(selectedText: "Cultural Sites"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
@@ -379,7 +414,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ResultsScreen(selectedText: "Game Parks"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
@@ -427,7 +470,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ResultsScreen(selectedText: "Forests"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
@@ -478,7 +529,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => ResultsScreen(selectedText: "Lakes"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
@@ -526,7 +584,15 @@ class _SearchScreenState extends State<SearchScreen> {
                 Padding(
                   padding: const EdgeInsets.only(right: 10),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ResultsScreen(selectedText: "Wildlife"),
+                        ),
+                      );
+                    },
                     child: Container(
                       height: 50,
                       width: 150,
