@@ -72,7 +72,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           color: Colors.white,
                         ),
                         child: const CircleAvatar(
-                          radius: 56,
+                          radius: 60,
                           backgroundImage: AssetImage('assets/profile.jpg'), // Replace as needed
                         ),
                       ),
