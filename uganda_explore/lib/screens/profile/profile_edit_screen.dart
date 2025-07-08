@@ -150,7 +150,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
-                      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0, top: 0),
+                      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(40),

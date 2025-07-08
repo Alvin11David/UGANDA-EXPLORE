@@ -15,6 +15,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    // Add navigation logic if needed
   }
 
   @override
@@ -205,16 +206,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () => _onItemTapped(2),
                   ),
                   _NavIcon(
-                    icon: Icons.notifications,
-                    label: 'Notifications',
-                    selected: _selectedIndex == 3,
-                    onTap: () => _onItemTapped(3),
-                  ),
-                  _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
-                    selected: _selectedIndex == 4,
-                    onTap: () => _onItemTapped(4),
+                    selected: _selectedIndex == 3,
+                    onTap: () => _onItemTapped(3),
                   ),
                 ],
               ),

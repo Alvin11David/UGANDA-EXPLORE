@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
     '/edit_profile': (context) => const EditProfileScreen(),
     
   },
-  home: EditProfileScreen(),
+  home: ProfileScreen(),
 );
   }
 }
