@@ -15,6 +15,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    // Navigation logic (example)
+    if (index == 0) Navigator.pushReplacementNamed(context, '/home');
+    if (index == 1) Navigator.pushReplacementNamed(context, '/profile');
+    // Add more navigation as needed
   }
 
   @override
@@ -89,13 +93,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Glass Container for Fields
+                // Glass Container for Fields, Update Button, and Nav Bar
                 ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0, top: 0),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(40),
@@ -103,103 +107,103 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       child: Column(
                         children: [
+                          const SizedBox(height: 20),
                           _buildFloatingField(Icons.person, "Full Names"),
                           _buildFloatingField(Icons.email, "Email"),
                           _buildFloatingField(Icons.phone, "Phone Contact"),
                           _buildFloatingField(Icons.location_on, "Location"),
                           _buildFloatingField(Icons.edit, "Bio", isMultiline: true),
+                          const SizedBox(height: 24),
+
+                          // Update Button
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                gradient: const LinearGradient(
+                                  colors: [Colors.black, Colors.greenAccent],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'Update',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Bottom Nav Bar
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(40),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                child: Container(
+                                  height: 64,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.3),
+                                    borderRadius: BorderRadius.circular(40),
+                                    border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.2),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      _NavIcon(
+                                        icon: Icons.home,
+                                        label: 'Home',
+                                        selected: _selectedIndex == 0,
+                                        onTap: () => _onItemTapped(0),
+                                      ),
+                                      _NavIcon(
+                                        icon: Icons.person,
+                                        label: 'Profile',
+                                        selected: _selectedIndex == 1,
+                                        onTap: () => _onItemTapped(1),
+                                      ),
+                                      _NavIcon(
+                                        icon: Icons.settings,
+                                        label: 'Settings',
+                                        selected: _selectedIndex == 2,
+                                        onTap: () => _onItemTapped(2),
+                                      ),
+                                      _NavIcon(
+                                        icon: Icons.notifications,
+                                        label: 'Notify',
+                                        selected: _selectedIndex == 3,
+                                        onTap: () => _onItemTapped(3),
+                                      ),
+                                      _NavIcon(
+                                        icon: Icons.map,
+                                        label: 'Map',
+                                        selected: _selectedIndex == 4,
+                                        onTap: () => _onItemTapped(4),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Update Button
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: const LinearGradient(
-                        colors: [Colors.black, Colors.greenAccent],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Update',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontFamily: 'Poppins',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 100),
               ],
-            ),
-          ),
-        ),
-      ),
-
-      // Bottom Nav Bar
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.2),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NavIcon(
-                    icon: Icons.home,
-                    label: 'Home',
-                    selected: _selectedIndex == 0,
-                    onTap: () => _onItemTapped(0),
-                  ),
-                  _NavIcon(
-                    icon: Icons.person,
-                    label: 'Profile',
-                    selected: _selectedIndex == 1,
-                    onTap: () => _onItemTapped(1),
-                  ),
-                  _NavIcon(
-                    icon: Icons.settings,
-                    label: 'Settings',
-                    selected: _selectedIndex == 2,
-                    onTap: () => _onItemTapped(2),
-                  ),
-                  _NavIcon(
-                    icon: Icons.notifications,
-                    label: 'Notify',
-                    selected: _selectedIndex == 3,
-                    onTap: () => _onItemTapped(3),
-                  ),
-                  _NavIcon(
-                    icon: Icons.map,
-                    label: 'Map',
-                    selected: _selectedIndex == 4,
-                    onTap: () => _onItemTapped(4),
-                  ),
-                ],
-              ),
             ),
           ),
         ),
