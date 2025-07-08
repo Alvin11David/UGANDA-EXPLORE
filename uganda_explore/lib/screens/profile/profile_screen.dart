@@ -130,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _ProfileOptionButton(
                             icon: Icons.person,
                             label: 'Edit Profile',
-                            onTap: () => print("Edit Profile tapped"),
+                            onTap: () => Navigator.pushNamed(context, '/edit_profile'),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
