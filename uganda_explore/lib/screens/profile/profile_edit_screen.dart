@@ -86,8 +86,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 const Text(
                   "Fill in the fields below",
                   style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black54,
+                    fontSize: 20,
+                    color: Colors.black,
                     fontFamily: 'Poppins',
                   ),
                 ),
@@ -235,7 +235,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             borderRadius: BorderRadius.circular(15),
             borderSide: const BorderSide(color: Colors.green, width: 2),
           ),
-          suffixIcon: const Icon(Icons.edit, size: 18, color: Colors.black54),
+          suffixIcon: const Icon(Icons.edit, size: 19, color: Colors.black),
         ),
         style: const TextStyle(color: Colors.black87, fontSize: 16, fontFamily: 'Poppins'),
       ),
