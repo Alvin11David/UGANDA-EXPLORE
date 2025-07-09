@@ -59,9 +59,10 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
+        '/settings': (context) => const SettingsScreen(),
         //'/map': (context) => const MapScreen(),
       },
-      home: SettingsScreen(),
+      home: HomeScreen(),
     );
   }
 }
