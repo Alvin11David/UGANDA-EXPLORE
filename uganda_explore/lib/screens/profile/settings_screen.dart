@@ -55,3 +55,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+                                const SizedBox(height: 20),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF1FF813),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      color: Colors.white,
+                    ),
+                    child: CircleAvatar(
+                      radius: 56,
+                      backgroundColor: Colors.white,
+                      backgroundImage: null,
+                      child: Text(
+                        email[0].toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 36,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
