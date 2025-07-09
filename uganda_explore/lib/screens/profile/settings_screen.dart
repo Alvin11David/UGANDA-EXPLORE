@@ -23,3 +23,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     // Add more navigation logic for other indices if needed
   }
+    @override
+  Widget build(BuildContext context) {
+    final String email = 'john.doe@email.com';
+    final String name = 'John Doe';
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFE5E3D4),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFFEFE9DE),
+              borderRadius: BorderRadius.circular(40),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            child: Column(
+              children: [
