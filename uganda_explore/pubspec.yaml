@@ -69,6 +69,9 @@ dependencies:
   camera:
   flutter_compass:
 
+  # Page Loading Skeleton
+  shimmer: ^3.0.0
+
   #Animations and utilities
   animated_text_kit: 
   cached_network_image:
