@@ -7,6 +7,7 @@ class SettingsScreen extends StatefulWidget {
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
+
 class _SettingsScreenState extends State<SettingsScreen> {
   int _selectedIndex = 2;
 
@@ -23,7 +24,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     // Add more navigation logic for other indices if needed
   }
-    @override
+
+  @override
   Widget build(BuildContext context) {
     final String email = 'john.doe@email.com';
     final String name = 'John Doe';
@@ -40,7 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: Column(
               children: [
-                                Align(
+                Align(
                   alignment: Alignment.topLeft,
                   child: Container(
                     decoration: const BoxDecoration(
@@ -55,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-                                const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Center(
                   child: Container(
                     padding: const EdgeInsets.all(4),
@@ -89,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
-                                const SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   name,
                   style: const TextStyle(
@@ -102,20 +104,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 3),
                 Text(
                   email,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.black54,
-                  ),
+                  style: const TextStyle(fontSize: 20, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                                ClipRRect(
+                ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 12,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(40),
@@ -136,7 +138,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.person,
                             label: 'Edit Profile',
-                            onTap: () => Navigator.pushNamed(context, '/edit_profile'),
+                            onTap: () =>
+                                Navigator.pushNamed(context, '/edit_profile'),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
@@ -168,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                              ],
+              ],
             ),
           ),
         ),
@@ -225,6 +228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+
 class _NavIcon extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -261,8 +265,63 @@ class _NavIcon extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ]
+            ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsOptionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _SettingsOptionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Container(
+            height: 59,
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.22),
+              border: Border.all(
+                color: const Color(0xFF1FF813).withOpacity(0.7),
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.black),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+                const Icon(Icons.chevron_right, color: Colors.black),
+              ],
+            ),
+          ),
         ),
       ),
     );
