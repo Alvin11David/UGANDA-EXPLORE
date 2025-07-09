@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -211,4 +209,3 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
     );
   }
 }
->>>>>>> Stashed changes

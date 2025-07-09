@@ -54,7 +54,7 @@ dependencies:
   permission_handler:
   
   # Virtual tour
-
+  photo_view: ^0.15.0
 
   # Firebase core & services
   firebase_core:
@@ -66,7 +66,8 @@ dependencies:
   video_player:
 
   # AR support 
-  
+  camera:
+  flutter_compass:
 
   #Animations and utilities
   animated_text_kit: 

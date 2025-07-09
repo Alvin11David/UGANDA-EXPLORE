@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:uganda_explore/screens/virtual_ar/ar_scan_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 import 'package:video_player/video_player.dart';
@@ -182,6 +183,29 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     // Add navigation logic here if needed
   }
 
+  Future<Map<String, double>?> fetchLatLng(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+        final lat = data['latitude'];
+        final lng = data['longitude'];
+        if (lat != null && lng != null) {
+          return {
+            'lat': (lat as num).toDouble(),
+            'lng': (lng as num).toDouble(),
+          };
+        }
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -301,14 +325,14 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         print(
                           '360° Tour button tapped for: ${widget.siteName}',
                         );
-                        //.push(
-                          //context,
-                          //MaterialPageRoute(
-                            //builder: (_) => VirtualTourScreen(
-                              //placeName: widget.siteName.trim(),
-                            //),
-                          //),
-                        //);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => VirtualTourScreen(
+                              placeName: widget.siteName.trim(),
+                            ),
+                          ),
+                        );
                       },
                       child: ClipOval(
                         child: BackdropFilter(
@@ -348,22 +372,49 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 // AR View
                 Column(
                   children: [
-                    ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.qr_code_scanner, // AR scan icon
-                              color: Colors.white,
-                              size: 30,
+                    GestureDetector(
+                      onTap: () async {
+                        print('AR Scan button tapped');
+                        final latLng = await fetchLatLng(
+                          widget.siteName.trim(),
+                        );
+                        if (latLng != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ARScanScreen(
+                                destinationLat: latLng['lat']!,
+                                destinationLng: latLng['lng']!,
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Location not found for this site.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.qr_code_scanner,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -371,7 +422,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     ),
                     const SizedBox(height: 1),
                     const Text(
-                      "AR View",
+                      "AR Scan",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -381,6 +432,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(width: 15),
                 // Location
                 // Find this section for the Location circle:
