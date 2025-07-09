@@ -978,7 +978,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Custom Bottom Navigation Bar (copied from ProfileScreen)
+          // Custom Bottom Navigation Bar (no notifications icon)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ClipRRect(
@@ -1017,16 +1017,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _onItemTapped(2),
                       ),
                       _NavIcon(
-                        icon: Icons.notifications,
-                        label: 'Notifications',
-                        selected: _selectedIndex == 3,
-                        onTap: () => _onItemTapped(3),
-                      ),
-                      _NavIcon(
                         icon: Icons.map,
                         label: 'Map',
-                        selected: _selectedIndex == 4,
-                        onTap: () => _onItemTapped(4),
+                        selected: _selectedIndex == 3,
+                        onTap: () => _onItemTapped(3),
                       ),
                     ],
                   ),

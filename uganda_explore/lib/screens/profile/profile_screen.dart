@@ -15,7 +15,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    // Add navigation logic if needed
+    if (index == 0) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+    // Add more navigation logic for other indices if needed
   }
 
   @override
