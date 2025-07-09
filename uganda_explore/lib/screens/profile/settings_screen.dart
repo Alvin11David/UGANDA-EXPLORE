@@ -168,3 +168,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(height: 30),
+                              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavIcon(
+                    icon: Icons.home,
+                    label: 'Home',
+                    selected: _selectedIndex == 0,
+                    onTap: () => _onItemTapped(0),
+                  ),
+                  _NavIcon(
+                    icon: Icons.person,
+                    label: 'Profile',
+                    selected: _selectedIndex == 1,
+                    onTap: () => _onItemTapped(1),
+                  ),
+                  _NavIcon(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
+                  ),
+                  _NavIcon(
+                    icon: Icons.map,
+                    label: 'Map',
+                    selected: _selectedIndex == 3,
+                    onTap: () => _onItemTapped(3),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
