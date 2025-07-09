@@ -109,3 +109,62 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
+                                ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.18),
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          _SettingsOptionButton(
+                            icon: Icons.person,
+                            label: 'Edit Profile',
+                            onTap: () => Navigator.pushNamed(context, '/edit_profile'),
+                          ),
+                          const SizedBox(height: 12),
+                          _SettingsOptionButton(
+                            icon: Icons.brightness_6,
+                            label: 'App Theme',
+                            onTap: () => print("App Theme tapped"),
+                          ),
+                          const SizedBox(height: 12),
+                          _SettingsOptionButton(
+                            icon: Icons.description,
+                            label: 'Terms & Privacy',
+                            onTap: () => print("Terms & Privacy tapped"),
+                          ),
+                          const SizedBox(height: 12),
+                          _SettingsOptionButton(
+                            icon: Icons.share,
+                            label: 'Share App',
+                            onTap: () => print("Share App tapped"),
+                          ),
+                          const SizedBox(height: 12),
+                          _SettingsOptionButton(
+                            icon: Icons.logout,
+                            label: 'Logout',
+                            onTap: () => print("Logout tapped"),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
