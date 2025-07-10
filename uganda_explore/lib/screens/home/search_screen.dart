@@ -307,7 +307,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Waterfalls"),
+                              ResultsScreen(selectedText: "Waterfall"),
                         ),
                       );
                     },
@@ -363,7 +363,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Cultural Sites"),
+                              ResultsScreen(selectedText: "Historical Site"),
                         ),
                       );
                     },
@@ -478,7 +478,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Forests"),
+                              ResultsScreen(selectedText: "Forest"),
                         ),
                       );
                     },
@@ -592,7 +592,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Wildlife"),
+                              ResultsScreen(selectedText: "Mountain"),
                         ),
                       );
                     },
@@ -609,16 +609,16 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(left: 15),
                             child: Icon(
-                              Icons.pets,
+                              Icons.terrain,
                               color: Color.fromARGB(255, 255, 255, 255),
                               size: 28,
                             ),
                           ),
                           const SizedBox(width: 10),
                           const Text(
-                            "Wildlife",
+                            "Mountains",
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
