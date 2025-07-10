@@ -189,7 +189,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _ProfileOptionButton(
                                 icon: Icons.logout,
                                 label: 'Logout',
-                                onTap: () => print("Logout tapped"),
+                                onTap: () {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    '/signin',
+                                    (route) => false,
+                                  );
+                                },
                               ),
                             ],
                           ),

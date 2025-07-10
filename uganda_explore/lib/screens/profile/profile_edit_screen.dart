@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -14,6 +16,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   int _selectedIndex = 1;
   File? _profileImage;
   final String email = "user@email.com"; // Replace with actual user email
+
+  final TextEditingController fullNamesController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneContactController = TextEditingController();
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController bioController = TextEditingController();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -83,10 +91,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         child: CircleAvatar(
                           radius: 60,
                           backgroundColor: mainGreen.withOpacity(0.15),
-                          backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
+                          backgroundImage: _profileImage != null
+                              ? FileImage(_profileImage!)
+                              : null,
                           child: _profileImage == null
                               ? Text(
-                                  email.isNotEmpty ? email[0].toUpperCase() : '',
+                                  email.isNotEmpty
+                                      ? email[0].toUpperCase()
+                                      : '',
                                   style: TextStyle(
                                     fontSize: 40,
                                     color: mainGreen,
@@ -150,25 +162,84 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
-                      padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
+                      padding: const EdgeInsets.only(
+                        left: 4,
+                        right: 4,
+                        bottom: 0,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.18),
                         borderRadius: BorderRadius.circular(40),
-                        border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5,
+                        ),
                       ),
                       child: Column(
                         children: [
                           const SizedBox(height: 20),
-                          _buildFloatingField(Icons.person, "Full Names", iconColor: mainGreen),
-                          _buildFloatingField(Icons.email, "Email", iconColor: mainGreen),
-                          _buildFloatingField(Icons.phone, "Phone Contact", iconColor: mainGreen),
-                          _buildFloatingField(Icons.location_on, "Location", iconColor: mainGreen),
-                          _buildFloatingField(Icons.edit, "Bio", isMultiline: true, iconColor: mainGreen),
+                          _buildFloatingField(
+                            Icons.person,
+                            "Full Names",
+                            controller: fullNamesController,
+                            iconColor: mainGreen,
+                          ),
+                          _buildFloatingField(
+                            Icons.email,
+                            "Email",
+                            controller: emailController,
+                            iconColor: mainGreen,
+                          ),
+                          _buildFloatingField(
+                            Icons.phone,
+                            "Phone Contact",
+                            controller: phoneContactController,
+                            iconColor: mainGreen,
+                          ),
+                          _buildFloatingField(
+                            Icons.location_on,
+                            "Location",
+                            controller: locationController,
+                            iconColor: mainGreen,
+                          ),
+                          _buildFloatingField(
+                            Icons.edit,
+                            "Bio",
+                            controller: bioController,
+                            isMultiline: true,
+                            iconColor: mainGreen,
+                          ),
                           const SizedBox(height: 24),
 
                           // Update Button
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () async {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                await FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .update({
+                                      'fullNames': fullNamesController.text
+                                          .trim(),
+                                      'email': emailController.text.trim(),
+                                      'phoneContact': phoneContactController
+                                          .text
+                                          .trim(),
+                                      'location': locationController.text
+                                          .trim(),
+                                      'bio': bioController.text.trim(),
+                                    });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Profile updated!'),
+                                  ),
+                                );
+                                Navigator.pop(
+                                  context,
+                                ); // Optionally go back to profile screen
+                              }
+                            },
                             child: Container(
                               width: double.infinity,
                               padding: const EdgeInsets.symmetric(vertical: 14),
@@ -198,20 +269,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                           // Bottom Nav Bar (4 icons only)
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 0,
+                              vertical: 8,
+                            ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(40),
                               child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                filter: ImageFilter.blur(
+                                  sigmaX: 12,
+                                  sigmaY: 12,
+                                ),
                                 child: Container(
                                   height: 64,
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.3),
                                     borderRadius: BorderRadius.circular(40),
-                                    border: Border.all(color: Colors.white.withOpacity(0.4), width: 1.2),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.4),
+                                      width: 1.2,
+                                    ),
                                   ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       _NavIcon(
                                         icon: Icons.home,
@@ -261,10 +342,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildFloatingField(IconData icon, String label, {bool isMultiline = false, Color? iconColor}) {
+  Widget _buildFloatingField(
+    IconData icon,
+    String label, {
+    bool isMultiline = false,
+    Color? iconColor,
+    required TextEditingController controller,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: TextFormField(
+        controller: controller,
         maxLines: isMultiline ? 3 : 1,
         decoration: InputDecoration(
           labelText: label,
@@ -274,7 +362,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             fontSize: 16,
             fontFamily: 'Poppins',
           ),
-          prefixIcon: Icon(icon, color: icon == Icons.edit ? Colors.black : (iconColor ?? Colors.black)),
+          prefixIcon: Icon(
+            icon,
+            color: icon == Icons.edit
+                ? Colors.black
+                : (iconColor ?? Colors.black),
+          ),
           filled: true,
           fillColor: Colors.white.withOpacity(0.15),
           enabledBorder: OutlineInputBorder(
@@ -287,7 +380,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           suffixIcon: const Icon(Icons.edit, size: 19, color: Colors.black),
         ),
-        style: const TextStyle(color: Colors.black87, fontSize: 16, fontFamily: 'Poppins'),
+        style: const TextStyle(
+          color: Colors.black87,
+          fontSize: 16,
+          fontFamily: 'Poppins',
+        ),
       ),
     );
   }
@@ -332,7 +429,7 @@ class _NavIcon extends StatelessWidget {
                   fontFamily: 'Poppins',
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
