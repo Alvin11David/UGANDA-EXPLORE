@@ -21,19 +21,34 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
+  if (index == 0) {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/profile');
-    } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    } else if (index == 3) {
-      Navigator.pushReplacementNamed(context, '/map');
-    }
+    Navigator.pushReplacementNamed(context, '/home');
+  } else if (index == 1) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.pushReplacementNamed(context, '/profile');
+  } else if (index == 2) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.pushReplacementNamed(context, '/settings');
+  } else if (index == 3) {
+    // Do NOT call setState here, just navigate!
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MapViewScreen(
+          siteName: 'Your Current Location',
+          showCurrentLocation: true,
+        ),
+      ),
+    );
   }
+}
 
   @override
   void initState() {
