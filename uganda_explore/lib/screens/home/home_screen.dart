@@ -713,71 +713,92 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(right: 18),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.water,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "Water Bodies",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.water,
                                   color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Waterbodies",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(left: 0, right: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.terrain,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "Mountains",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.terrain,
                                   color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Mountains",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
