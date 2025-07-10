@@ -7,6 +7,7 @@ import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
+import 'package:uganda_explore/screens/auth/signup_screen.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
@@ -62,7 +63,7 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => const SettingsScreen(),
         //'/map': (context) => const MapScreen(),
       },
-      home: HomeScreen(),
+      home: SignUpScreen(),
     );
   }
 }
