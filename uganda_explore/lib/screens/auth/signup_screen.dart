@@ -16,7 +16,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _fullNamesController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -31,36 +32,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-              email: _emailController.text.trim(),
-              password: _passwordController.text.trim());
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
 
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user!.uid)
           .set({
-        'fullNames': _fullNamesController.text.trim(),
-        'email': _emailController.text.trim(),
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+            'fullNames': _fullNamesController.text.trim(),
+            'email': _emailController.text.trim(),
+            'createdAt': FieldValue.serverTimestamp(),
+          });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sign Up Successful!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Sign Up Successful!')));
       Navigator.pushReplacementNamed(context, '/onboarding_screen1');
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message}')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: ${e.message}')));
     } catch (e) {
       setState(() {
         _errorMessage = 'An Error occurred. Please try again.';
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -71,21 +73,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<void> _signUpWithGoogle() async {
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn(); // Now prompts account picker
+      final GoogleSignInAccount? googleUser = await googleSignIn
+          .signIn(); // Now prompts account picker
 
       if (googleUser == null) return; // User cancelled
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithCredential(credential);
 
       // Optionally, create user in Firestore if new
-      final userDoc = FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid);
+      final userDoc = FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid);
       final docSnapshot = await userDoc.get();
       if (!docSnapshot.exists) {
         await userDoc.set({
@@ -98,9 +105,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.pushReplacementNamed(context, '/onboarding_screen1');
     } catch (e) {
       print('Google sign-up failed: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Google sign-up failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Google sign-up failed: $e')));
     }
   }
 
@@ -123,10 +130,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [
-              Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
-            ],
+            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
             stops: [0.03, 0.63],
           ),
         ),
@@ -136,7 +140,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 60),
               Center(
                 child: Image.asset(
-                  'assets/logo/blacklogo.png',
+                  'assets/logo/whitelogo.png',
                   width: 80,
                   height: 80,
                   fit: BoxFit.contain,
@@ -150,7 +154,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.black,
+                  color: Colors.white,
                 ),
               ),
               const SizedBox(height: 20),
@@ -159,9 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(40),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                 ),
                 child: Form(
                   key: _formKey,
@@ -233,7 +235,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 alignment: Alignment.center,
                                 child: _isLoading
                                     ? const CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.black,
+                                            ),
                                       )
                                     : const Text(
                                         'Sign Up',
@@ -298,7 +303,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             onPressed: _signUpWithGoogle,
                             style: OutlinedButton.styleFrom(
                               backgroundColor: Colors.white,
-                              side: const BorderSide(color: Color(0xFF1EF813), width: 1.5),
+                              side: const BorderSide(
+                                color: Color(0xFF1EF813),
+                                width: 1.5,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -349,7 +357,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 onTap: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => SignInScreen()),
+                                    MaterialPageRoute(
+                                      builder: (context) => SignInScreen(),
+                                    ),
                                   );
                                 },
                                 child: const Text(
@@ -380,8 +390,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 }
 
-// ...FullNames and Email widgets unchanged...
-
 class Password extends StatefulWidget {
   final TextEditingController controller;
   const Password({super.key, required this.controller});
@@ -393,6 +401,18 @@ class Password extends StatefulWidget {
 class _PasswordState extends State<Password> {
   bool _isObscured = true;
   double _strength = 0;
+
+  String get _strengthLabel {
+    if (_strength < 0.4) return 'Weak';
+    if (_strength < 0.7) return 'Good';
+    return 'Strong';
+  }
+
+  Color get _strengthLabelColor {
+    if (_strength < 0.4) return Colors.red;
+    if (_strength < 0.7) return Colors.orange;
+    return Colors.green;
+  }
 
   double _calculateStrength(String password) {
     if (password.isEmpty) return 0;
@@ -455,10 +475,7 @@ class _PasswordState extends State<Password> {
                 fillColor: Colors.white,
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 6),
-                  child: Icon(
-                    Icons.lock,
-                    color: Colors.black,
-                  ),
+                  child: Icon(Icons.lock, color: Colors.black),
                 ),
                 prefixIconConstraints: const BoxConstraints(
                   minWidth: 0,
@@ -512,7 +529,10 @@ class _PasswordState extends State<Password> {
                   fontWeight: FontWeight.w500,
                   fontSize: 13,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 20,
+                ),
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
               ),
               style: const TextStyle(
@@ -532,19 +552,33 @@ class _PasswordState extends State<Password> {
                   value: _strength,
                   minHeight: 5,
                   backgroundColor: Colors.white,
-                  valueColor: AlwaysStoppedAnimation<Color>(_getStrengthColor(_strength)),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getStrengthColor(_strength),
+                  ),
                 ),
               ),
             ),
+            // Show label only when user types
+            if (widget.controller.text.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 1.0, left: 2.0),
+                child: Text(
+                  _strengthLabel,
+                  style: TextStyle(
+                    color: _strengthLabelColor,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 }
-
-// ...ConfirmPassword widget unchanged...
-
 
 class FullNames extends StatelessWidget {
   final TextEditingController controller;
@@ -582,10 +616,7 @@ class FullNames extends StatelessWidget {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.person,
-                color: Colors.black,
-              ),
+              child: Icon(Icons.person, color: Colors.black),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -593,17 +624,11 @@ class FullNames extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -614,10 +639,7 @@ class FullNames extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorStyle: const TextStyle(
               color: Colors.red,
@@ -625,7 +647,10 @@ class FullNames extends StatelessWidget {
               fontWeight: FontWeight.w500,
               fontSize: 13,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
@@ -683,10 +708,7 @@ class Email extends StatelessWidget {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.mail,
-                color: Colors.black,
-              ),
+              child: Icon(Icons.mail, color: Colors.black),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -694,17 +716,11 @@ class Email extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -715,10 +731,7 @@ class Email extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorStyle: const TextStyle(
               color: Colors.red,
@@ -726,7 +739,10 @@ class Email extends StatelessWidget {
               fontWeight: FontWeight.w500,
               fontSize: 13,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
@@ -741,8 +757,6 @@ class Email extends StatelessWidget {
     );
   }
 }
-
-
 
 class ConfirmPassword extends StatefulWidget {
   final TextEditingController controller;
@@ -796,10 +810,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(
-                Icons.lock,
-                color: Colors.black,
-              ),
+              child: Icon(Icons.lock, color: Colors.black),
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -821,17 +832,11 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 1,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
@@ -842,10 +847,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
-                width: 2,
-              ),
+              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
             ),
             errorStyle: const TextStyle(
               color: Colors.red,
@@ -853,7 +855,10 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
               fontWeight: FontWeight.w500,
               fontSize: 13,
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 20,
+            ),
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(

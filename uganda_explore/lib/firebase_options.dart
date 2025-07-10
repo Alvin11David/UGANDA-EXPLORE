@@ -41,48 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDD5bJiLeSxuKSGGLRZH4_pZkDHkC0mm9g',
-    appId: '1:116601275817:web:1df940ab9aa24a74b5f0b8',
-    messagingSenderId: '116601275817',
-    projectId: 'uganda-explore',
-    authDomain: 'uganda-explore.firebaseapp.com',
-    storageBucket: 'uganda-explore.firebasestorage.app',
-    measurementId: 'G-J2P79SK915',
+    apiKey: 'AIzaSyCf6b7-B0tFPwrqa6OLiKVNcLZzvvIWj_w',
+    appId: '1:73784585693:web:eb2b7b6ba4f43bdba31a34',
+    messagingSenderId: '73784585693',
+    projectId: 'uganda-explore-935e5',
+    authDomain: 'uganda-explore-935e5.firebaseapp.com',
+    storageBucket: 'uganda-explore-935e5.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBlMhem690sa2rqlfDhCL3-0yVcdTHeWYU',
-    appId: '1:116601275817:android:87645805792893beb5f0b8',
-    messagingSenderId: '116601275817',
-    projectId: 'uganda-explore',
-    storageBucket: 'uganda-explore.firebasestorage.app',
+    apiKey: 'AIzaSyCPclmAk0-g0Keqqom6PdJuS7qGaHXpyaU',
+    appId: '1:73784585693:android:2b79bc292afa4f37a31a34',
+    messagingSenderId: '73784585693',
+    projectId: 'uganda-explore-935e5',
+    storageBucket: 'uganda-explore-935e5.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAqPbFctWxYO7LqllAImz_1unBjfK_2kz8',
-    appId: '1:116601275817:ios:3fbe0167632646eeb5f0b8',
-    messagingSenderId: '116601275817',
-    projectId: 'uganda-explore',
-    storageBucket: 'uganda-explore.firebasestorage.app',
+    apiKey: 'AIzaSyARiZqb18PmUi7KQBlT0X09d1MBqW99lx0',
+    appId: '1:73784585693:ios:c06b9336d9c36a16a31a34',
+    messagingSenderId: '73784585693',
+    projectId: 'uganda-explore-935e5',
+    storageBucket: 'uganda-explore-935e5.firebasestorage.app',
     iosBundleId: 'com.example.ugandaExplore',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAqPbFctWxYO7LqllAImz_1unBjfK_2kz8',
-    appId: '1:116601275817:ios:3fbe0167632646eeb5f0b8',
-    messagingSenderId: '116601275817',
-    projectId: 'uganda-explore',
-    storageBucket: 'uganda-explore.firebasestorage.app',
+    apiKey: 'AIzaSyARiZqb18PmUi7KQBlT0X09d1MBqW99lx0',
+    appId: '1:73784585693:ios:c06b9336d9c36a16a31a34',
+    messagingSenderId: '73784585693',
+    projectId: 'uganda-explore-935e5',
+    storageBucket: 'uganda-explore-935e5.firebasestorage.app',
     iosBundleId: 'com.example.ugandaExplore',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDD5bJiLeSxuKSGGLRZH4_pZkDHkC0mm9g',
-    appId: '1:116601275817:web:13db89a6a6cc0ce4b5f0b8',
-    messagingSenderId: '116601275817',
-    projectId: 'uganda-explore',
-    authDomain: 'uganda-explore.firebaseapp.com',
-    storageBucket: 'uganda-explore.firebasestorage.app',
-    measurementId: 'G-5C7BTVMGVP',
+    apiKey: 'AIzaSyCf6b7-B0tFPwrqa6OLiKVNcLZzvvIWj_w',
+    appId: '1:73784585693:web:878cfedadb8d8ca9a31a34',
+    messagingSenderId: '73784585693',
+    projectId: 'uganda-explore-935e5',
+    authDomain: 'uganda-explore-935e5.firebaseapp.com',
+    storageBucket: 'uganda-explore-935e5.firebasestorage.app',
   );
 }
