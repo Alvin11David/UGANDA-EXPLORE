@@ -56,7 +56,6 @@ class MyApp extends StatelessWidget {
     '/otp': (context) => const OtpScreen(email: '', otp: ''),
     '/home': (context) => const HomeScreen(),
     '/profile': (context) => const ProfileScreen(),
-    '/place_details': (context) => PlaceDetailsScreen(siteName: ''),
     
   },
   home: const SearchScreen(),

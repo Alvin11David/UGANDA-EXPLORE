@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
@@ -633,44 +634,57 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(left: 15, right: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
-                            ),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF000000), Color(0xFF1FF813)],
-                              stops: [0.0, 0.47],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.park,
-                                color: Colors.white,
-                                size: 30,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResultsScreen(
+                                  selectedText: "National Parks",
+                                ), // Pass any data if needed
                               ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "National Parks",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF000000), Color(0xFF1FF813)],
+                                stops: [0.0, 0.47],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.park,
+                                  color: Colors.white,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "National Parks",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+
                         Container(
                           height: 50,
                           width: 200,
@@ -767,13 +781,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.only(left: 20),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                '/place_details', // Make sure this route exists in your app
-                                arguments: {
-                                  'siteName':
-                                      "Bwindi Impenetrable National Park", // Pass the site name
-                                },
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
+                                ),
                               );
                             },
                             child: Container(
@@ -904,13 +916,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.only(left: 30),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                '/place_details', // Make sure this route exists in your app
-                                arguments: {
-                                  'siteName':
-                                      "Kazinga Channel", // Pass the site name
-                                },
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
+                                ),
                               );
                             },
                             child: Container(
@@ -1041,13 +1051,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: EdgeInsets.only(left: 30),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushNamed(
+                              Navigator.push(
                                 context,
-                                '/place_details', // Make sure this route exists in your app
-                                arguments: {
-                                  'siteName':
-                                      "Mountain Elgon National Park", // Pass the site name
-                                },
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
+                                ),
                               );
                             },
                             child: Container(

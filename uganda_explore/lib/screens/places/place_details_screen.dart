@@ -68,7 +68,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         final videos = List<String>.from(data['videos'] ?? []);
         return videos.take(3).toList();
       }
@@ -100,7 +100,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         final images = List<String>.from(data['images'] ?? []);
         return images.take(3).toList();
       }
@@ -117,7 +117,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return dbName;
       }
     }
@@ -133,7 +133,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return data['location']?.toString();
       }
     }
@@ -149,7 +149,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return data['description']?.toString();
       }
     }
@@ -165,7 +165,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return {
           'entryfee': data['entryfee']?.toString() ?? '',
           'openingHours': data['openingHours']?.toString() ?? '',
@@ -192,7 +192,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         final lat = data['latitude'];
         final lng = data['longitude'];
         if (lat != null && lng != null) {
