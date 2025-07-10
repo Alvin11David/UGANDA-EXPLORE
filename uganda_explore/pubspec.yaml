@@ -38,6 +38,9 @@ dependencies:
   provider: 
   flutter_svg: 
 
+  # image picker
+  image_picker: 
+
   # Google maps and places
   google_maps_flutter:
 

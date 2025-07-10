@@ -22,7 +22,15 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    // Add navigation logic here if needed
+    if (index == 0) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (index == 1) {
+      Navigator.pushReplacementNamed(context, '/profile');
+    } else if (index == 2) {
+      Navigator.pushReplacementNamed(context, '/settings');
+    } else if (index == 3) {
+      Navigator.pushReplacementNamed(context, '/map');
+    }
   }
 
   @override
@@ -978,7 +986,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Custom Bottom Navigation Bar (copied from ProfileScreen)
+          // Custom Bottom Navigation Bar (with navigation)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ClipRRect(
@@ -1017,16 +1025,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _onItemTapped(2),
                       ),
                       _NavIcon(
-                        icon: Icons.notifications,
-                        label: 'Notifications',
-                        selected: _selectedIndex == 3,
-                        onTap: () => _onItemTapped(3),
-                      ),
-                      _NavIcon(
                         icon: Icons.map,
                         label: 'Map',
-                        selected: _selectedIndex == 4,
-                        onTap: () => _onItemTapped(4),
+                        selected: _selectedIndex == 3,
+                        onTap: () => _onItemTapped(3),
                       ),
                     ],
                   ),

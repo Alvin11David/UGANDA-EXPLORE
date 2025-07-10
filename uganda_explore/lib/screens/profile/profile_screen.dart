@@ -15,6 +15,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 0) {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+    // Add more navigation logic for other indices if needed
   }
 
   @override
@@ -130,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _ProfileOptionButton(
                             icon: Icons.person,
                             label: 'Edit Profile',
-                            onTap: () => print("Edit Profile tapped"),
+                            onTap: () => Navigator.pushNamed(context, '/edit_profile'),
                           ),
                           const SizedBox(height: 12),
                           _ProfileOptionButton(
@@ -205,16 +209,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () => _onItemTapped(2),
                   ),
                   _NavIcon(
-                    icon: Icons.notifications,
-                    label: 'Notifications',
-                    selected: _selectedIndex == 3,
-                    onTap: () => _onItemTapped(3),
-                  ),
-                  _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
-                    selected: _selectedIndex == 4,
-                    onTap: () => _onItemTapped(4),
+                    selected: _selectedIndex == 3,
+                    onTap: () => _onItemTapped(3),
                   ),
                 ],
               ),
