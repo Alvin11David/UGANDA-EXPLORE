@@ -229,6 +229,42 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     return null;
   }
 
+  void _showFullscreenVideo(VideoPlayerController controller) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(8),
+          child: AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                VideoPlayer(controller),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      controller.pause();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -695,6 +731,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         _playingIndex = index;
                                       });
                                       await controller.play();
+                                      _showFullscreenVideo(
+                                        controller,
+                                      ); // <-- Show fullscreen dialog
                                     },
                                     child: Container(
                                       width: 100,
