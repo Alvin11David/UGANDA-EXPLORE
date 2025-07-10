@@ -225,8 +225,38 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(30),
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle filter logic here
-                                Navigator.pop(context);
+                                final selectedCategories = <String>[];
+                                for (int i = 0; i < categories.length; i++) {
+                                  if (checked[i])
+                                    selectedCategories.add(categories[i]);
+                                }
+
+                                if (selectedCategories.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please select at least one category.',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                final selectedCategory =
+                                    selectedCategories.first;
+
+                                Navigator.pop(
+                                  context,
+                                ); // Only this pop to close the filter sheet
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ResultsScreen(
+                                      selectedText: selectedCategory,
+                                    ),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
@@ -639,9 +669,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => ResultsScreen(
-                                  selectedText: "National Parks",
-                                ), // Pass any data if needed
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
                               ),
                             );
                           },
