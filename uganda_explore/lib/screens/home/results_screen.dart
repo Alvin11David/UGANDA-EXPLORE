@@ -14,15 +14,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Future<List<Map<String, String>>> fetchSiteImages() async {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
-        .where('category', isEqualTo: widget.selectedText)
+        .where('category', isEqualTo: widget.selectedText.trim())
         .get();
-    // Get the first image and name from each document (if available)
+    print('Query returned ${query.docs.length} documents');
     return query.docs
         .map((doc) {
           final images = doc['images'];
           final name = doc['name']?.toString() ?? '';
+          print('Doc: $name, images: $images, type: ${images.runtimeType}');
           if (images is List && images.isNotEmpty) {
-            return {'image': images.first.toString(), 'name': name};
+            final firstImage = images.first.toString();
+            print('Using image: $firstImage');
+            return {'image': firstImage, 'name': name};
           }
           return null;
         })
@@ -152,8 +155,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     ),
                                   ],
                                 ),
-                                child:
-                                    items.length > index
+                                child: items.length > index
                                     ? Padding(
                                         padding: const EdgeInsets.only(
                                           left: 3,

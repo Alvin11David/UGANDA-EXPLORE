@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -75,6 +76,211 @@ class _HomeScreenState extends State<HomeScreen> {
       // If any error, keep default
       print("Location error: $e");
     }
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        // State for checkboxes and dropdown
+        List<String> categories = [
+          "National Parks",
+          "Lakes",
+          "Cultural Sites",
+          "Adventure Activities",
+          "Historical Landmarks",
+        ];
+        List<bool> checked = List.filled(categories.length, false);
+        String selectedRegion = "Central";
+        List<String> regions = [
+          "Central",
+          "Western",
+          "Eastern",
+          "Northern Uganda",
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      top: 24,
+                      bottom: 0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        const Center(
+                          child: Text(
+                            "Filter screen",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // Categories
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Categories:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: List.generate(categories.length, (i) {
+                            return CheckboxListTile(
+                              value: checked[i],
+                              onChanged: (val) {
+                                setModalState(() => checked[i] = val ?? false);
+                              },
+                              title: Text(
+                                categories[i],
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: const Color(0xFF1FF813),
+                              contentPadding: EdgeInsets.zero,
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 8),
+                        // Dropdown
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Region:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedRegion,
+                            isExpanded: true,
+                            underline: const SizedBox(),
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                            items: regions.map((region) {
+                              return DropdownMenuItem<String>(
+                                value: region,
+                                child: Text(region),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setModalState(
+                                () => selectedRegion = val ?? "Central",
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Apply Filter Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Handle filter logic here
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF000000),
+                                      Color(0xFF1FF813),
+                                    ],
+                                    stops: [0.0, 0.47],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  constraints: const BoxConstraints(
+                                    minHeight: 50,
+                                  ),
+                                  child: const Text(
+                                    "Apply Filter",
+                                    style: TextStyle(
+                                      color: Colors
+                                          .white, // Use white for best contrast
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -272,148 +478,138 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Search bar
                   const SizedBox(height: 20),
 
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SearchScreen(),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AbsorbPointer(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 250,
-                                child: ValueListenableBuilder<bool>(
-                                  valueListenable: isSearchFocused,
-                                  builder: (context, focused, child) {
-                                    return Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(30),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.15,
-                                            ),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                        border: Border.all(
-                                          color: focused
-                                              ? const Color(0xFF1FF813)
-                                              : Colors.transparent,
-                                          width: 1,
-                                        ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Search bar (with its own GestureDetector)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SearchScreen(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: SizedBox(
+                            width: 250,
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: isSearchFocused,
+                              builder: (context, focused, child) {
+                                return Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 16),
-                                          const Icon(
-                                            Icons.search,
-                                            color: Colors.black,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: TextField(
-                                              focusNode: searchFocusNode,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Search Your Place',
-                                                border: InputBorder.none,
-                                                isDense: true,
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                      vertical: 14,
-                                                    ),
-                                              ),
-                                              style: const TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16,
-                                              ),
-                                              enabled: false,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-
-                              ValueListenableBuilder<bool>(
-                                valueListenable: isFilterFocused,
-                                builder: (context, focused, child) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      FocusScope.of(
-                                        context,
-                                      ).requestFocus(filterFocusNode);
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
-                                        ),
-                                        child: Container(
-                                          height: 50,
-                                          width: 70,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.3,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                            border: Border.all(
-                                              color: focused
-                                                  ? const Color(0xFF1FF813)
-                                                  : Colors.white,
-                                              width: 1.5,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.15,
-                                                ),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Focus(
-                                            focusNode: filterFocusNode,
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.filter_alt,
-                                                color: Colors.black,
-                                                size: 26,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: focused
+                                          ? const Color(0xFF1FF813)
+                                          : Colors.transparent,
+                                      width: 1,
                                     ),
-                                  );
-                                },
-                              ),
-                            ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 16),
+                                      const Icon(
+                                        Icons.search,
+                                        color: Colors.black,
+                                        size: 24,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: TextField(
+                                          focusNode: searchFocusNode,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Search Your Place',
+                                            border: InputBorder.none,
+                                            isDense: true,
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                  vertical: 14,
+                                                ),
+                                          ),
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontSize: 16,
+                                          ),
+                                          enabled: false,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      // Filter icon (with its own GestureDetector)
+                      GestureDetector(
+                        onTap: () {
+                          print('filter clicked');
+                          _showFilterSheet(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: ValueListenableBuilder<bool>(
+                            valueListenable: isFilterFocused,
+                            builder: (context, focused, child) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 30,
+                                    sigmaY: 30,
+                                  ),
+                                  child: Container(
+                                    height: 50,
+                                    width: 70,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color: focused
+                                            ? const Color(0xFF1FF813)
+                                            : Colors.white,
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.15),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Focus(
+                                      focusNode: filterFocusNode,
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.filter_alt,
+                                          color: Colors.black,
+                                          size: 26,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 25),
                   Padding(
@@ -948,25 +1144,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(right: 5),
-                        child: Container(
-                          height: 55,
-                          width: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.4),
-                                blurRadius: 5,
-                                offset: const Offset(0, 4),
+                        child: GestureDetector(
+                          onTap: () {
+                            print('Location icon tapped');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MapViewScreen(
+                                  siteName: 'Your Current Location',
+                                  showCurrentLocation: true,
+                                ),
                               ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.my_location,
-                              color: Colors.black,
-                              size: 25,
+                            );
+                          },
+                          child: Container(
+                            height: 55,
+                            width: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.my_location,
+                                color: Colors.black,
+                                size: 25,
+                              ),
                             ),
                           ),
                         ),

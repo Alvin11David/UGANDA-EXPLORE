@@ -9,7 +9,8 @@ import 'package:http/http.dart' as http;
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
-  const MapViewScreen({super.key, required this.siteName});
+  final bool showCurrentLocation;
+  const MapViewScreen({super.key, required this.siteName, this.showCurrentLocation = false});
 
   @override
   State<MapViewScreen> createState() => _MapViewScreenState();
