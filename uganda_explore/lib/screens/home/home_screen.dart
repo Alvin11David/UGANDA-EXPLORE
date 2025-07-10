@@ -494,7 +494,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 15),
                           child: SizedBox(
-                            width: 250,
+                            width: 240,
                             child: ValueListenableBuilder<bool>(
                               valueListenable: isSearchFocused,
                               builder: (context, focused, child) {
@@ -553,7 +553,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 0),
                       // Filter icon (with its own GestureDetector)
                       GestureDetector(
                         onTap: () {
@@ -561,7 +561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           _showFilterSheet(context);
                         },
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
                           child: ValueListenableBuilder<bool>(
                             valueListenable: isFilterFocused,
                             builder: (context, focused, child) {
@@ -574,7 +574,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   child: Container(
                                     height: 50,
-                                    width: 70,
+                                    width: 60,
                                     decoration: BoxDecoration(
                                       color: Colors.white.withOpacity(0.3),
                                       borderRadius: BorderRadius.circular(30),
@@ -660,7 +660,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(width: 12),
                               const Text(
-                                "Game Parks",
+                                "National Parks",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 20,
@@ -687,13 +687,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               const SizedBox(width: 20),
                               const Icon(
-                                Icons.beach_access,
+                                Icons.water,
                                 color: Colors.black,
                                 size: 30,
                               ),
                               const SizedBox(width: 12),
                               const Text(
-                                "Leisure",
+                                "Water Bodies",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 20,
@@ -726,7 +726,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(width: 12),
                               const Text(
-                                "Adventure",
+                                "Mountains",
                                 style: TextStyle(
                                   fontFamily: 'Inter',
                                   fontSize: 20,
@@ -765,372 +765,411 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(left: 20),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/baboon.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/place_details', // Make sure this route exists in your app
+                                arguments: {
+                                  'siteName':
+                                      "Bwindi Impenetrable National Park", // Pass the site name
+                                },
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/baboon.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Bwindi Impenetrable N.P",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Bwindi Impenetrable N.P",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "90km Kanungu District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "90km Kanungu District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 30),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/hippopotamus.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/place_details', // Make sure this route exists in your app
+                                arguments: {
+                                  'siteName':
+                                      "Kazinga Channel", // Pass the site name
+                                },
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/hippopotamus.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Kazinga Channel",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Kazinga Channel",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "120km Kasese District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "120km Kasese District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 30),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/mount.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/place_details', // Make sure this route exists in your app
+                                arguments: {
+                                  'siteName':
+                                      "Mountain Elgon National Park", // Pass the site name
+                                },
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/mount.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Mountain Elgon",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Mountain Elgon",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "320km Mbale District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "320km Mbale District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
