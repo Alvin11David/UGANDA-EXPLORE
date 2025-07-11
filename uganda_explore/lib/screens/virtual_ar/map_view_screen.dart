@@ -1,16 +1,22 @@
 import 'dart:convert';
 import 'dart:ui';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
   final bool showCurrentLocation;
-  const MapViewScreen({super.key, required this.siteName, this.showCurrentLocation = false});
+  const MapViewScreen({
+    super.key,
+    required this.siteName,
+    this.showCurrentLocation = false,
+  });
 
   @override
   State<MapViewScreen> createState() => _MapViewScreenState();
@@ -32,11 +38,33 @@ class _MapViewScreenState extends State<MapViewScreen> {
   String? bicyclingDuration;
   String? routeDistance;
 
+  StreamSubscription<Position>? _positionStream;
+
   @override
   void initState() {
     super.initState();
     fetchCoordinates();
     fetchUserDistrict();
+    _listenToUserLocation();
+  }
+
+  void _listenToUserLocation() {
+    _positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: 5, // meters before update
+          ),
+        ).listen((Position position) {
+          setState(() {
+            userLatLng = LatLng(position.latitude, position.longitude);
+            userDistrict = null; // Optionally update district if you want
+          });
+          // Update the route as the user moves
+          if (siteLatLng != null) {
+            fetchAndSetRoute();
+          }
+        });
   }
 
   Future<void> fetchUserDistrict() async {
@@ -252,6 +280,12 @@ class _MapViewScreenState extends State<MapViewScreen> {
           results['bicycling']?['distance'] ??
           '-';
     });
+  }
+
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    super.dispose();
   }
 
   @override
@@ -493,15 +527,17 @@ class _MapViewScreenState extends State<MapViewScreen> {
               children: [
                 // NEW: Add your custom circle on the left
                 GestureDetector(
-                  //onTap: () {
-                  // TODO: Replace 'Your360Screen' with your actual 360 screen widget/class
-                  //Navigator.push(
-                  //context,
-                  //MaterialPageRoute(
-                  //builder: (context) => Your360Screen(siteName: widget.siteName),
-                  //),
-                  //);
-                  //},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            // ...existing code...
+                            VirtualTourScreen(placeName: widget.siteName),
+                        // ...existing code...
+                      ),
+                    );
+                  },
                   child: Container(
                     height: 55,
                     width: 55,

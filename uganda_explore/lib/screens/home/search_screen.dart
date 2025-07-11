@@ -477,8 +477,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              ResultsScreen(selectedText: "Forest"),
+                          builder: (_) => ResultsScreen(selectedText: "Forest"),
                         ),
                       );
                     },
@@ -792,8 +791,42 @@ class _SearchScreenState extends State<SearchScreen> {
                             borderRadius: BorderRadius.circular(30),
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle filter logic here
-                                Navigator.pop(context);
+                                // Get all checked categories
+                                final selectedCategories = <String>[];
+                                for (int i = 0; i < categories.length; i++) {
+                                  if (checked[i])
+                                    selectedCategories.add(categories[i]);
+                                }
+
+                                if (selectedCategories.isEmpty) {
+                                  // Show a message if nothing is selected
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please select at least one category.',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // For now, just use the first checked category
+                                final selectedCategory =
+                                    selectedCategories.first;
+
+                                Navigator.pop(
+                                  context,
+                                ); // Close the filter sheet
+
+                                // Navigate to ResultsScreen for the selected category
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ResultsScreen(
+                                      selectedText: selectedCategory,
+                                    ),
+                                  ),
+                                );
                               },
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(

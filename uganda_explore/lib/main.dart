@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/apptheme/apptheme.dart';
 import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
@@ -13,6 +14,7 @@ import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
+import 'package:uganda_explore/screens/profile/termsandprivacy_screen.dart';
 // Splash Screens
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
@@ -61,7 +63,8 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
         '/settings': (context) => const SettingsScreen(),
-        //'/map': (context) => const MapScreen(),
+        '/app_theme': (context) => const AppThemeScreen(),
+        '/privacy': (context) => const TermsPrivacyScreen(),
       },
       home: SignUpScreen(),
     );

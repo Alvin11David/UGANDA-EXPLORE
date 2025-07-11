@@ -171,13 +171,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _ProfileOptionButton(
                                 icon: Icons.brightness_6,
                                 label: 'App Theme',
-                                onTap: () => print("App Theme tapped"),
+                                onTap: () => Navigator.pushNamed(context, '/app_theme'),
                               ),
                               const SizedBox(height: 12),
                               _ProfileOptionButton(
                                 icon: Icons.description,
                                 label: 'Terms & Privacy',
-                                onTap: () => print("Terms & Privacy tapped"),
+                                onTap: () => Navigator.pushNamed(context, '/privacy'),
                               ),
                               const SizedBox(height: 12),
                               _ProfileOptionButton(

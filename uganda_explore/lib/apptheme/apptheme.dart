@@ -31,9 +31,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
@@ -45,7 +43,10 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(32),
@@ -62,60 +63,61 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       height: 40,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 1.5),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 1.5,
+                                        ),
                                       ),
                                       child: IconButton(
-                                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          color: Colors.white,
+                                        ),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
-              
-                                    // Center Logo/Text
-                                    Expanded(
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Text(
-                                            'Uganda',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 1.1,
-                                            ),
+                                    const Spacer(),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Text(
+                                          'Uganda',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.1,
                                           ),
-                                          const SizedBox(width: 6),
-                                          const Icon(Icons.travel_explore, color: Colors.white, size: 24),
-                                          const SizedBox(width: 6),
-                                          const Text(
-                                            'Explore',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold,
-                                              letterSpacing: 1.1,
-                                            ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        const Icon(
+                                          Icons.travel_explore,
+                                          color: Colors.white,
+                                          size: 24,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        const Text(
+                                          'Explore',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1.1,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-              
-                                    // Placeholder space to balance alignment
-                                    const SizedBox(width: 56),
+                                    const Spacer(),
                                   ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-              
+
                         // Flexible spacer - grows to fill available space
-                        Expanded(
-                          child: Container(),
-                        ),
-              
+                        Expanded(child: Container()),
+
                         // 🎨 Theme Selector Card
                         Container(
                           margin: const EdgeInsets.all(20),
@@ -153,10 +155,11 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 32),
-              
+
                                     // Dark & Light Mode
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         GestureDetector(
                                           onTap: () {
@@ -170,16 +173,25 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                                 width: 70,
                                                 height: 70,
                                                 decoration: BoxDecoration(
-                                                  color: isDarkMode ? Colors.black : Colors.white.withOpacity(0.2),
+                                                  color: isDarkMode
+                                                      ? Colors.black
+                                                      : Colors.white
+                                                            .withOpacity(0.2),
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: isDarkMode ? Colors.white : Colors.white.withOpacity(0.3),
+                                                    color: isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.white
+                                                              .withOpacity(0.3),
                                                     width: 2,
                                                   ),
                                                 ),
                                                 child: Icon(
                                                   Icons.nightlight_round,
-                                                  color: isDarkMode ? Colors.white : Colors.white.withOpacity(0.7),
+                                                  color: isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.white
+                                                            .withOpacity(0.7),
                                                   size: 30,
                                                 ),
                                               ),
@@ -187,7 +199,8 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                               Text(
                                                 'Dark Mode',
                                                 style: TextStyle(
-                                                  color: Colors.white.withOpacity(0.9),
+                                                  color: Colors.white
+                                                      .withOpacity(0.9),
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -207,16 +220,25 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                                 width: 70,
                                                 height: 70,
                                                 decoration: BoxDecoration(
-                                                  color: !isDarkMode ? Colors.white : Colors.white.withOpacity(0.2),
+                                                  color: !isDarkMode
+                                                      ? Colors.white
+                                                      : Colors.white
+                                                            .withOpacity(0.2),
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
-                                                    color: !isDarkMode ? Colors.orange : Colors.white.withOpacity(0.3),
+                                                    color: !isDarkMode
+                                                        ? Colors.orange
+                                                        : Colors.white
+                                                              .withOpacity(0.3),
                                                     width: 2,
                                                   ),
                                                 ),
                                                 child: Icon(
                                                   Icons.wb_sunny,
-                                                  color: !isDarkMode ? Colors.orange : Colors.white.withOpacity(0.7),
+                                                  color: !isDarkMode
+                                                      ? Colors.orange
+                                                      : Colors.white
+                                                            .withOpacity(0.7),
                                                   size: 30,
                                                 ),
                                               ),
@@ -224,7 +246,8 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                               Text(
                                                 'Light Mode',
                                                 style: TextStyle(
-                                                  color: Colors.white.withOpacity(0.9),
+                                                  color: Colors.white
+                                                      .withOpacity(0.9),
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w500,
                                                 ),
@@ -234,23 +257,28 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                         ),
                                       ],
                                     ),
-              
+
                                     const SizedBox(height: 32),
-              
+
                                     // ✅ Continue Button
                                     Container(
                                       width: double.infinity,
                                       height: 56,
                                       decoration: BoxDecoration(
                                         gradient: const LinearGradient(
-                                          colors: [Color(0xFF4CAF50), Color(0xFF2E7D32)],
+                                          colors: [
+                                            Color(0xFF4CAF50),
+                                            Color(0xFF2E7D32),
+                                          ],
                                           begin: Alignment.centerLeft,
                                           end: Alignment.centerRight,
                                         ),
                                         borderRadius: BorderRadius.circular(28),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.2),
+                                            color: Colors.black.withOpacity(
+                                              0.2,
+                                            ),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -258,10 +286,14 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                       ),
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
                                             SnackBar(
                                               content: Text(
-                                                isDarkMode ? 'Dark Mode Selected' : 'Light Mode Selected',
+                                                isDarkMode
+                                                    ? 'Dark Mode Selected'
+                                                    : 'Light Mode Selected',
                                               ),
                                               backgroundColor: Colors.green,
                                             ),
@@ -271,7 +303,9 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                                           backgroundColor: Colors.transparent,
                                           shadowColor: Colors.transparent,
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(28),
+                                            borderRadius: BorderRadius.circular(
+                                              28,
+                                            ),
                                           ),
                                         ),
                                         child: const Text(
@@ -290,7 +324,7 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
                             ),
                           ),
                         ),
-              
+
                         const SizedBox(height: 24),
                       ],
                     ),
