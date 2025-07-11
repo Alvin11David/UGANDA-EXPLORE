@@ -14,14 +14,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Future<List<Map<String, String>>> fetchSiteImages() async {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
+        .where('category', isEqualTo: widget.selectedText.trim())
         .get();
-    // Get the first image and name from each document (if available)
+    print('Query returned ${query.docs.length} documents');
     return query.docs
         .map((doc) {
           final images = doc['images'];
           final name = doc['name']?.toString() ?? '';
+          print('Doc: $name, images: $images, type: ${images.runtimeType}');
           if (images is List && images.isNotEmpty) {
-            return {'image': images.first.toString(), 'name': name};
+            final firstImage = images.first.toString();
+            print('Using image: $firstImage');
+            return {'image': firstImage, 'name': name};
           }
           return null;
         })
@@ -151,8 +155,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     ),
                                   ],
                                 ),
-                                child: items.length > index &&
-                                        widget.selectedText == "Game Parks"
+                                child: items.length > index
                                     ? Padding(
                                         padding: const EdgeInsets.only(
                                           left: 3,
@@ -168,13 +171,18 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                                     Navigator.pushNamed(
                                                       context,
                                                       '/place_details',
-                                                      arguments: items[index]['name'],
+                                                      arguments:
+                                                          items[index]['name'],
                                                     );
                                                   },
                                                   child: ClipRRect(
-                                                    borderRadius: BorderRadius.circular(30),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          30,
+                                                        ),
                                                     child: Image.network(
-                                                      items[index]['image'] ?? '',
+                                                      items[index]['image'] ??
+                                                          '',
                                                       width: 150,
                                                       height: 125,
                                                       fit: BoxFit.cover,
@@ -189,26 +197,42 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                                       Navigator.pushNamed(
                                                         context,
                                                         '/place_details',
-                                                        arguments: items[index]['name'],
+                                                        arguments:
+                                                            items[index]['name'],
                                                       );
                                                     },
                                                     child: ClipOval(
                                                       child: BackdropFilter(
-                                                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                                        filter:
+                                                            ImageFilter.blur(
+                                                              sigmaX: 30,
+                                                              sigmaY: 30,
+                                                            ),
                                                         child: Container(
                                                           width: 35,
                                                           height: 35,
                                                           decoration: BoxDecoration(
-                                                            color: Colors.white.withOpacity(0.3),
-                                                            shape: BoxShape.circle,
-                                                            border: Border.all(color: Colors.white, width: 1),
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                  0.3,
+                                                                ),
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            border: Border.all(
+                                                              color:
+                                                                  Colors.white,
+                                                              width: 1,
+                                                            ),
                                                           ),
                                                           child: Center(
                                                             child: Transform.rotate(
-                                                              angle: 0.785398, // -45 degrees in radians (north east)
+                                                              angle:
+                                                                  0.785398, // -45 degrees in radians (north east)
                                                               child: const Icon(
-                                                                Icons.arrow_upward,
-                                                                color: Colors.black,
+                                                                Icons
+                                                                    .arrow_upward,
+                                                                color: Colors
+                                                                    .black,
                                                                 size: 22,
                                                               ),
                                                             ),

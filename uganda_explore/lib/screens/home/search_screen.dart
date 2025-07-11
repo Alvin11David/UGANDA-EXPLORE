@@ -181,6 +181,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 const SizedBox(width: 1),
                 GestureDetector(
+                  onTap: () {
+                    _showFilterSheet(context);
+                  },
                   onTapDown: (_) => setState(() => isFilterFocused = true),
                   onTapUp: (_) => setState(() => isFilterFocused = false),
                   onTapCancel: () => setState(() => isFilterFocused = false),
@@ -304,7 +307,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Waterfalls"),
+                              ResultsScreen(selectedText: "Waterfall"),
                         ),
                       );
                     },
@@ -360,7 +363,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Cultural Sites"),
+                              ResultsScreen(selectedText: "Historical Site"),
                         ),
                       );
                     },
@@ -419,7 +422,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Game Parks"),
+                              ResultsScreen(selectedText: "National Park"),
                         ),
                       );
                     },
@@ -474,8 +477,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              ResultsScreen(selectedText: "Forests"),
+                          builder: (_) => ResultsScreen(selectedText: "Forest"),
                         ),
                       );
                     },
@@ -589,7 +591,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              ResultsScreen(selectedText: "Wildlife"),
+                              ResultsScreen(selectedText: "Mountain"),
                         ),
                       );
                     },
@@ -606,16 +608,16 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Row(
                         children: [
                           const Padding(
-                            padding: EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(left: 15),
                             child: Icon(
-                              Icons.pets,
+                              Icons.terrain,
                               color: Color.fromARGB(255, 255, 255, 255),
                               size: 28,
                             ),
                           ),
                           const SizedBox(width: 10),
                           const Text(
-                            "Wildlife",
+                            "Mountains",
                             style: TextStyle(
                               fontFamily: 'Poppins',
                               fontWeight: FontWeight.bold,
@@ -640,6 +642,244 @@ class _SearchScreenState extends State<SearchScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        // State for checkboxes and dropdown
+        List<String> categories = [
+          "National Parks",
+          "Lakes",
+          "Cultural Sites",
+          "Adventure Activities",
+          "Historical Landmarks",
+        ];
+        List<bool> checked = List.filled(categories.length, false);
+        String selectedRegion = "Central";
+        List<String> regions = [
+          "Central",
+          "Western",
+          "Eastern",
+          "Northern Uganda",
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      top: 24,
+                      bottom: 0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        const Center(
+                          child: Text(
+                            "Filter screen",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // Categories
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Categories:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: List.generate(categories.length, (i) {
+                            return CheckboxListTile(
+                              value: checked[i],
+                              onChanged: (val) {
+                                setModalState(() => checked[i] = val ?? false);
+                              },
+                              title: Text(
+                                categories[i],
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: const Color(0xFF1FF813),
+                              contentPadding: EdgeInsets.zero,
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 8),
+                        // Dropdown
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Region:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedRegion,
+                            isExpanded: true,
+                            underline: const SizedBox(),
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                            items: regions.map((region) {
+                              return DropdownMenuItem<String>(
+                                value: region,
+                                child: Text(region),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setModalState(
+                                () => selectedRegion = val ?? "Central",
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Apply Filter Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Get all checked categories
+                                final selectedCategories = <String>[];
+                                for (int i = 0; i < categories.length; i++) {
+                                  if (checked[i])
+                                    selectedCategories.add(categories[i]);
+                                }
+
+                                if (selectedCategories.isEmpty) {
+                                  // Show a message if nothing is selected
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please select at least one category.',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // For now, just use the first checked category
+                                final selectedCategory =
+                                    selectedCategories.first;
+
+                                Navigator.pop(
+                                  context,
+                                ); // Close the filter sheet
+
+                                // Navigate to ResultsScreen for the selected category
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ResultsScreen(
+                                      selectedText: selectedCategory,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF000000),
+                                      Color(0xFF1FF813),
+                                    ],
+                                    stops: [0.0, 0.47],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  constraints: const BoxConstraints(
+                                    minHeight: 50,
+                                  ),
+                                  child: const Text(
+                                    "Apply Filter",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

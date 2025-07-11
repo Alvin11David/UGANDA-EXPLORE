@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/home/search_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,19 +21,34 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
+  if (index == 0) {
     setState(() {
       _selectedIndex = index;
     });
-    if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/profile');
-    } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/settings');
-    } else if (index == 3) {
-      Navigator.pushReplacementNamed(context, '/map');
-    }
+    Navigator.pushReplacementNamed(context, '/home');
+  } else if (index == 1) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.pushReplacementNamed(context, '/profile');
+  } else if (index == 2) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.pushReplacementNamed(context, '/settings');
+  } else if (index == 3) {
+    // Do NOT call setState here, just navigate!
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MapViewScreen(
+          siteName: 'Your Current Location',
+          showCurrentLocation: true,
+        ),
+      ),
+    );
   }
+}
 
   @override
   void initState() {
@@ -83,6 +100,241 @@ class _HomeScreenState extends State<HomeScreen> {
       // If any error, keep default
       print("Location error: $e");
     }
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        // State for checkboxes and dropdown
+        List<String> categories = [
+          "National Parks",
+          "Lakes",
+          "Cultural Sites",
+          "Adventure Activities",
+          "Historical Landmarks",
+        ];
+        List<bool> checked = List.filled(categories.length, false);
+        String selectedRegion = "Central";
+        List<String> regions = [
+          "Central",
+          "Western",
+          "Eastern",
+          "Northern Uganda",
+        ];
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      top: 24,
+                      bottom: 0,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        const Center(
+                          child: Text(
+                            "Filter screen",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        // Categories
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Categories:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Column(
+                          children: List.generate(categories.length, (i) {
+                            return CheckboxListTile(
+                              value: checked[i],
+                              onChanged: (val) {
+                                setModalState(() => checked[i] = val ?? false);
+                              },
+                              title: Text(
+                                categories[i],
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: const Color(0xFF1FF813),
+                              contentPadding: EdgeInsets.zero,
+                            );
+                          }),
+                        ),
+                        const SizedBox(height: 8),
+                        // Dropdown
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Region:",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white, width: 1),
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedRegion,
+                            isExpanded: true,
+                            underline: const SizedBox(),
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                            items: regions.map((region) {
+                              return DropdownMenuItem<String>(
+                                value: region,
+                                child: Text(region),
+                              );
+                            }).toList(),
+                            onChanged: (val) {
+                              setModalState(
+                                () => selectedRegion = val ?? "Central",
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        // Apply Filter Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(30),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final selectedCategories = <String>[];
+                                for (int i = 0; i < categories.length; i++) {
+                                  if (checked[i])
+                                    selectedCategories.add(categories[i]);
+                                }
+
+                                if (selectedCategories.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Please select at least one category.',
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                final selectedCategory =
+                                    selectedCategories.first;
+
+                                Navigator.pop(
+                                  context,
+                                ); // Only this pop to close the filter sheet
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ResultsScreen(
+                                      selectedText: selectedCategory,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [
+                                      Color(0xFF000000),
+                                      Color(0xFF1FF813),
+                                    ],
+                                    stops: [0.0, 0.47],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  constraints: const BoxConstraints(
+                                    minHeight: 50,
+                                  ),
+                                  child: const Text(
+                                    "Apply Filter",
+                                    style: TextStyle(
+                                      color: Colors
+                                          .white, // Use white for best contrast
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -280,148 +532,138 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Search bar
                   const SizedBox(height: 20),
 
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SearchScreen(),
-                        ),
-                      );
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: AbsorbPointer(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: 250,
-                                child: ValueListenableBuilder<bool>(
-                                  valueListenable: isSearchFocused,
-                                  builder: (context, focused, child) {
-                                    return Container(
-                                      height: 50,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(30),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.15,
-                                            ),
-                                            blurRadius: 12,
-                                            offset: const Offset(0, 4),
-                                          ),
-                                        ],
-                                        border: Border.all(
-                                          color: focused
-                                              ? const Color(0xFF1FF813)
-                                              : Colors.transparent,
-                                          width: 1,
-                                        ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Search bar (with its own GestureDetector)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SearchScreen(),
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15),
+                          child: SizedBox(
+                            width: 240,
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: isSearchFocused,
+                              builder: (context, focused, child) {
+                                return Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          const SizedBox(width: 16),
-                                          const Icon(
-                                            Icons.search,
-                                            color: Colors.black,
-                                            size: 24,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: TextField(
-                                              focusNode: searchFocusNode,
-                                              decoration: const InputDecoration(
-                                                hintText: 'Search Your Place',
-                                                border: InputBorder.none,
-                                                isDense: true,
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                      vertical: 14,
-                                                    ),
-                                              ),
-                                              style: const TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16,
-                                              ),
-                                              enabled: false,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-
-                              ValueListenableBuilder<bool>(
-                                valueListenable: isFilterFocused,
-                                builder: (context, focused, child) {
-                                  return GestureDetector(
-                                    onTap: () {
-                                      FocusScope.of(
-                                        context,
-                                      ).requestFocus(filterFocusNode);
-                                    },
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(16),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
-                                        ),
-                                        child: Container(
-                                          height: 50,
-                                          width: 70,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.3,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              30,
-                                            ),
-                                            border: Border.all(
-                                              color: focused
-                                                  ? const Color(0xFF1FF813)
-                                                  : Colors.white,
-                                              width: 1.5,
-                                            ),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black.withOpacity(
-                                                  0.15,
-                                                ),
-                                                blurRadius: 12,
-                                                offset: const Offset(0, 4),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Focus(
-                                            focusNode: filterFocusNode,
-                                            child: const Center(
-                                              child: Icon(
-                                                Icons.filter_alt,
-                                                color: Colors.black,
-                                                size: 26,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: focused
+                                          ? const Color(0xFF1FF813)
+                                          : Colors.transparent,
+                                      width: 1,
                                     ),
-                                  );
-                                },
-                              ),
-                            ],
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 16),
+                                      const Icon(
+                                        Icons.search,
+                                        color: Colors.black,
+                                        size: 24,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: TextField(
+                                          focusNode: searchFocusNode,
+                                          decoration: const InputDecoration(
+                                            hintText: 'Search Your Place',
+                                            border: InputBorder.none,
+                                            isDense: true,
+                                            contentPadding:
+                                                EdgeInsets.symmetric(
+                                                  vertical: 14,
+                                                ),
+                                          ),
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontSize: 16,
+                                          ),
+                                          enabled: false,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 0),
+                      // Filter icon (with its own GestureDetector)
+                      GestureDetector(
+                        onTap: () {
+                          print('filter clicked');
+                          _showFilterSheet(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          child: ValueListenableBuilder<bool>(
+                            valueListenable: isFilterFocused,
+                            builder: (context, focused, child) {
+                              return ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 30,
+                                    sigmaY: 30,
+                                  ),
+                                  child: Container(
+                                    height: 50,
+                                    width: 60,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.3),
+                                      borderRadius: BorderRadius.circular(30),
+                                      border: Border.all(
+                                        color: focused
+                                            ? const Color(0xFF1FF813)
+                                            : Colors.white,
+                                        width: 1.5,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.15),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Focus(
+                                      focusNode: filterFocusNode,
+                                      child: const Center(
+                                        child: Icon(
+                                          Icons.filter_alt,
+                                          color: Colors.black,
+                                          size: 26,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 25),
                   Padding(
@@ -445,108 +687,141 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(left: 15, right: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
-                            ),
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF000000), Color(0xFF1FF813)],
-                              stops: [0.0, 0.47],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.park,
-                                color: Colors.white,
-                                size: 30,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
                               ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "Game Parks",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF000000), Color(0xFF1FF813)],
+                                stops: [0.0, 0.47],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.park,
+                                  color: Colors.white,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "National Parks",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(right: 18),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.beach_access,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "Leisure",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.water,
                                   color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Waterbodies",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Container(
-                          height: 50,
-                          width: 200,
-                          margin: const EdgeInsets.only(left: 0, right: 12),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                              color: const Color(0xFF1FF813),
-                              width: 1,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    SearchScreen(), // Pass any data if needed
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 200,
+                            margin: const EdgeInsets.only(left: 15, right: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: const Color(0xFF1FF813),
+                                width: 1,
+                              ),
+                              color: Colors.white,
                             ),
-                            color: Colors.white,
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              const Icon(
-                                Icons.terrain,
-                                color: Colors.black,
-                                size: 30,
-                              ),
-                              const SizedBox(width: 12),
-                              const Text(
-                                "Adventure",
-                                style: TextStyle(
-                                  fontFamily: 'Inter',
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 20),
+                                const Icon(
+                                  Icons.terrain,
                                   color: Colors.black,
+                                  size: 30,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 12),
+                                const Text(
+                                  "Mountains",
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -577,372 +852,405 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(left: 20),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/baboon.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/baboon.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Bwindi Impenetrable N.P",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Bwindi Impenetrable N.P",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "90km Kanungu District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "90km Kanungu District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 30),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/hippopotamus.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/hippopotamus.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Kazinga Channel",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Kazinga Channel",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "120km Kasese District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "120km Kasese District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 30),
-                          child: Container(
-                            height: 250,
-                            width: 220,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.5),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 8),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SearchScreen(),
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(25),
-                              child: Stack(
-                                children: [
-                                  Image.asset(
-                                    'assets/images/mount.png',
-                                    height: 250,
-                                    width: 220,
-                                    fit: BoxFit.cover,
+                              );
+                            },
+                            child: Container(
+                              height: 250,
+                              width: 220,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(25),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.5),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 8),
                                   ),
-                                  Positioned(
-                                    left: 0,
-                                    right: 0,
-                                    bottom: 0,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.only(
-                                        bottomLeft: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                        topLeft: Radius.circular(20),
-                                        topRight: Radius.circular(20),
-                                      ),
-                                      child: BackdropFilter(
-                                        filter: ImageFilter.blur(
-                                          sigmaX: 30,
-                                          sigmaY: 30,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/mount.png',
+                                      height: 250,
+                                      width: 220,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      right: 0,
+                                      bottom: 0,
+                                      child: ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          bottomLeft: Radius.circular(25),
+                                          bottomRight: Radius.circular(25),
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20),
                                         ),
-                                        child: Container(
-                                          height: 80,
-                                          width: 220,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white.withOpacity(
-                                              0.5,
-                                            ),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(
-                                                    25,
-                                                  ),
-                                                  bottomRight: Radius.circular(
-                                                    25,
-                                                  ),
-                                                ),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 30,
+                                            sigmaY: 30,
                                           ),
-                                          child: Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                left: 5,
-                                                top: 12,
+                                          child: Container(
+                                            height: 80,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withOpacity(
+                                                0.5,
                                               ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  const Text(
-                                                    "Mountain Elgon",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 15,
-                                                      color: Colors.white,
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    bottomLeft: Radius.circular(
+                                                      25,
                                                     ),
+                                                    bottomRight:
+                                                        Radius.circular(25),
                                                   ),
-                                                  const SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                              left: 1,
-                                                              top: 1,
-                                                            ),
-                                                        child: Icon(
-                                                          Icons.location_on,
-                                                          color: Colors.black,
-                                                          size: 20,
-                                                        ),
+                                            ),
+                                            child: Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: 5,
+                                                  top: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    const Text(
+                                                      "Mountain Elgon",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 15,
+                                                        color: Colors.white,
                                                       ),
-                                                      Text(
-                                                        "320km Mbale District",
-                                                        style: TextStyle(
-                                                          fontFamily: 'Poppins',
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          fontSize: 15,
-                                                          color: Colors.white,
+                                                    ),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 1,
+                                                                top: 1,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Colors.black,
+                                                            size: 20,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                        Text(
+                                                          "320km Mbale District",
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 15,
+                                                            color: Colors.white,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -956,25 +1264,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(right: 5),
-                        child: Container(
-                          height: 55,
-                          width: 55,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.4),
-                                blurRadius: 5,
-                                offset: const Offset(0, 4),
+                        child: GestureDetector(
+                          onTap: () {
+                            print('Location icon tapped');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => MapViewScreen(
+                                  siteName: 'Your Current Location',
+                                  showCurrentLocation: true,
+                                ),
                               ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.my_location,
-                              color: Colors.black,
-                              size: 25,
+                            );
+                          },
+                          child: Container(
+                            height: 55,
+                            width: 55,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.my_location,
+                                color: Colors.black,
+                                size: 25,
+                              ),
                             ),
                           ),
                         ),

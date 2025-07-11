@@ -1,5 +1,7 @@
 import 'dart:ui';
+import 'package:uganda_explore/screens/virtual_ar/ar_scan_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -66,7 +68,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         final videos = List<String>.from(data['videos'] ?? []);
         return videos.take(3).toList();
       }
@@ -98,7 +100,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         final images = List<String>.from(data['images'] ?? []);
         return images.take(3).toList();
       }
@@ -115,7 +117,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return dbName;
       }
     }
@@ -131,7 +133,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return data['location']?.toString();
       }
     }
@@ -147,7 +149,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return data['description']?.toString();
       }
     }
@@ -163,7 +165,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var doc in query.docs) {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase().contains(trimmedSiteName)) {
+      if (dbName.toLowerCase() == trimmedSiteName) {
         return {
           'entryfee': data['entryfee']?.toString() ?? '',
           'openingHours': data['openingHours']?.toString() ?? '',
@@ -175,10 +177,92 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    // Add navigation logic here if needed
+    if (index == 0) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (index == 1) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/profile');
+    } else if (index == 2) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/settings');
+    } else if (index == 3) {
+      // Do NOT call setState here, just navigate!
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<Map<String, double>?> fetchLatLng(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase() == trimmedSiteName) {
+        final lat = data['latitude'];
+        final lng = data['longitude'];
+        if (lat != null && lng != null) {
+          return {
+            'lat': (lat as num).toDouble(),
+            'lng': (lng as num).toDouble(),
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  void _showFullscreenVideo(VideoPlayerController controller) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black,
+          insetPadding: const EdgeInsets.all(8),
+          child: AspectRatio(
+            aspectRatio: controller.value.aspectRatio,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                VideoPlayer(controller),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      controller.pause();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -295,22 +379,37 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 // 360° Tour
                 Column(
                   children: [
-                    ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
+                    GestureDetector(
+                      onTap: () {
+                        print(
+                          '360° Tour button tapped for: ${widget.siteName}',
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => VirtualTourScreen(
+                              placeName: widget.siteName.trim(),
+                            ),
                           ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.threesixty, // 360 arrow icon
-                              color: Colors.white,
-                              size: 30,
+                        );
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.threesixty,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -332,22 +431,49 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 // AR View
                 Column(
                   children: [
-                    ClipOval(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                        child: Container(
-                          width: 45,
-                          height: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.qr_code_scanner, // AR scan icon
-                              color: Colors.white,
-                              size: 30,
+                    GestureDetector(
+                      onTap: () async {
+                        print('AR Scan button tapped');
+                        final latLng = await fetchLatLng(
+                          widget.siteName.trim(),
+                        );
+                        if (latLng != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ARScanScreen(
+                                destinationLat: latLng['lat']!,
+                                destinationLng: latLng['lng']!,
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Location not found for this site.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.qr_code_scanner,
+                                color: Colors.white,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
@@ -355,7 +481,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     ),
                     const SizedBox(height: 1),
                     const Text(
-                      "AR View",
+                      "AR Scan",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -365,6 +491,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(width: 15),
                 // Location
                 // Find this section for the Location circle:
@@ -604,6 +731,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         _playingIndex = index;
                                       });
                                       await controller.play();
+                                      _showFullscreenVideo(
+                                        controller,
+                                      ); // <-- Show fullscreen dialog
                                     },
                                     child: Container(
                                       width: 100,
@@ -897,16 +1027,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           onTap: () => _onItemTapped(2),
                         ),
                         _NavIcon(
-                          icon: Icons.notifications,
-                          label: 'Notifications',
-                          selected: _selectedIndex == 3,
-                          onTap: () => _onItemTapped(3),
-                        ),
-                        _NavIcon(
                           icon: Icons.map,
                           label: 'Map',
-                          selected: _selectedIndex == 4,
-                          onTap: () => _onItemTapped(4),
+                          selected: _selectedIndex == 3,
+                          onTap: () => _onItemTapped(3),
                         ),
                       ],
                     ),
@@ -958,7 +1082,7 @@ class _NavIcon extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-            ]
+            ],
           ],
         ),
       ),
