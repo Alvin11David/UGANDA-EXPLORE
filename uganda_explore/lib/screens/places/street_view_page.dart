@@ -41,4 +41,65 @@ class _StreetViewPageState extends State<StreetViewPage> {
     _initializeStreetView();
     _getUserLocation();
   }
+
+  // Segment 2: Fetch site coordinates from Firestore
+  Future<void> _initializeStreetView() async {
+    if (widget.latitude != null && widget.longitude != null) {
+      _siteLatitude = widget.latitude;
+      _siteLongitude = widget.longitude;
+      _setupWebView();
+    } else {
+      await _fetchCoordinatesFromFirestore();
+    }
+  }
+
+  Future<void> _fetchCoordinatesFromFirestore() async {
+    try {
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: widget.siteName.trim())
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        final lat = doc['latitude'];
+        final lng = doc['longitude'];
+
+        double? latitude;
+        double? longitude;
+
+        if (lat is double && lng is double) {
+          latitude = lat;
+          longitude = lng;
+        } else if (lat is int && lng is int) {
+          latitude = lat.toDouble();
+          longitude = lng.toDouble();
+        } else if (lat is String && lng is String) {
+          latitude = double.tryParse(lat);
+          longitude = double.tryParse(lng);
+        }
+
+        if (latitude != null && longitude != null) {
+          _siteLatitude = latitude;
+          _siteLongitude = longitude;
+          _setupWebView();
+        } else {
+          _setError('Invalid coordinates for this location');
+        }
+      } else {
+        _setError('Location not found in database');
+      }
+    } catch (e) {
+      _setError('Error fetching location: \$e');
+    }
+  }
+
+  void _setError(String message) {
+    setState(() {
+      _hasError = true;
+      _errorMessage = message;
+      _isLoading = false;
+    });
+  }
 }
