@@ -43,6 +43,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
   }
 
   Future<void> _initializeStreetView() async {
+    // Use provided coordinates or fetch from Firestore
     if (widget.latitude != null && widget.longitude != null) {
       _siteLatitude = widget.latitude;
       _siteLongitude = widget.longitude;
@@ -64,7 +65,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
         final doc = query.docs.first;
         final lat = doc['latitude'];
         final lng = doc['longitude'];
-
+        
         double? latitude;
         double? longitude;
 
@@ -92,14 +93,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     } catch (e) {
       _setError('Error fetching location: $e');
     }
-  }
-
-  void _setError(String message) {
-    setState(() {
-      _hasError = true;
-      _errorMessage = message;
-      _isLoading = false;
-    });
   }
 
   Future<void> _getUserLocation() async {
@@ -159,7 +152,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
     if (_siteLatitude == null || _siteLongitude == null) return;
 
     final streetViewHtml = _generateStreetViewHtml();
-
+    
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
@@ -231,6 +224,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 
                 streetViewService = new google.maps.StreetViewService();
                 
+                // Check if Street View is available at this location
                 streetViewService.getPanorama({
                     location: targetLocation,
                     radius: 50,
@@ -287,74 +281,12 @@ class _StreetViewPageState extends State<StreetViewPage> {
     ''';
   }
 
-  Widget _buildErrorView() {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.all(20),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 60,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Street View Error',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _errorMessage ?? 'Unknown error occurred',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _hasError = false;
-                  _isLoading = true;
-                });
-                _initializeStreetView();
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStreetViewContent() {
-    if (_hasError) return _buildErrorView();
-    if (_siteLatitude != null && _siteLongitude != null) {
-      return WebViewWidget(controller: _webViewController);
-    }
-    return const SizedBox();
-  }
-
-  Widget _buildLoadingIndicator() {
-    return _isLoading && !_hasError
-        ? const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          )
-        : const SizedBox();
+  void _setError(String message) {
+    setState(() {
+      _hasError = true;
+      _errorMessage = message;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -363,9 +295,69 @@ class _StreetViewPageState extends State<StreetViewPage> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          _buildStreetViewContent(),
-          _buildLoadingIndicator(),
-          // Segment 7: Custom AppBar with blur effect and title
+          // Main Street View content
+          if (_hasError)
+            Center(
+              child: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline,
+                      size: 60,
+                      color: Colors.red,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Street View Error',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _errorMessage ?? 'Unknown error occurred',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _hasError = false;
+                          _isLoading = true;
+                        });
+                        _initializeStreetView();
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          else if (_siteLatitude != null && _siteLongitude != null)
+            WebViewWidget(controller: _webViewController),
+          
+          // Loading indicator
+          if (_isLoading && !_hasError)
+            const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          
+          // Custom app bar with blur effect (matching your existing style)
           Positioned(
             top: 0,
             left: 0,
@@ -387,6 +379,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
+                      // Back button with blur effect
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: ClipOval(
@@ -413,14 +406,15 @@ class _StreetViewPageState extends State<StreetViewPage> {
                         ),
                       ),
                       const SizedBox(width: 16),
+                      // Title
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Street View',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -438,6 +432,89 @@ class _StreetViewPageState extends State<StreetViewPage> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          
+          // Bottom info panel (matching your existing style)
+          Positioned(
+            left: 4,
+            right: 4,
+            bottom: 0,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(25),
+                topRight: Radius.circular(25),
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                child: Container(
+                  height: 120,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25),
+                    ),
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.siteName,
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            fontFamily: 'Poppins',
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        if (_userDistrict != null) ...[
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.my_location,
+                                size: 16,
+                                color: Colors.blue,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Your location: $_userDistrict',
+                                style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on,
+                              size: 16,
+                              color: Colors.red,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Coordinates: ${_siteLatitude?.toStringAsFixed(4)}, ${_siteLongitude?.toStringAsFixed(4)}',
+                              style: const TextStyle(
+                                color: Colors.black87,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
