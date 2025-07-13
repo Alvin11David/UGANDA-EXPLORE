@@ -5,6 +5,7 @@ import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/places/street_view_page.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
   final String siteName;
@@ -545,6 +546,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ],
             ),
           ),
+          
           Positioned(
             top: 170, // adjust as needed to appear below the circles
             left: 10,
