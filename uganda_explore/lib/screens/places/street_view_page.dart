@@ -32,7 +32,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
   double? _userLatitude;
   double? _userLongitude;
 
-  // Your Google Maps API key (same as used in MapViewScreen)
   static const String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
 
   @override
@@ -287,7 +286,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     ''';
   }
 
-  // Segment 5: Error UI with retry button
   Widget _buildErrorView() {
     return Center(
       child: Container(
@@ -338,5 +336,24 @@ class _StreetViewPageState extends State<StreetViewPage> {
         ),
       ),
     );
+  }
+
+  // Segment 6: Main WebView and loading UI
+  Widget _buildStreetViewContent() {
+    if (_hasError) return _buildErrorView();
+    if (_siteLatitude != null && _siteLongitude != null) {
+      return WebViewWidget(controller: _webViewController);
+    }
+    return const SizedBox();
+  }
+
+  Widget _buildLoadingIndicator() {
+    return _isLoading && !_hasError
+        ? const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          )
+        : const SizedBox();
   }
 }
