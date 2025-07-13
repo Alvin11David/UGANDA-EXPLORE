@@ -156,4 +156,137 @@ class _StreetViewPageState extends State<StreetViewPage> {
       });
     }
   }
+
+  // Segment 4: Generate and load Street View HTML
+  void _setupWebView() {
+    if (_siteLatitude == null || _siteLongitude == null) return;
+
+    final streetViewHtml = _generateStreetViewHtml();
+
+    _webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (String url) {
+            setState(() {
+              _isLoading = true;
+            });
+          },
+          onPageFinished: (String url) {
+            setState(() {
+              _isLoading = false;
+            });
+          },
+          onWebResourceError: (WebResourceError error) {
+            _setError('Street View failed to load: \${error.description}');
+          },
+        ),
+      )
+      ..loadHtmlString(streetViewHtml);
+  }
+
+  String _generateStreetViewHtml() {
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            html, body, #pano {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+            }
+            #error-message {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                z-index: 1000;
+            }
+            .loading {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: #333;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="pano"></div>
+        <div id="loading" class="loading">Loading Street View...</div>
+        <div id="error-message" style="display: none;"></div>
+        
+        <script>
+            let panorama;
+            let streetViewService;
+            
+            function initStreetView() {
+                const targetLocation = { lat: $_siteLatitude, lng: $_siteLongitude };
+                
+                streetViewService = new google.maps.StreetViewService();
+                
+                streetViewService.getPanorama({
+                    location: targetLocation,
+                    radius: 50,
+                    source: google.maps.StreetViewSource.OUTDOOR
+                }, processSVData);
+            }
+            
+            function processSVData(data, status) {
+                const loading = document.getElementById('loading');
+                const errorDiv = document.getElementById('error-message');
+                
+                if (status === 'OK') {
+                    loading.style.display = 'none';
+                    
+                    panorama = new google.maps.StreetViewPanorama(
+                        document.getElementById('pano'),
+                        {
+                            position: data.location.latLng,
+                            pov: {
+                                heading: 0,
+                                pitch: 0
+                            },
+                            zoom: 1,
+                            motionTracking: false,
+                            motionTrackingControl: false,
+                            addressControl: false,
+                            linksControl: true,
+                            panControl: true,
+                            enableCloseButton: false,
+                            showRoadLabels: false
+                        }
+                    );
+                } else {
+                    loading.style.display = 'none';
+                    errorDiv.innerHTML = 'Street View not available for this location<br><small>Try a different location or check back later</small>';
+                    errorDiv.style.display = 'block';
+                }
+            }
+            
+            window.onerror = function(msg, url, line, col, error) {
+                const loading = document.getElementById('loading');
+                const errorDiv = document.getElementById('error-message');
+                loading.style.display = 'none';
+                errorDiv.innerHTML = 'Error loading Street View<br><small>Please check your internet connection</small>';
+                errorDiv.style.display = 'block';
+            };
+        </script>
+        
+        <script async defer 
+            src="https://maps.googleapis.com/maps/api/js?key=$_apiKey&callback=initStreetView">
+        </script>
+    </body>
+    </html>
+    ''';
+  }
 }
