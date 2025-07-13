@@ -102,4 +102,58 @@ class _StreetViewPageState extends State<StreetViewPage> {
       _isLoading = false;
     });
   }
+
+  // Segment 3: Get user's current location and district
+  Future<void> _getUserLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        setState(() {
+          _userDistrict = "Location services disabled";
+        });
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          setState(() {
+            _userDistrict = "Location permission denied";
+          });
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        setState(() {
+          _userDistrict = "Location permission permanently denied";
+        });
+        return;
+      }
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      setState(() {
+        _userLatitude = position.latitude;
+        _userLongitude = position.longitude;
+        _userDistrict = placemarks.isNotEmpty
+            ? (placemarks.first.subAdministrativeArea ??
+                placemarks.first.locality ??
+                "Unknown District")
+            : "District not found";
+      });
+    } catch (e) {
+      setState(() {
+        _userDistrict = "Error getting location: \$e";
+      });
+    }
+  }
 }
