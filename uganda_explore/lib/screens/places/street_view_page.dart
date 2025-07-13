@@ -42,7 +42,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     _getUserLocation();
   }
 
-  // Segment 2: Fetch site coordinates from Firestore
   Future<void> _initializeStreetView() async {
     if (widget.latitude != null && widget.longitude != null) {
       _siteLatitude = widget.latitude;
@@ -103,7 +102,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     });
   }
 
-  // Segment 3: Get user's current location and district
   Future<void> _getUserLocation() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -157,7 +155,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     }
   }
 
-  // Segment 4: Generate and load Street View HTML
   void _setupWebView() {
     if (_siteLatitude == null || _siteLongitude == null) return;
 
@@ -288,5 +285,58 @@ class _StreetViewPageState extends State<StreetViewPage> {
     </body>
     </html>
     ''';
+  }
+
+  // Segment 5: Error UI with retry button
+  Widget _buildErrorView() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              size: 60,
+              color: Colors.red,
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Street View Error',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage ?? 'Unknown error occurred',
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _hasError = false;
+                  _isLoading = true;
+                });
+                _initializeStreetView();
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
