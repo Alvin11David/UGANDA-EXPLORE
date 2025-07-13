@@ -32,6 +32,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
   double? _userLatitude;
   double? _userLongitude;
 
+  // Your Google Maps API key (same as used in MapViewScreen)
   static const String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
 
   @override
@@ -89,7 +90,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
         _setError('Location not found in database');
       }
     } catch (e) {
-      _setError('Error fetching location: \$e');
+      _setError('Error fetching location: $e');
     }
   }
 
@@ -149,7 +150,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
       });
     } catch (e) {
       setState(() {
-        _userDistrict = "Error getting location: \$e";
+        _userDistrict = "Error getting location: $e";
       });
     }
   }
@@ -174,7 +175,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
             });
           },
           onWebResourceError: (WebResourceError error) {
-            _setError('Street View failed to load: \${error.description}');
+            _setError('Street View failed to load: ${error.description}');
           },
         ),
       )
@@ -338,7 +339,6 @@ class _StreetViewPageState extends State<StreetViewPage> {
     );
   }
 
-  // Segment 6: Main WebView and loading UI
   Widget _buildStreetViewContent() {
     if (_hasError) return _buildErrorView();
     if (_siteLatitude != null && _siteLongitude != null) {
@@ -355,5 +355,96 @@ class _StreetViewPageState extends State<StreetViewPage> {
             ),
           )
         : const SizedBox();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          _buildStreetViewContent(),
+          _buildLoadingIndicator(),
+          // Segment 7: Custom AppBar with blur effect and title
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: 110,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.7),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: ClipOval(
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.3),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.5),
+                                  width: 1,
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.chevron_left,
+                                color: Colors.white,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Street View',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              widget.siteName,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
