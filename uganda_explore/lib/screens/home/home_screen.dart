@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _showNavBar = true;
   String _district = 'Kampala';
   int _selectedIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
 
   void _onItemTapped(int index) {
     if (index == 0) {
@@ -37,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       Navigator.pushReplacementNamed(context, '/settings');
     } else if (index == 3) {
-      // Do NOT call setState here, just navigate!
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -48,6 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     }
+  }
+
+  void _onSearch(String query) {
+    if (query.trim().isEmpty) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ResultsScreen(selectedText: query.trim()),
+      ),
+    );
   }
 
   @override
@@ -71,11 +81,11 @@ class _HomeScreenState extends State<HomeScreen> {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          return; // Permission denied, keep default
+          return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
-        return; // Permissions are denied forever, keep default
+        return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
@@ -89,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (placemarks.isNotEmpty) {
         setState(() {
-          // Use subAdministrativeArea for district, fallback to locality
           _district =
               placemarks.first.subAdministrativeArea ??
               placemarks.first.locality ??
@@ -97,7 +106,6 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      // If any error, keep default
       print("Location error: $e");
     }
   }
@@ -108,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        // State for checkboxes and dropdown
         List<String> categories = [
           "National Parks",
           "Lakes",
@@ -156,7 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Title
                         const Center(
                           child: Text(
                             "Filter screen",
@@ -168,7 +174,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        // Categories
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -202,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           }),
                         ),
                         const SizedBox(height: 8),
-                        // Dropdown
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
@@ -241,7 +245,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        // Apply Filter Button
                         SizedBox(
                           width: double.infinity,
                           child: ClipRRect(
@@ -270,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                                 Navigator.pop(
                                   context,
-                                ); // Only this pop to close the filter sheet
+                                );
 
                                 Navigator.push(
                                   context,
@@ -313,8 +316,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: const Text(
                                     "Apply Filter",
                                     style: TextStyle(
-                                      color: Colors
-                                          .white, // Use white for best contrast
+                                      color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 18,
                                     ),
@@ -340,6 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -367,7 +370,6 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: Column(
                 children: [
-                  // Header section with Stack
                   SizedBox(
                     height: 155,
                     child: Stack(
@@ -390,7 +392,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        // Logo
                         Positioned(
                           top: 35,
                           left: 0,
@@ -403,7 +404,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        // Location
                         Positioned(
                           top: 95,
                           left: 4,
@@ -469,7 +469,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        // Weather
                         Positioned(
                           top: 95,
                           right: 4,
@@ -528,88 +527,78 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-
-                  // Search bar
                   const SizedBox(height: 20),
-
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Search bar
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const SearchScreen(),
-                            ),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: SizedBox(
-                            width: 240,
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: isSearchFocused,
-                              builder: (context, focused, child) {
-                                return Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.18),
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.15),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                    border: Border.all(
-                                      color: focused
-                                          ? const Color(0xFF3B82F6)
-                                          : Colors.transparent,
-                                      width: 1,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: SizedBox(
+                          width: 240,
+                          child: ValueListenableBuilder<bool>(
+                            valueListenable: isSearchFocused,
+                            builder: (context, focused, child) {
+                              return Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.15),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 4),
                                     ),
+                                  ],
+                                  border: Border.all(
+                                    color: focused
+                                        ? const Color(0xFF1FF813)
+                                        : Colors.transparent,
+                                    width: 1,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 16),
-                                      const Icon(
-                                        Icons.search,
-                                        color: Color(0xFF3B82F6),
-                                        size: 24,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: TextField(
-                                          focusNode: searchFocusNode,
-                                          decoration: const InputDecoration(
-                                            hintText: 'Search Your Place',
-                                            border: InputBorder.none,
-                                            isDense: true,
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                  vertical: 14,
-                                                ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 16),
+                                    const Icon(
+                                      Icons.search,
+                                      color: Colors.black,
+                                      size: 24,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: TextField(
+                                        focusNode: searchFocusNode,
+                                        controller: _searchController,
+                                        decoration: const InputDecoration(
+                                          hintText: 'Search Your Place',
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding:
+                                              EdgeInsets.symmetric(
+                                            vertical: 14,
                                           ),
-                                          style: const TextStyle(
-                                            fontFamily: 'Poppins',
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                          ),
-                                          enabled: false,
                                         ),
+                                        style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 16,
+                                        ),
+                                        onSubmitted: _onSearch,
+                                        textInputAction: TextInputAction.search,
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.arrow_forward, color: Colors.black),
+                                      onPressed: () => _onSearch(_searchController.text),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
                       const SizedBox(width: 0),
-                      // Filter icon
                       GestureDetector(
                         onTap: () {
                           print('filter clicked');
@@ -926,12 +915,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                               borderRadius:
                                                   const BorderRadius.only(
-                                                    bottomLeft: Radius.circular(
-                                                      25,
-                                                    ),
-                                                    bottomRight:
-                                                        Radius.circular(25),
-                                                  ),
+                                                bottomLeft: Radius.circular(
+                                                  25,
+                                                ),
+                                                bottomRight:
+                                                    Radius.circular(25),
+                                              ),
                                             ),
                                             child: Align(
                                               alignment: Alignment.topLeft,
@@ -962,9 +951,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         Padding(
                                                           padding:
                                                               EdgeInsets.only(
-                                                                left: 1,
-                                                                top: 1,
-                                                              ),
+                                                            left: 1,
+                                                            top: 1,
+                                                          ),
                                                           child: Icon(
                                                             Icons.location_on,
                                                             color: Color(
@@ -1066,12 +1055,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                               borderRadius:
                                                   const BorderRadius.only(
-                                                    bottomLeft: Radius.circular(
-                                                      25,
-                                                    ),
-                                                    bottomRight:
-                                                        Radius.circular(25),
-                                                  ),
+                                                bottomLeft: Radius.circular(
+                                                  25,
+                                                ),
+                                                bottomRight:
+                                                    Radius.circular(25),
+                                              ),
                                             ),
                                             child: Align(
                                               alignment: Alignment.topLeft,
@@ -1102,9 +1091,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         Padding(
                                                           padding:
                                                               EdgeInsets.only(
-                                                                left: 1,
-                                                                top: 1,
-                                                              ),
+                                                            left: 1,
+                                                            top: 1,
+                                                          ),
                                                           child: Icon(
                                                             Icons.location_on,
                                                             color: Color(
@@ -1206,12 +1195,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                               borderRadius:
                                                   const BorderRadius.only(
-                                                    bottomLeft: Radius.circular(
-                                                      25,
-                                                    ),
-                                                    bottomRight:
-                                                        Radius.circular(25),
-                                                  ),
+                                                bottomLeft: Radius.circular(
+                                                  25,
+                                                ),
+                                                bottomRight:
+                                                    Radius.circular(25),
+                                              ),
                                             ),
                                             child: Align(
                                               alignment: Alignment.topLeft,
@@ -1242,9 +1231,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         Padding(
                                                           padding:
                                                               EdgeInsets.only(
-                                                                left: 1,
-                                                                top: 1,
-                                                              ),
+                                                            left: 1,
+                                                            top: 1,
+                                                          ),
                                                           child: Icon(
                                                             Icons.location_on,
                                                             color: Color(
@@ -1333,7 +1322,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          // Custom Bottom Navigation Bar (with navigation)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ClipRRect(
