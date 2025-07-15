@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -13,7 +14,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   File? _profileImage;
   final String email = "user@email.com"; // Replace with actual user email
 
@@ -28,8 +29,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _selectedIndex = index;
     });
     if (index == 0) Navigator.pushReplacementNamed(context, '/home');
-    if (index == 1) Navigator.pushReplacementNamed(context, '/profile');
-    // Add more navigation as needed
+    if (index == 1) Navigator.pushReplacementNamed(context, '/settings');
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _onChangePicture() async {
@@ -267,7 +278,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Bottom Nav Bar (4 icons only)
+                          // Bottom Nav Bar (Profile button removed)
                           Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 0,
@@ -302,24 +313,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         color: mainGreen,
                                       ),
                                       _NavIcon(
-                                        icon: Icons.person,
-                                        label: 'Profile',
+                                        icon: Icons.settings,
+                                        label: 'Settings',
                                         selected: _selectedIndex == 1,
                                         onTap: () => _onItemTapped(1),
                                         color: mainGreen,
                                       ),
                                       _NavIcon(
-                                        icon: Icons.settings,
-                                        label: 'Settings',
-                                        selected: _selectedIndex == 2,
-                                        onTap: () => _onItemTapped(2),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
                                         icon: Icons.map,
                                         label: 'Map',
-                                        selected: _selectedIndex == 3,
-                                        onTap: () => _onItemTapped(3),
+                                        selected: _selectedIndex == 2,
+                                        onTap: () => _onItemTapped(2),
                                         color: mainGreen,
                                       ),
                                     ],
