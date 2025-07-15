@@ -366,11 +366,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           filled: true,
           fillColor: Colors.white.withOpacity(0.15),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
             borderSide: const BorderSide(color: Colors.green, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
             borderSide: const BorderSide(color: Colors.green, width: 2),
           ),
           suffixIcon: const Icon(Icons.edit, size: 19, color: Colors.black),
