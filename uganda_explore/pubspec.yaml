@@ -38,19 +38,26 @@ dependencies:
   provider: 
   flutter_svg: 
 
+  # image picker
+  image_picker: 
+
   # Google maps and places
   google_maps_flutter:
-  google_place:
 
   # Animation
+  http:
 
   # Google signin
   google_sign_in: ^6.2.1
 
   # Location & Permissions
   location: ^5.0.3
-  geolocator: 
+  geolocator: 14.0.1
+  geocoding:
   permission_handler:
+  
+  # Virtual tour
+  photo_view: ^0.15.0
 
   # Firebase core & services
   firebase_core:
@@ -62,7 +69,11 @@ dependencies:
   video_player:
 
   # AR support 
-  
+  camera:
+  flutter_compass:
+
+  # Page Loading Skeleton
+  shimmer: ^3.0.0
 
   #Animations and utilities
   animated_text_kit: 
@@ -88,6 +99,7 @@ flutter:
     - assets/images/
     - assets/logo/
     - assets/vectors/
+    
     
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
