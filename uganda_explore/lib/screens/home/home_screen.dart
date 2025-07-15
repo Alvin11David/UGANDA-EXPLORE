@@ -592,7 +592,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontFamily: 'Poppins',
                                           fontSize: 16,
                                         ),
-                                        onSubmitted: _onSearch,
+                                        onSubmitted: (value) {
+                                          if (value.trim().isNotEmpty) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    PlaceDetailsScreen(
+                                                      siteName: value.trim(),
+                                                    ),
+                                              ),
+                                            );
+                                          }
+                                        },
                                         textInputAction: TextInputAction.search,
                                       ),
                                     ),
@@ -601,8 +613,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Icons.arrow_forward,
                                         color: Colors.black,
                                       ),
-                                      onPressed: () =>
-                                          _onSearch(_searchController.text),
+                                      onPressed: () {
+                                        final value = _searchController.text
+                                            .trim();
+                                        if (value.isNotEmpty) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) =>
+                                                  PlaceDetailsScreen(
+                                                    siteName: value,
+                                                  ),
+                                            ),
+                                          );
+                                        }
+                                      },
                                     ),
                                   ],
                                 ),
@@ -851,7 +876,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   .start,
                                                           children: [
                                                             Text(
-                                                              site['name'] ?? '',
+                                                              site['name'] ??
+                                                                  '',
                                                               style: const TextStyle(
                                                                 fontFamily:
                                                                     'Poppins',
@@ -887,7 +913,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 ),
                                                                 Expanded(
                                                                   child: Text(
-                                                                    site['location'] ?? '',
+                                                                    site['location'] ??
+                                                                        '',
                                                                     style: const TextStyle(
                                                                       fontFamily:
                                                                           'Poppins',
