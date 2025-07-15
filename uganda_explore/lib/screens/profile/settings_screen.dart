@@ -9,7 +9,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 1; // Settings tab is highlighted by default
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,11 +18,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/settings');
+      // Already on settings, do nothing
     } else if (index == 2) {
       Navigator.pushReplacementNamed(context, '/map');
     }
-    // Add more navigation logic for other indices if needed
   }
 
   @override
@@ -151,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () => print("Terms & Privacy tapped"),
+                            onTap: () => Navigator.pushNamed(context, '/termsandprivacy'),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
@@ -201,7 +200,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     selected: _selectedIndex == 0,
                     onTap: () => _onItemTapped(0),
                   ),
-                  // Profile icon removed
                   _NavIcon(
                     icon: Icons.settings,
                     label: 'Settings',
