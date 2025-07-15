@@ -40,7 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
+            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)], // Navy Blue to Blue
             stops: [0.03, 0.63],
           ),
         ),
@@ -175,23 +175,22 @@ class EmailField extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
-              color: Colors.black,
+              color: Color(0xFF374151), // Dark Gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Enter Your Email',
             hintStyle: const TextStyle(
-              color: Colors.black54,
+              color: Color(0xFF9CA3AF), // Light Gray (hint)
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
             ),
-            filled: true,
-            fillColor: Colors.white,
+            fillColor: Color(0xFFE5E7EB), // Light Gray background
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.mail, color: Colors.black),
+              child: Icon(Icons.mail, color: Color(0xFF6B7280)), // Gray icon
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -199,11 +198,17 @@ class EmailField extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
+              borderSide: const BorderSide(
+                color: Color(0xFF3B82F6),
+                width: 1,
+              ), // Blue
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
+              borderSide: const BorderSide(
+                color: Color(0xFF1E3A8A),
+                width: 2,
+              ), // Navy Blue
             ),
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16,
@@ -212,12 +217,12 @@ class EmailField extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
-            color: Colors.black,
+            color: Color(0xFF374151), // Dark Gray
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             fontSize: 15,
           ),
-          cursorColor: Color(0xFF1EF813),
+          cursorColor: Color(0xFF3B82F6), // Blue
         ),
       ),
     );
@@ -252,23 +257,22 @@ class _PasswordFieldState extends State<PasswordField> {
           decoration: InputDecoration(
             labelText: 'Password',
             labelStyle: const TextStyle(
-              color: Colors.black,
+              color: Color(0xFF374151), // Dark Gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Enter Your Password',
             hintStyle: const TextStyle(
-              color: Colors.black54,
+              color: Color(0xFF9CA3AF), // Light Gray (hint)
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
             ),
-            filled: true,
-            fillColor: Colors.white,
+            fillColor: Color(0xFFE5E7EB), // Light Gray background
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.lock, color: Colors.black),
+              child: Icon(Icons.lock, color: Color(0xFF6B7280)), // Gray icon
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -284,17 +288,23 @@ class _PasswordFieldState extends State<PasswordField> {
                 },
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.black54,
+                  color: Color(0xFF6B7280), // Gray
                 ),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
+              borderSide: const BorderSide(
+                color: Color(0xFF3B82F6),
+                width: 1,
+              ), // Blue
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
+              borderSide: const BorderSide(
+                color: Color(0xFF1E3A8A),
+                width: 2,
+              ), // Navy Blue
             ),
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16,
@@ -303,12 +313,12 @@ class _PasswordFieldState extends State<PasswordField> {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
-            color: Colors.black,
+            color: Color(0xFF374151), // Dark Gray
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             fontSize: 15,
           ),
-          cursorColor: Color(0xFF1EF813),
+          cursorColor: Color(0xFF3B82F6), // Blue
         ),
       ),
     );
@@ -330,7 +340,7 @@ class ForgotPasswordLink extends StatelessWidget {
         child: const Text(
           'Forgot Password?',
           style: TextStyle(
-            color: Colors.black,
+            color: Color(0xFF3B82F6), // Blue
             fontSize: 16,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w600,
@@ -358,32 +368,35 @@ class SignInButton extends StatelessWidget {
   });
 
   Future<void> _onSignInPressed(BuildContext context) async {
-    setError(null);
-    if (!formKey.currentState!.validate()) return;
-    isLoading.value = true;
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text,
-      );
+  setError(null);
+  if (!formKey.currentState!.validate()) return;
+  isLoading.value = true;
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text,
+    );
+    // Check if admin
+    if (emailController.text.trim().toLowerCase() == 'admin@gmail.com') {
+      Navigator.pushReplacementNamed(context, '/admin_dashboard');
+    } else {
       Navigator.pushReplacementNamed(context, '/home');
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        setError('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        setError('Wrong password provided.');
-      } else {
-        setError(e.message);
-      }
-    } catch (e) {
-      print(
-        'Sign in error: $e',
-      ); // <-- This will show the real error in your debug console
-      setError('An error occurred. Please try again.');
-    } finally {
-      isLoading.value = false;
     }
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      setError('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      setError('Wrong password provided.');
+    } else {
+      setError(e.message);
+    }
+  } catch (e) {
+    print('Sign in error: $e');
+    setError('An error occurred. Please try again.');
+  } finally {
+    isLoading.value = false;
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -402,13 +415,16 @@ class SignInButton extends StatelessWidget {
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                     colors: [
-                      Color.fromARGB(255, 47, 44, 44),
-                      Color(0xFF1EF813),
+                      Color(0xFF1E3A8A), // Navy Blue
+                      Color(0xFF3B82F6), // Blue
                     ],
                     stops: [0.0, 0.47],
                   ),
                   shape: RoundedRectangleBorder(
-                    side: const BorderSide(width: 1, color: Color(0xFF1EF813)),
+                    side: const BorderSide(
+                      width: 1,
+                      color: Color(0xFF3B82F6),
+                    ), // Blue
                     borderRadius: BorderRadius.circular(30),
                   ),
                   shadows: const [
@@ -465,7 +481,7 @@ class OrDivider extends StatelessWidget {
             child: Text(
               'Or Sign In With',
               style: TextStyle(
-                color: Colors.black54,
+                color: Color(0xFF6B7280), // Gray
                 fontSize: 14,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
@@ -498,7 +514,7 @@ class SignUpLink extends StatelessWidget {
               const TextSpan(
                 text: 'Don\'t have an account? ',
                 style: TextStyle(
-                  color: Colors.black,
+                  color: Color(0xFF6B7280), // Gray
                   fontSize: 16,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,
@@ -507,7 +523,7 @@ class SignUpLink extends StatelessWidget {
               TextSpan(
                 text: 'Sign Up',
                 style: TextStyle(
-                  color: const Color(0xFF0F7709),
+                  color: Color(0xFF1E3A8A), // Navy Blue
                   fontSize: 16,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w600,

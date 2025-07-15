@@ -44,10 +44,7 @@ class OnboardingScreen1 extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(40),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1.1,
-                    ),
+                    border: Border.all(color: Colors.white, width: 1.1),
                   ),
                   child: Column(
                     children: [
@@ -62,7 +59,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Color(0xFF1FF813),
+                                color: Color(0xFF3B82F6), // Blue
                                 width: 3,
                               ),
                               color: Colors.transparent,
@@ -74,7 +71,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             height: 15,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF1E3A8A), // Navy Blue
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -83,7 +80,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             height: 15,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF3B82F6), // Blue
                             ),
                           ),
                         ],
@@ -124,19 +121,21 @@ class OnboardingScreen1 extends StatelessWidget {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                               colors: [
-                                Color(0xFF000000),
-                                Color(0xFF1FF813),
+                                Color(0xFF1E3A8A), // Navy Blue
+                                Color(0xFF3B82F6), // Blue
                               ],
                               stops: [0.0, 0.47],
                             ),
                             border: Border.all(
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF3B82F6), // Blue
                               width: 1,
                             ),
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/onboarding_screen2');
+                              Navigator.of(
+                                context,
+                              ).pushReplacementNamed('/onboarding_screen2');
                             },
                             style: TextButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -155,17 +154,21 @@ class OnboardingScreen1 extends StatelessWidget {
                                       fontFamily: 'Outfit',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22,
-                                      color: Colors.black,
+                                      color: Color(0xFFE5E7EB), // Light Gray
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, right: 5),
+                                  padding: const EdgeInsets.only(
+                                    top: 5,
+                                    bottom: 5,
+                                    right: 5,
+                                  ),
                                   child: Container(
                                     width: 52,
                                     height: 52,
                                     decoration: const BoxDecoration(
-                                      color: Colors.black,
+                                      color: Color(0xFF3B82F6), // Blue
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(

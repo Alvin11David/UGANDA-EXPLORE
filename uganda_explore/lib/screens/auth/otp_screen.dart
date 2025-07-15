@@ -140,7 +140,7 @@ class _OtpScreenState extends State<OtpScreen> {
               fontFamily: 'Poppins',
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: Color(0xFF374151), // Dark Gray
             ),
             maxLength: 1,
             inputFormatters: [
@@ -150,25 +150,25 @@ class _OtpScreenState extends State<OtpScreen> {
             decoration: InputDecoration(
               counterText: '',
               filled: true,
-              fillColor: Colors.white,
+              fillColor: Color(0xFFE5E7EB), // Light Gray background
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color(0xFF1FF813),
+                  color: Color(0xFF3B82F6), // Blue
                   width: 2,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color(0xFF1FF813),
+                  color: Color(0xFF3B82F6), // Blue
                   width: 2,
                 ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color(0xFF1FF813),
+                  color: Color(0xFF1E3A8A), // Navy Blue
                   width: 2,
                 ),
               ),
@@ -197,7 +197,7 @@ class _OtpScreenState extends State<OtpScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
+            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)], // Navy Blue to Blue
             stops: [0.03, 0.63],
           ),
         ),
@@ -220,7 +220,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   fontFamily: 'Poppins',
                   fontSize: 38,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Color(0xFF1E3A8A), // Navy Blue
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -250,8 +250,8 @@ class _OtpScreenState extends State<OtpScreen> {
                                 center: Alignment.center,
                                 radius: 1.0,
                                 colors: [
-                                  Color(0xFF0C0F0A),
-                                  Color.fromARGB(255, 16, 164, 8),
+                                  Color(0xFF1E3A8A), // Navy Blue
+                                  Color(0xFF3B82F6), // Blue
                                 ],
                                 stops: [0.03, 0.63],
                               ),
@@ -261,7 +261,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               children: [
                                 const Icon(
                                   Icons.email_outlined,
-                                  color: Colors.white,
+                                  color: Color(0xFF1E3A8A), // Navy Blue
                                   size: 50,
                                 ),
                                 Positioned(
@@ -275,7 +275,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     padding: const EdgeInsets.all(2),
                                     child: const Icon(
                                       Icons.check_circle,
-                                      color: Colors.green,
+                                      color: Color(0xFF3B82F6), // Blue
                                       size: 18,
                                     ),
                                   ),
@@ -293,7 +293,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             fontFamily: 'Poppins',
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black,
+                            color: Color(0xFF1E3A8A), // Navy Blue
                           ),
                         ),
                       ),
@@ -310,7 +310,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               fontFamily: "Poppins",
                               fontSize: 17,
                               fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                              color: Color(0xFF374151), // Dark Gray
                               height: 1.5,
                             ),
                             children: [
@@ -320,7 +320,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               TextSpan(
                                 text: widget.email,
                                 style: const TextStyle(
-                                  color: Color(0xFF078B00),
+                                  color: Color(0xFF3B82F6), // Blue
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -334,7 +334,9 @@ class _OtpScreenState extends State<OtpScreen> {
                         const SizedBox(height: 12),
                         Text(
                           _errorText!,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(
+                            color: Color(0xFFEF4444),
+                          ), // Red for error
                         ),
                       ],
                       const SizedBox(height: 32),
@@ -346,7 +348,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             height: 28,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF078800),
+                              color: Color(0xFF3B82F6), // Blue
                             ),
                             child: const Icon(
                               Icons.refresh,
@@ -358,7 +360,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           TextButton(
                             onPressed: _resendOtp,
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color(0xFF078800),
+                              foregroundColor: const Color(0xFF3B82F6), // Blue
                               padding: EdgeInsets.zero,
                               minimumSize: Size(0, 0),
                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -369,7 +371,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w600,
                                 fontSize: 20,
-                                color: Color(0xFF078800),
+                                color: Color(0xFF3B82F6), // Blue
                               ),
                             ),
                           ),
@@ -389,8 +391,8 @@ class _OtpScreenState extends State<OtpScreen> {
                                 borderRadius: BorderRadius.circular(30),
                                 gradient: const LinearGradient(
                                   colors: [
-                                    Color(0xFF000000),
-                                    Color(0xFF1FF813),
+                                    Color(0xFF1E3A8A), // Navy Blue
+                                    Color(0xFF3B82F6), // Blue
                                   ],
                                   stops: [0.0, 0.47],
                                   begin: Alignment.centerLeft,
@@ -400,7 +402,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               child: _isLoading
                                   ? const CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.black,
+                                        Color(0xFF1E3A8A), // Navy Blue
                                       ),
                                     )
                                   : const Center(
@@ -410,7 +412,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                           fontFamily: 'Poppins',
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,
-                                          color: Colors.black,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ),
@@ -433,11 +435,15 @@ class _OtpScreenState extends State<OtpScreen> {
                             children: [
                               const TextSpan(
                                 text: "Back to ",
-                                style: TextStyle(color: Colors.black),
+                                style: TextStyle(
+                                  color: Color(0xFF374151),
+                                ), // Dark Gray
                               ),
                               const TextSpan(
                                 text: "Sign In",
-                                style: TextStyle(color: Color(0xFF0F7709)),
+                                style: TextStyle(
+                                  color: Color(0xFF1E3A8A),
+                                ), // Navy Blue
                               ),
                             ],
                           ),

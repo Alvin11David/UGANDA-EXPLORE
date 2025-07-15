@@ -11,79 +11,75 @@ class ForgotPasswordScreen extends StatefulWidget {
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-  class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-    String generateOtp() {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  String generateOtp() {
     final random = Random();
-    return (random.nextInt(9000) + 1000).toString(); 
+    return (random.nextInt(9000) + 1000).toString();
   }
 
-Future<bool> sendOtpEmail({required String email, required String otp}) async {
-  const serviceId = 'Uganda_Explore';      // your EmailJS service ID
-  const templateId = 'template_b6hthi8';        // your EmailJS OTP template ID
-  const userId = 'r1x2A2YyfHtXLLHR0';        // EmailJS public key 
+  Future<bool> sendOtpEmail({
+    required String email,
+    required String otp,
+  }) async {
+    const serviceId = 'Uganda_Explore'; // your EmailJS service ID
+    const templateId = 'template_b6hthi8'; // your EmailJS OTP template ID
+    const userId = 'r1x2A2YyfHtXLLHR0'; // EmailJS public key
 
-  final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
+    final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
 
-  final response = await http.post(
-    url,
-    headers: {
-      'origin': 'http://localhost',
-      'Content-Type': 'application/json',
-    },
-    body: json.encode({
-      'service_id': serviceId,
-      'template_id': templateId,
-      'user_id': userId,
-      'template_params': {
-        'email': email,
-        'otp': otp,
+    final response = await http.post(
+      url,
+      headers: {
+        'origin': 'http://localhost',
+        'Content-Type': 'application/json',
       },
-    }),
-  );
+      body: json.encode({
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {'email': email, 'otp': otp},
+      }),
+    );
 
-  print('STATUS: ${response.statusCode}');
-  print('BODY: ${response.body}');
+    print('STATUS: ${response.statusCode}');
+    print('BODY: ${response.body}');
 
-  return response.statusCode == 200;
-}
-
-
-
+    return response.statusCode == 200;
+  }
 
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   void _signUp() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  setState(() {
-    _isLoading = true;
-  });
+    setState(() {
+      _isLoading = true;
+    });
 
-  final email = emailController.text.trim();
-  final otp = generateOtp();
+    final email = emailController.text.trim();
+    final otp = generateOtp();
 
-  final emailSent = await sendOtpEmail(email: email, otp: otp);
+    final emailSent = await sendOtpEmail(email: email, otp: otp);
 
-  setState(() {
-    _isLoading = false;
-  });
+    setState(() {
+      _isLoading = false;
+    });
 
-  if (emailSent) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OtpScreen(email: email, otp: otp),
-      ),
-    );
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to send OTP email. Please try again.')),
-    );
+    if (emailSent) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpScreen(email: email, otp: otp),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send OTP email. Please try again.')),
+      );
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +89,7 @@ Future<bool> sendOtpEmail({required String email, required String otp}) async {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
+            colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)], // Navy Blue to Blue
             stops: [0.03, 0.63],
           ),
         ),
@@ -157,7 +153,10 @@ Future<bool> sendOtpEmail({required String email, required String otp}) async {
                           gradient: RadialGradient(
                             center: Alignment.center,
                             radius: 0.5,
-                            colors: [Color(0xFF000000), Color(0xFF1FF813)],
+                            colors: [
+                              Color(0xFF1E3A8A),
+                              Color(0xFF3B82F6),
+                            ], // Navy Blue to Blue
                             stops: [0.0, 1.0],
                           ),
                         ),
@@ -233,7 +232,10 @@ Future<bool> sendOtpEmail({required String email, required String otp}) async {
                                   gradient: const LinearGradient(
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight,
-                                    colors: [Color(0xFF000000), Color(0xFF1EF813)],
+                                    colors: [
+                                      Color(0xFF1E3A8A),
+                                      Color(0xFF3B82F6),
+                                    ], // Navy Blue to Blue
                                     stops: [0.0, 0.47],
                                   ),
                                   borderRadius: BorderRadius.circular(30),
@@ -242,9 +244,10 @@ Future<bool> sendOtpEmail({required String email, required String otp}) async {
                                   alignment: Alignment.center,
                                   child: _isLoading
                                       ? const CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.black,
-                                          ),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.black,
+                                              ),
                                         )
                                       : const Text(
                                           'Submit',
@@ -273,6 +276,7 @@ Future<bool> sendOtpEmail({required String email, required String otp}) async {
   }
 }
 
+// Email widget
 class Email extends StatelessWidget {
   final TextEditingController controller;
   const Email({super.key, required this.controller});
@@ -299,23 +303,23 @@ class Email extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
-              color: Colors.black,
+              color: Color(0xFF374151), // Dark Gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Enter Your Email Address',
             hintStyle: const TextStyle(
-              color: Colors.black54,
+              color: Color(0xFF9CA3AF), // Light Gray (hint)
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
             ),
             filled: true,
-            fillColor: Colors.white,
+            fillColor: Color(0xFFE5E7EB), // Light Gray background
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.mail, color: Colors.black),
+              child: Icon(Icons.mail, color: Color(0xFF6B7280)), // Gray icon
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -323,25 +327,36 @@ class Email extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
+              borderSide: const BorderSide(
+                color: Color(0xFF3B82F6),
+                width: 1,
+              ), // Blue
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
+              borderSide: const BorderSide(
+                color: Color(0xFF1E3A8A),
+                width: 2,
+              ), // Navy Blue
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
-                color: Color(0xFF1EF813),
+                color: Color(0xFF3B82F6), // Blue
                 width: 1.5,
               ),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
+              borderSide: const BorderSide(
+                color: Color(0xFF1E3A8A),
+                width: 2,
+              ), // Navy Blue
             ),
             errorStyle: const TextStyle(
-              color: Colors.red,
+              color: Color(
+                0xFFEF4444,
+              ), // Red for error (can be changed if you want)
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 13,
@@ -353,12 +368,12 @@ class Email extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
-            color: Colors.black,
+            color: Color(0xFF374151), // Dark Gray
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             fontSize: 15,
           ),
-          cursorColor: Color(0xFF1EF813),
+          cursorColor: Color(0xFF3B82F6), // Blue
         ),
       ),
     );
