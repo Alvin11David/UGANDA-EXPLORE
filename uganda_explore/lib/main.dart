@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:uganda_explore/Admin/Admin_Dashboard.dart';
 import 'package:uganda_explore/apptheme/apptheme.dart';
 import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/auth/change_password_screen.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
         '/settings': (context) => const SettingsScreen(),
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
+        '/admin_dashboard': (context) => const AdminDashboard(),
       },
       home: SignUpScreen(),
     );
