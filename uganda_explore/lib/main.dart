@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
       },
-      home: PlaceDetailsScreen(siteName: '',),
+      home: HomeScreen(),
     );
   }
 }
