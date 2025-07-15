@@ -18,8 +18,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/profile');
-    } else if (index == 3) {
+      Navigator.pushReplacementNamed(context, '/settings');
+    } else if (index == 2) {
       Navigator.pushReplacementNamed(context, '/map');
     }
     // Add more navigation logic for other indices if needed
@@ -201,23 +201,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     selected: _selectedIndex == 0,
                     onTap: () => _onItemTapped(0),
                   ),
+                  // Profile icon removed
                   _NavIcon(
-                    icon: Icons.person,
-                    label: 'Profile',
+                    icon: Icons.settings,
+                    label: 'Settings',
                     selected: _selectedIndex == 1,
                     onTap: () => _onItemTapped(1),
                   ),
                   _NavIcon(
-                    icon: Icons.settings,
-                    label: 'Settings',
-                    selected: _selectedIndex == 2,
-                    onTap: () => _onItemTapped(2),
-                  ),
-                  _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
-                    selected: _selectedIndex == 3,
-                    onTap: () => _onItemTapped(3),
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
                   ),
                 ],
               ),

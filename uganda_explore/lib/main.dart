@@ -69,7 +69,7 @@ class MyApp extends StatelessWidget {
         '/privacy': (context) => const TermsPrivacyScreen(),
         '/admin_dashboard': (context) => const AdminDashboard(),
       },
-      home: EditProfileScreen(),
+      home: SettingsScreen(),
     );
   }
 }
