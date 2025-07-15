@@ -22,7 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
   String _district = 'Kampala';
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
+  OverlayEntry? _suggestionsOverlay;
+  List<Map<String, dynamic>> _suggestions = [];
+  bool _isLoadingSuggestions = false;
   String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
+  final LayerLink _searchBarLink = LayerLink();
 
   void _onItemTapped(int index) {
     if (index == 0) {
@@ -344,12 +349,156 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _searchFocusNode.dispose();
+    _removeSuggestionsOverlay();
     super.dispose();
   }
 
-  // Fetch sites from Firestore by category
+  void _removeSuggestionsOverlay() {
+    _suggestionsOverlay?.remove();
+    _suggestionsOverlay = null;
+  }
+
+  Future<void> _showSuggestionsOverlay(BuildContext context) async {
+    _removeSuggestionsOverlay();
+    final RenderBox box = context.findRenderObject() as RenderBox;
+    final Offset position = box.localToGlobal(Offset.zero);
+
+    _suggestionsOverlay = OverlayEntry(
+      builder: (context) {
+        return Positioned(
+          left: position.dx + 15,
+          top: position.dy + 70,
+          width: 240,
+          child: Material(
+            color: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  constraints: const BoxConstraints(maxHeight: 220),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.25),
+                    border: Border.all(color: Colors.white.withOpacity(0.5)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: _isLoadingSuggestions
+                      ? const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : (_suggestions.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  'No matches found.',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                              )
+                            : ListView.separated(
+                                shrinkWrap: true,
+                                itemCount: _suggestions.length,
+                                separatorBuilder: (_, __) => const Divider(
+                                  height: 1,
+                                  color: Colors.white24,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final site = _suggestions[index];
+                                  return ListTile(
+                                    tileColor: Colors.transparent,
+                                    title: Text(
+                                      site['name'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      _removeSuggestionsOverlay();
+                                      FocusScope.of(context).unfocus();
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => PlaceDetailsScreen(
+                                            siteName: site['name'],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              )),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    Overlay.of(context, rootOverlay: true).insert(_suggestionsOverlay!);
+  }
+
+  Future<void> _fetchSuggestions(String keyword) async {
+    if (keyword.trim().isEmpty) {
+      setState(() => _suggestions = []);
+      _removeSuggestionsOverlay();
+      return;
+    }
+    setState(() => _isLoadingSuggestions = true);
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isGreaterThanOrEqualTo: keyword)
+        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .limit(6)
+        .get();
+    setState(() {
+      _suggestions = query.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+      _isLoadingSuggestions = false;
+    });
+    if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
+      _showSuggestionsOverlay(context);
+    } else {
+      _removeSuggestionsOverlay();
+    }
+  }
+
+  Future<void> _fetchSuggestionsDropdown(
+    String keyword,
+    BuildContext context,
+  ) async {
+    if (keyword.trim().isEmpty) {
+      setState(() => _suggestions = []);
+      _removeSuggestionsOverlay();
+      return;
+    }
+    setState(() => _isLoadingSuggestions = true);
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isGreaterThanOrEqualTo: keyword)
+        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .limit(6)
+        .get();
+    setState(() {
+      _suggestions = query.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+      _isLoadingSuggestions = false;
+    });
+    if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
+      _showSuggestionsOverlay(context);
+    } else {
+      _removeSuggestionsOverlay();
+    }
+  }
+
   Stream<List<Map<String, dynamic>>> _fetchSites(String category) {
-    if (category.isEmpty) return const Stream.empty();
     return FirebaseFirestore.instance
         .collection('tourismsites')
         .where('category', isEqualTo: category)
@@ -543,96 +692,180 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: SizedBox(
-                          width: 240,
-                          child: ValueListenableBuilder<bool>(
-                            valueListenable: isSearchFocused,
-                            builder: (context, focused, child) {
-                              return Container(
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(30),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.15),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 4),
+                        child: CompositedTransformTarget(
+                          link: _searchBarLink,
+                          child: SizedBox(
+                            width: 240,
+                            child: ValueListenableBuilder<bool>(
+                              valueListenable: isSearchFocused,
+                              builder: (context, focused, child) {
+                                return Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.15),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                    border: Border.all(
+                                      color: focused
+                                          ? const Color(0xFF1FF813)
+                                          : Colors.transparent,
+                                      width: 1,
                                     ),
-                                  ],
-                                  border: Border.all(
-                                    color: focused
-                                        ? const Color(0xFF1FF813)
-                                        : Colors.transparent,
-                                    width: 1,
                                   ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 16),
-                                    const Icon(
-                                      Icons.search,
-                                      color: Colors.black,
-                                      size: 24,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: TextField(
-                                        focusNode: searchFocusNode,
-                                        controller: _searchController,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Search Your Place',
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                            vertical: 14,
-                                          ),
-                                        ),
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontSize: 16,
-                                        ),
-                                        onSubmitted: (value) {
-                                          if (value.trim().isNotEmpty) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) =>
-                                                    PlaceDetailsScreen(
-                                                      siteName: value.trim(),
-                                                    ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        textInputAction: TextInputAction.search,
-                                      ),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_forward,
+                                  child: Row(
+                                    children: [
+                                      const SizedBox(width: 16),
+                                      const Icon(
+                                        Icons.search,
                                         color: Colors.black,
+                                        size: 24,
                                       ),
-                                      onPressed: () {
-                                        final value = _searchController.text
-                                            .trim();
-                                        if (value.isNotEmpty) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) =>
-                                                  PlaceDetailsScreen(
-                                                    siteName: value,
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Focus(
+                                          focusNode: _searchFocusNode,
+                                          child: TextField(
+                                            controller: _searchController,
+                                            decoration: const InputDecoration(
+                                              hintText: 'Search Your Place',
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                              contentPadding:
+                                                  EdgeInsets.symmetric(
+                                                    vertical: 14,
                                                   ),
                                             ),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontSize: 16,
+                                            ),
+                                            onChanged: (value) {
+                                              _fetchSuggestionsDropdown(
+                                                value,
+                                                context,
+                                              );
+                                            },
+                                            onTap: () {
+                                              if (_searchController
+                                                  .text
+                                                  .isNotEmpty) {
+                                                _fetchSuggestionsDropdown(
+                                                  _searchController.text,
+                                                  context,
+                                                );
+                                              }
+                                            },
+                                            onEditingComplete: () {
+                                              _removeSuggestionsOverlay();
+                                            },
+                                            onSubmitted: (value) async {
+                                              _removeSuggestionsOverlay();
+                                              final keyword = value.trim();
+                                              if (keyword.isNotEmpty) {
+                                                final query =
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection(
+                                                          'tourismsites',
+                                                        )
+                                                        .where(
+                                                          'name',
+                                                          isEqualTo: keyword,
+                                                        )
+                                                        .limit(1)
+                                                        .get();
+
+                                                if (query.docs.isNotEmpty) {
+                                                  final siteData = query
+                                                      .docs
+                                                      .first
+                                                      .data();
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          PlaceDetailsScreen(
+                                                            siteName:
+                                                                siteData['name'],
+                                                          ),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(
+                                                    context,
+                                                  ).showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                        'No site found with that name.',
+                                                      ),
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                            },
+                                            textInputAction:
+                                                TextInputAction.search,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.arrow_forward,
+                                          color: Colors.black,
+                                        ),
+                                        onPressed: () async {
+                                          _removeSuggestionsOverlay();
+                                          final keyword = _searchController.text
+                                              .trim();
+                                          if (keyword.isNotEmpty) {
+                                            final query =
+                                                await FirebaseFirestore.instance
+                                                    .collection('tourismsites')
+                                                    .where(
+                                                      'name',
+                                                      isEqualTo: keyword,
+                                                    )
+                                                    .limit(1)
+                                                    .get();
+
+                                            if (query.docs.isNotEmpty) {
+                                              final siteData = query.docs.first
+                                                  .data();
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) =>
+                                                      PlaceDetailsScreen(
+                                                        siteName:
+                                                            siteData['name'],
+                                                      ),
+                                                ),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'No site found with that name.',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -702,7 +935,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         'Popular Place Category',
                         style: TextStyle(
                           fontFamily: 'Poppins',
-                          fontSize: 25,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -716,11 +949,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _CategoryButton(
-                          label: "National Parks",
-                          selected: _selectedCategory == "National Park",
-                          onTap: () => setState(
-                            () => _selectedCategory = "National Park",
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4),
+                          child: _CategoryButton(
+                            label: "National Parks",
+                            selected: _selectedCategory == "National Park",
+                            onTap: () => setState(
+                              () => _selectedCategory = "National Park",
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -759,7 +995,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               'No sites found for this category.',
                               style: TextStyle(
                                 color: Colors.white70,
-                                fontSize: 18,
+                                fontSize: 15,
                               ),
                             ),
                           );
@@ -884,7 +1120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize: 16,
+                                                                fontSize: 13,
                                                                 color: Colors
                                                                     .white,
                                                               ),
@@ -922,7 +1158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                           FontWeight
                                                                               .w500,
                                                                       fontSize:
-                                                                          15,
+                                                                          13,
                                                                       color: Colors
                                                                           .white,
                                                                     ),
