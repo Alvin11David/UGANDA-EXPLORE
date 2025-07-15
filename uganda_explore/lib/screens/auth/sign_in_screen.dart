@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uganda_explore/screens/auth/signup_screen.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -133,7 +132,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       const SizedBox(height: 20),
                       const OrDivider(),
                       const SizedBox(height: 16),
-                      const GoogleSignInButton(),
+                      // GoogleSignInButton removed
                       const SizedBox(height: 20),
                       const SignUpLink(),
                       const SizedBox(height: 30),
@@ -475,86 +474,6 @@ class OrDivider extends StatelessWidget {
           ),
           Expanded(child: Container(height: 1, color: Colors.grey)),
         ],
-      ),
-    );
-  }
-}
-
-class GoogleSignInButton extends StatelessWidget {
-  const GoogleSignInButton({super.key});
-
-  Future<void> _signInWithGoogle(BuildContext context) async {
-    try {
-      final googleSignIn = GoogleSignIn();
-      await googleSignIn.signOut();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return;
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      Navigator.pushReplacementNamed(context, '/home');
-    } catch (e) {
-      print('Google sign-in failed: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: SizedBox(
-        width: 320,
-        child: GestureDetector(
-          onTap: () => _signInWithGoogle(context),
-          child: Container(
-            height: 50,
-            decoration: ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                side: const BorderSide(width: 1, color: Color(0xFF1EF813)),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              shadows: const [
-                BoxShadow(
-                  color: Color(0xA5000000),
-                  blurRadius: 4,
-                  offset: Offset(0, 1),
-                  spreadRadius: 0,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image(
-                  image: AssetImage('assets/vectors/google.png'),
-                  width: 20,
-                  height: 20,
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Sign In With Google',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
