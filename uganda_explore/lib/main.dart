@@ -68,6 +68,7 @@ class MyApp extends StatelessWidget {
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
         '/admin_dashboard': (context) => const AdminDashboard(),
+        '/termsandprivacy': (context) => const TermsPrivacyScreen(),
       },
       home: HomeScreen(),
     );

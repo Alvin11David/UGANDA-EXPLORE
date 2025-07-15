@@ -39,13 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _selectedIndex = index;
       });
-      Navigator.pushReplacementNamed(context, '/profile');
+      Navigator.pushReplacementNamed(context, '/settings');
     } else if (index == 2) {
       setState(() {
         _selectedIndex = index;
       });
-      Navigator.pushReplacementNamed(context, '/settings');
-    } else if (index == 3) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -527,6 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF101624),
+
       body: Column(
         children: [
           Expanded(
@@ -590,7 +589,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: const Center(
                                   child: Icon(
                                     Icons.location_on,
-                                    color: Color(0xFF3B82F6), // Blue
+                                    color: Color(0xFF3B82F6),
                                     size: 28,
                                   ),
                                 ),
@@ -650,7 +649,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: const Center(
                                   child: Icon(
                                     Icons.sunny,
-                                    color: Color(0xFFF59E0B), // Orange
+                                    color: Color(0xFFF59E0B),
                                     size: 28,
                                   ),
                                 ),
@@ -1675,22 +1674,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () => _onItemTapped(0),
                       ),
                       _NavIcon(
-                        icon: Icons.person,
-                        label: 'Profile',
+                        icon: Icons.settings,
+                        label: 'Settings',
                         selected: _selectedIndex == 1,
                         onTap: () => _onItemTapped(1),
                       ),
                       _NavIcon(
-                        icon: Icons.settings,
-                        label: 'Settings',
-                        selected: _selectedIndex == 2,
-                        onTap: () => _onItemTapped(2),
-                      ),
-                      _NavIcon(
                         icon: Icons.map,
                         label: 'Map',
-                        selected: _selectedIndex == 3,
-                        onTap: () => _onItemTapped(3),
+                        selected: _selectedIndex == 2,
+                        onTap: () => _onItemTapped(2),
                       ),
                     ],
                   ),

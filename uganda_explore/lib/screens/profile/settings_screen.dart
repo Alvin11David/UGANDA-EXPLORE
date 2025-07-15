@@ -9,7 +9,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedIndex = 2;
+  int _selectedIndex = 1; 
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,11 +18,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
-      Navigator.pushReplacementNamed(context, '/profile');
-    } else if (index == 3) {
+    } else if (index == 2) {
       Navigator.pushReplacementNamed(context, '/map');
     }
-    // Add more navigation logic for other indices if needed
   }
 
   @override
@@ -151,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () => print("Terms & Privacy tapped"),
+                            onTap: () => Navigator.pushNamed(context, '/termsandprivacy'),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
@@ -202,22 +200,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onTap: () => _onItemTapped(0),
                   ),
                   _NavIcon(
-                    icon: Icons.person,
-                    label: 'Profile',
+                    icon: Icons.settings,
+                    label: 'Settings',
                     selected: _selectedIndex == 1,
                     onTap: () => _onItemTapped(1),
                   ),
                   _NavIcon(
-                    icon: Icons.settings,
-                    label: 'Settings',
-                    selected: _selectedIndex == 2,
-                    onTap: () => _onItemTapped(2),
-                  ),
-                  _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
-                    selected: _selectedIndex == 3,
-                    onTap: () => _onItemTapped(3),
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
                   ),
                 ],
               ),
