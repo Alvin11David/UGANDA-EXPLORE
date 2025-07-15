@@ -413,7 +413,7 @@ class _NavIcon extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : color, size: 24),
+            Icon(icon, color: Colors.black, size: 24),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(
