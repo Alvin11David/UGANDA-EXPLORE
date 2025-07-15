@@ -21,7 +21,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
   List<VideoPlayerController> _videoControllers = [];
   int _playingIndex = -1;
-  int _selectedIndex = 0; // Add this for nav bar selection
+  int _selectedIndex = 0; // For nav bar selection
 
   @override
   void initState() {
@@ -186,14 +186,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       setState(() {
         _selectedIndex = index;
       });
-      Navigator.pushReplacementNamed(context, '/profile');
-    } else if (index == 2) {
-      setState(() {
-        _selectedIndex = index;
-      });
       Navigator.pushReplacementNamed(context, '/settings');
-    } else if (index == 3) {
-      // Do NOT call setState here, just navigate!
+    } else if (index == 2) {
+      // Map
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -494,7 +489,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
                 const SizedBox(width: 15),
                 // Location
-                // Find this section for the Location circle:
                 Column(
                   children: [
                     GestureDetector(
@@ -546,7 +540,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 170, // adjust as needed to appear below the circles
+            top: 170,
             left: 10,
             right: 10,
             child: FutureBuilder<String?>(
@@ -572,7 +566,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 210, // adjust as needed to appear below the name
+            top: 210,
             left: 10,
             right: 10,
             child: FutureBuilder<String?>(
@@ -611,7 +605,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            // Position at the bottom right border of the big image circle
             top: 290,
             left: MediaQuery.of(context).size.width / 2 + 85,
             child: ClipOval(
@@ -670,7 +663,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Video Preview label
                         const Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
@@ -683,7 +675,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-                        // Videos row
                         FutureBuilder<List<String>>(
                           future: fetchSiteVideos(widget.siteName),
                           builder: (context, snapshot) {
@@ -733,7 +724,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                       await controller.play();
                                       _showFullscreenVideo(
                                         controller,
-                                      ); // <-- Show fullscreen dialog
+                                      );
                                     },
                                     child: Container(
                                       width: 100,
@@ -797,10 +788,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        // Black line
                         Container(height: 1, color: Colors.black),
                         const SizedBox(height: 12),
-                        // Place Description label
                         const Padding(
                           padding: EdgeInsets.only(left: 4, bottom: 8),
                           child: Text(
@@ -813,7 +802,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-                        // Place Description text
                         FutureBuilder<String?>(
                           future: fetchSiteDescription(widget.siteName),
                           builder: (context, snapshot) {
@@ -984,7 +972,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ),
             ),
           ),
-          // Add the custom nav bar at the bottom
+          // Custom nav bar at the bottom (Profile button removed)
           Positioned(
             left: 0,
             right: 0,
@@ -1015,22 +1003,16 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           onTap: () => _onItemTapped(0),
                         ),
                         _NavIcon(
-                          icon: Icons.person,
-                          label: 'Profile',
+                          icon: Icons.settings,
+                          label: 'Settings',
                           selected: _selectedIndex == 1,
                           onTap: () => _onItemTapped(1),
                         ),
                         _NavIcon(
-                          icon: Icons.settings,
-                          label: 'Settings',
-                          selected: _selectedIndex == 2,
-                          onTap: () => _onItemTapped(2),
-                        ),
-                        _NavIcon(
                           icon: Icons.map,
                           label: 'Map',
-                          selected: _selectedIndex == 3,
-                          onTap: () => _onItemTapped(3),
+                          selected: _selectedIndex == 2,
+                          onTap: () => _onItemTapped(2),
                         ),
                       ],
                     ),
@@ -1045,7 +1027,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   }
 }
 
-// Add this widget at the bottom of your file if not already present
 class _NavIcon extends StatelessWidget {
   final IconData icon;
   final String label;
