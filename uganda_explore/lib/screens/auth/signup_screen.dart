@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -67,47 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       setState(() {
         _isLoading = false;
       });
-    }
-  }
-
-  Future<void> _signUpWithGoogle() async {
-    try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn
-          .signIn(); // Now prompts account picker
-
-      if (googleUser == null) return; // User cancelled
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithCredential(credential);
-
-      // Optionally, create user in Firestore if new
-      final userDoc = FirebaseFirestore.instance
-          .collection('users')
-          .doc(userCredential.user!.uid);
-      final docSnapshot = await userDoc.get();
-      if (!docSnapshot.exists) {
-        await userDoc.set({
-          'fullNames': userCredential.user!.displayName ?? '',
-          'email': userCredential.user!.email ?? '',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-      }
-
-      Navigator.pushReplacementNamed(context, '/onboarding_screen1');
-    } catch (e) {
-      print('Google sign-up failed: $e');
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-up failed: $e')));
     }
   }
 
@@ -295,48 +253,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Center(
-                        child: SizedBox(
-                          width: 320,
-                          height: 50,
-                          child: OutlinedButton(
-                            onPressed: _signUpWithGoogle,
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              side: const BorderSide(
-                                color: Color(0xFF1EF813),
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              padding: EdgeInsets.zero,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 12.0),
-                                  child: Image.asset(
-                                    'assets/vectors/google.png',
-                                    width: 22,
-                                    height: 22,
-                                  ),
-                                ),
-                                const Text(
-                                  'Sign Up with Google',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      // Google Sign Up button removed
                       const SizedBox(height: 18),
                       Center(
                         child: Wrap(
