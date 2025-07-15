@@ -9,7 +9,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedIndex = 1; // Settings tab is highlighted by default
+  int _selectedIndex = 1; 
 
   void _onItemTapped(int index) {
     setState(() {
@@ -18,7 +18,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
-      // Already on settings, do nothing
     } else if (index == 2) {
       Navigator.pushReplacementNamed(context, '/map');
     }
