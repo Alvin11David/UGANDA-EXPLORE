@@ -1000,190 +1000,647 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           );
                         }
-                        return SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              for (final site in sites)
-                                if (site['images'] != null &&
-                                    site['images'] is List &&
-                                    (site['images'] as List).isNotEmpty)
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 4),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (_) => PlaceDetailsScreen(
-                                              siteName: site['name'] ?? '',
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 250,
-                                        width: 220,
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.5,
-                                              ),
-                                              blurRadius: 5,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            30,
-                                          ),
-                                          child: Stack(
-                                            children: [
-                                              Image.network(
-                                                site['images'][0],
-                                                height: 250,
-                                                width: 220,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (c, e, s) =>
-                                                    Container(
-                                                      height: 250,
-                                                      width: 220,
-                                                      color: Colors.grey[300],
-                                                      child: const Icon(
-                                                        Icons.broken_image,
-                                                        color: Colors.grey,
-                                                      ),
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Images Row
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  for (final site in sites)
+                                    if (site['images'] != null &&
+                                        site['images'] is List &&
+                                        (site['images'] as List).isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 4),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    PlaceDetailsScreen(
+                                                      siteName:
+                                                          site['name'] ?? '',
                                                     ),
                                               ),
-                                              Positioned(
-                                                left: 0,
-                                                right: 0,
-                                                bottom: 0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      const BorderRadius.only(
-                                                        bottomLeft:
-                                                            Radius.circular(30),
-                                                        bottomRight:
-                                                            Radius.circular(30),
-                                                      ),
-                                                  child: BackdropFilter(
-                                                    filter: ImageFilter.blur(
-                                                      sigmaX: 30,
-                                                      sigmaY: 30,
-                                                    ),
-                                                    child: Container(
-                                                      height: 80,
-                                                      width: 219,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white
-                                                            .withOpacity(0.18),
-                                                        border: Border.all(
-                                                          color: Colors.white,
-                                                          width: 1,
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 250,
+                                            width: 220,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 5,
+                                                  offset: const Offset(0, 8),
+                                                ),
+                                              ],
+                                            ),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              child: Stack(
+                                                children: [
+                                                  Image.network(
+                                                    site['images'][0],
+                                                    height: 250,
+                                                    width: 220,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (c, e, s) =>
+                                                        Container(
+                                                          height: 250,
+                                                          width: 220,
+                                                          color:
+                                                              Colors.grey[300],
+                                                          child: const Icon(
+                                                            Icons.broken_image,
+                                                            color: Colors.grey,
+                                                          ),
                                                         ),
-                                                        borderRadius:
-                                                            const BorderRadius.only(
-                                                              bottomLeft:
-                                                                  Radius.circular(
-                                                                    30,
-                                                                  ),
-                                                              bottomRight:
-                                                                  Radius.circular(
-                                                                    30,
-                                                                  ),
+                                                  ),
+                                                  Positioned(
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          const BorderRadius.only(
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                  30,
+                                                                ),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                  30,
+                                                                ),
+                                                          ),
+                                                      child: BackdropFilter(
+                                                        filter:
+                                                            ImageFilter.blur(
+                                                              sigmaX: 30,
+                                                              sigmaY: 30,
                                                             ),
-                                                      ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets.only(
-                                                              left: 3,
-                                                              top: 10,
-                                                              right: 8,
+                                                        child: Container(
+                                                          height: 80,
+                                                          width: 219,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.white
+                                                                .withOpacity(
+                                                                  0.18,
+                                                                ),
+                                                            border: Border.all(
+                                                              color:
+                                                                  Colors.white,
+                                                              width: 1,
                                                             ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              site['name'] ??
-                                                                  '',
-                                                              style: const TextStyle(
-                                                                fontFamily:
-                                                                    'Poppins',
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 13,
-                                                                color: Colors
-                                                                    .white,
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                              height: 8,
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                const Padding(
-                                                                  padding:
-                                                                      EdgeInsets.only(
-                                                                        left: 4,
+                                                            borderRadius:
+                                                                const BorderRadius.only(
+                                                                  bottomLeft:
+                                                                      Radius.circular(
+                                                                        30,
                                                                       ),
-                                                                  child: Icon(
-                                                                    Icons
-                                                                        .location_on,
-                                                                    color: Color(
-                                                                      0xFF3B82F6,
-                                                                    ),
-                                                                    size: 20,
+                                                                  bottomRight:
+                                                                      Radius.circular(
+                                                                        30,
+                                                                      ),
+                                                                ),
+                                                          ),
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets.only(
+                                                                  left: 3,
+                                                                  top: 10,
+                                                                  right: 8,
+                                                                ),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  site['name'] ??
+                                                                      '',
+                                                                  style: const TextStyle(
+                                                                    fontFamily:
+                                                                        'Poppins',
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize:
+                                                                        13,
+                                                                    color: Colors
+                                                                        .white,
                                                                   ),
                                                                 ),
                                                                 const SizedBox(
-                                                                  width: 6,
+                                                                  height: 8,
                                                                 ),
-                                                                Expanded(
-                                                                  child: Text(
-                                                                    site['location'] ??
-                                                                        '',
-                                                                    style: const TextStyle(
-                                                                      fontFamily:
-                                                                          'Poppins',
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500,
-                                                                      fontSize:
-                                                                          13,
-                                                                      color: Colors
-                                                                          .white,
+                                                                Row(
+                                                                  children: [
+                                                                    const Padding(
+                                                                      padding:
+                                                                          EdgeInsets.only(
+                                                                            left:
+                                                                                4,
+                                                                          ),
+                                                                      child: Icon(
+                                                                        Icons
+                                                                            .location_on,
+                                                                        color: Color(
+                                                                          0xFF3B82F6,
+                                                                        ),
+                                                                        size:
+                                                                            20,
+                                                                      ),
                                                                     ),
-                                                                    overflow:
-                                                                        TextOverflow
-                                                                            .ellipsis,
-                                                                  ),
+                                                                    const SizedBox(
+                                                                      width: 6,
+                                                                    ),
+                                                                    Expanded(
+                                                                      child: Text(
+                                                                        site['location'] ??
+                                                                            '',
+                                                                        style: const TextStyle(
+                                                                          fontFamily:
+                                                                              'Poppins',
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                          fontSize:
+                                                                              13,
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                    ),
+                                                                  ],
                                                                 ),
                                                               ],
                                                             ),
-                                                          ],
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
                                         ),
                                       ),
+                                ],
+                              ),
+                            ),
+                            // --- ADD YOUR WIDGETS BELOW THE IMAGES ROW ---
+                            const SizedBox(height: 15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Text(
+                                    "Popular Searches",
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
                                   ),
-                            ],
-                          ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            // Static Images Row
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                    ),
+                                    child: ImageCard(
+                                      site: {
+                                        'image': 'assets/images/waterfall1.png',
+                                        'name': 'Sipi Falls',
+                                        'location': 'Kapchorwa',
+                                      },
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                    ),
+                                    child: ImageCard(
+                                      site: {
+                                        'image': 'assets/images/gameparks.png',
+                                        'name': 'Queen Elizabeth N.P',
+                                        'location': 'Kasese',
+                                      },
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                    ),
+                                    child: ImageCard(
+                                      site: {
+                                        'image': 'assets/images/lakes.png',
+                                        'name': 'Lake Victoria',
+                                        'location': 'Entebbe',
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            // Popular Searches Buttons BELOW images
+                            Padding(
+                              padding: const EdgeInsets.only(left: 4, right: 4),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText: "Waterfall",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/waterfall1.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 25,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.waterfall_chart,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "Waterfall",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText:
+                                                      "Historical Site",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/culturalsites.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 18,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.museum,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "Cultural",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText: "National Park",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/gameparks.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 5,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.nature,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "GameParks",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText: "Forest",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/forest.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 25,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.forest,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "Forests",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText: "Lakes",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/lakes.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 25,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.water,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "Lakes",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ResultsScreen(
+                                                  selectedText: "Mountain",
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(30),
+                                              image: const DecorationImage(
+                                                image: AssetImage(
+                                                  'assets/images/wildlife.png',
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                const Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 15,
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.terrain,
+                                                    color: Colors.white,
+                                                    size: 28,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 10),
+                                                const Text(
+                                                  "Mountains",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                    color: Colors.white,
+                                                    shadows: [
+                                                      Shadow(
+                                                        color: Colors.black,
+                                                        blurRadius: 5,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         );
                       },
                     ),
@@ -1348,6 +1805,105 @@ class _CategoryButton extends StatelessWidget {
                 fontSize: 19,
                 fontWeight: FontWeight.bold,
                 color: selected ? Colors.white : const Color(0xFF3B82F6),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Image Card Widget for static images in popular searches
+class ImageCard extends StatelessWidget {
+  final Map<String, dynamic> site;
+
+  const ImageCard({super.key, required this.site});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            Image.asset(
+              site['image'],
+              height: 120,
+              width: 120,
+              fit: BoxFit.cover,
+              errorBuilder: (c, e, s) => Container(
+                height: 120,
+                width: 120,
+                color: Colors.grey[300],
+                child: const Icon(Icons.broken_image, color: Colors.grey),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          site['name'],
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1FF813),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text(
+                          'Explore',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
