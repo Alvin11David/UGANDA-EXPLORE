@@ -167,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Glass Container for Fields, Update Button, and Nav Bar
+                // Glass Container for Fields and Update Button
                 ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
@@ -277,61 +277,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Bottom Nav Bar (Profile button removed)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 0,
-                              vertical: 8,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(40),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 12,
-                                  sigmaY: 12,
-                                ),
-                                child: Container(
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(40),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.4),
-                                      width: 1.2,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      _NavIcon(
-                                        icon: Icons.home,
-                                        label: 'Home',
-                                        selected: _selectedIndex == 0,
-                                        onTap: () => _onItemTapped(0),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
-                                        icon: Icons.settings,
-                                        label: 'Settings',
-                                        selected: _selectedIndex == 1,
-                                        onTap: () => _onItemTapped(1),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
-                                        icon: Icons.map,
-                                        label: 'Map',
-                                        selected: _selectedIndex == 2,
-                                        onTap: () => _onItemTapped(2),
-                                        color: mainGreen,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -339,6 +284,52 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavIcon(
+                    icon: Icons.home,
+                    label: 'Home',
+                    selected: _selectedIndex == 0,
+                    onTap: () => _onItemTapped(0),
+                    color: mainGreen,
+                  ),
+                  _NavIcon(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    selected: _selectedIndex == 1,
+                    onTap: () => _onItemTapped(1),
+                    color: mainGreen,
+                  ),
+                  _NavIcon(
+                    icon: Icons.map,
+                    label: 'Map',
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
+                    color: mainGreen,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
