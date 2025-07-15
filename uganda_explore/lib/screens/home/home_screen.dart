@@ -21,34 +21,34 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
-  if (index == 0) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    Navigator.pushReplacementNamed(context, '/home');
-  } else if (index == 1) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    Navigator.pushReplacementNamed(context, '/profile');
-  } else if (index == 2) {
-    setState(() {
-      _selectedIndex = index;
-    });
-    Navigator.pushReplacementNamed(context, '/settings');
-  } else if (index == 3) {
-    // Do NOT call setState here, just navigate!
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MapViewScreen(
-          siteName: 'Your Current Location',
-          showCurrentLocation: true,
+    if (index == 0) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (index == 1) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/profile');
+    } else if (index == 2) {
+      setState(() {
+        _selectedIndex = index;
+      });
+      Navigator.pushReplacementNamed(context, '/settings');
+    } else if (index == 3) {
+      // Do NOT call setState here, just navigate!
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
 
   @override
   void initState() {
@@ -359,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E3D4),
+      backgroundColor: const Color(0xFF101624), // Professional dark background
       body: Column(
         children: [
           Expanded(
@@ -381,9 +381,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Container(
                               width: double.infinity,
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
+                                color: Colors.white.withOpacity(0.10),
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(1),
+                                  color: Colors.white.withOpacity(0.25),
                                   width: 1,
                                 ),
                               ),
@@ -413,7 +413,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 50,
                                 width: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Colors.white.withOpacity(0.15),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
@@ -426,7 +426,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: const Center(
                                   child: Icon(
                                     Icons.location_on,
-                                    color: Colors.black87,
+                                    color: Color(0xFF3B82F6), // Blue
                                     size: 28,
                                   ),
                                 ),
@@ -441,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
-                                      color: Colors.black87,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -453,14 +453,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           fontFamily: 'Poppins',
                                           fontWeight: FontWeight.w600,
                                           fontSize: 16,
-                                          color: Colors.black87,
+                                          color: Colors.white,
                                         ),
                                       ),
                                       const SizedBox(width: 4),
                                       const Icon(
                                         Icons.keyboard_arrow_down_rounded,
                                         size: 20,
-                                        color: Colors.black87,
+                                        color: Colors.white,
                                       ),
                                     ],
                                   ),
@@ -479,7 +479,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 height: 50,
                                 width: 50,
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: Colors.white.withOpacity(0.15),
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
@@ -492,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: const Center(
                                   child: Icon(
                                     Icons.sunny,
-                                    color: Colors.amber,
+                                    color: Color(0xFFF59E0B), // Orange
                                     size: 28,
                                   ),
                                 ),
@@ -507,7 +507,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
-                                      color: Colors.black87,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -517,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
-                                      color: Colors.black87,
+                                      color: Colors.white,
                                     ),
                                   ),
                                 ],
@@ -535,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Search bar (with its own GestureDetector)
+                      // Search bar
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -555,7 +555,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 return Container(
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    color: Colors.white.withOpacity(0.18),
                                     borderRadius: BorderRadius.circular(30),
                                     boxShadow: [
                                       BoxShadow(
@@ -566,7 +566,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ],
                                     border: Border.all(
                                       color: focused
-                                          ? const Color(0xFF1FF813)
+                                          ? const Color(0xFF3B82F6)
                                           : Colors.transparent,
                                       width: 1,
                                     ),
@@ -576,7 +576,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       const SizedBox(width: 16),
                                       const Icon(
                                         Icons.search,
-                                        color: Colors.black,
+                                        color: Color(0xFF3B82F6),
                                         size: 24,
                                       ),
                                       const SizedBox(width: 10),
@@ -595,6 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           style: const TextStyle(
                                             fontFamily: 'Poppins',
                                             fontSize: 16,
+                                            color: Colors.white,
                                           ),
                                           enabled: false,
                                         ),
@@ -608,7 +609,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(width: 0),
-                      // Filter icon (with its own GestureDetector)
+                      // Filter icon
                       GestureDetector(
                         onTap: () {
                           print('filter clicked');
@@ -630,12 +631,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 50,
                                     width: 60,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withOpacity(0.18),
                                       borderRadius: BorderRadius.circular(30),
                                       border: Border.all(
                                         color: focused
-                                            ? const Color(0xFF1FF813)
-                                            : Colors.white,
+                                            ? const Color(0xFF3B82F6)
+                                            : Colors.white.withOpacity(0.25),
                                         width: 1.5,
                                       ),
                                       boxShadow: [
@@ -651,7 +652,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: const Center(
                                         child: Icon(
                                           Icons.filter_alt,
-                                          color: Colors.black,
+                                          color: Color(0xFF3B82F6),
                                           size: 26,
                                         ),
                                       ),
@@ -676,7 +677,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontFamily: 'Poppins',
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -687,13 +688,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
+                        // Example: National Parks
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    SearchScreen(), // Pass any data if needed
+                                builder: (context) => SearchScreen(),
                               ),
                             );
                           },
@@ -704,11 +705,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: const Color(0xFF1FF813),
+                                color: const Color(0xFF3B82F6),
                                 width: 1,
                               ),
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF000000), Color(0xFF1FF813)],
+                                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
                                 stops: [0.0, 0.47],
                                 begin: Alignment.centerLeft,
                                 end: Alignment.centerRight,
@@ -729,20 +730,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontFamily: 'Inter',
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
+                        // Example: Waterbodies
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    SearchScreen(), // Pass any data if needed
+                                builder: (context) => SearchScreen(),
                               ),
                             );
                           },
@@ -753,17 +754,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: const Color(0xFF1FF813),
+                                color: const Color(0xFF3B82F6),
                                 width: 1,
                               ),
-                              color: Colors.white,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                                stops: [0.0, 0.47],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                             ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 20),
                                 const Icon(
                                   Icons.water,
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 12),
@@ -773,20 +779,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontFamily: 'Inter',
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
                           ),
                         ),
+                        // Example: Mountains
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    SearchScreen(), // Pass any data if needed
+                                builder: (context) => SearchScreen(),
                               ),
                             );
                           },
@@ -797,17 +803,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(
-                                color: const Color(0xFF1FF813),
+                                color: const Color(0xFF3B82F6),
                                 width: 1,
                               ),
-                              color: Colors.white,
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF1E3A8A), Color(0xFF3B82F6)],
+                                stops: [0.0, 0.47],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
                             ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 20),
                                 const Icon(
                                   Icons.terrain,
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   size: 30,
                                 ),
                                 const SizedBox(width: 12),
@@ -817,7 +828,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontFamily: 'Inter',
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
@@ -838,18 +849,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontFamily: 'Poppins',
                           fontSize: 25,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                         textAlign: TextAlign.start,
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 25),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
+                        // Example: Bwindi Impenetrable N.P
                         Padding(
                           padding: EdgeInsets.only(left: 20),
                           child: GestureDetector(
@@ -904,11 +915,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             height: 80,
                                             width: 220,
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.5,
+                                              color: Colors.black.withOpacity(
+                                                0.45,
                                               ),
                                               border: Border.all(
-                                                color: Colors.white,
+                                                color: Colors.white.withOpacity(
+                                                  0.25,
+                                                ),
                                                 width: 1,
                                               ),
                                               borderRadius:
@@ -954,7 +967,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                           child: Icon(
                                                             Icons.location_on,
-                                                            color: Colors.black,
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
                                                             size: 20,
                                                           ),
                                                         ),
@@ -985,6 +1000,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
+                        // Example: Kazinga Channel
                         Padding(
                           padding: EdgeInsets.only(left: 30),
                           child: GestureDetector(
@@ -1039,11 +1055,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             height: 80,
                                             width: 220,
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.5,
+                                              color: Colors.black.withOpacity(
+                                                0.45,
                                               ),
                                               border: Border.all(
-                                                color: Colors.white,
+                                                color: Colors.white.withOpacity(
+                                                  0.25,
+                                                ),
                                                 width: 1,
                                               ),
                                               borderRadius:
@@ -1089,7 +1107,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                           child: Icon(
                                                             Icons.location_on,
-                                                            color: Colors.black,
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
                                                             size: 20,
                                                           ),
                                                         ),
@@ -1120,6 +1140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
+                        // Example: Mountain Elgon
                         Padding(
                           padding: EdgeInsets.only(left: 30),
                           child: GestureDetector(
@@ -1174,11 +1195,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                             height: 80,
                                             width: 220,
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(
-                                                0.5,
+                                              color: Colors.black.withOpacity(
+                                                0.45,
                                               ),
                                               border: Border.all(
-                                                color: Colors.white,
+                                                color: Colors.white.withOpacity(
+                                                  0.25,
+                                                ),
                                                 width: 1,
                                               ),
                                               borderRadius:
@@ -1224,7 +1247,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                               ),
                                                           child: Icon(
                                                             Icons.location_on,
-                                                            color: Colors.black,
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
                                                             size: 20,
                                                           ),
                                                         ),
@@ -1281,7 +1306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 55,
                             width: 55,
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white.withOpacity(0.15),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -1294,7 +1319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: const Center(
                               child: Icon(
                                 Icons.my_location,
-                                color: Colors.black,
+                                color: Color(0xFF3B82F6),
                                 size: 25,
                               ),
                             ),
@@ -1318,10 +1343,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Colors.white.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Colors.white.withOpacity(0.25),
                       width: 1.2,
                     ),
                   ),
