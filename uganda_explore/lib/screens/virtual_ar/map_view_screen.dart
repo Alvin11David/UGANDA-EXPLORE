@@ -273,7 +273,10 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
 
         if (latitude != null && longitude != null) {
           setState(() {
-            siteLatLng = LatLng(latitude!, longitude!);
+            siteLatLng = LatLng(
+              latitude!,
+              longitude!,
+            ); // Use ! to assert non-null
             error = null;
           });
           

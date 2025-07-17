@@ -29,8 +29,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
+    } else if (index == 1) {
+      // Profile button removed, so this can be left empty or navigate to settings if needed
+    } else if (index == 2) {
+      Navigator.pushReplacementNamed(context, '/settings');
+    } else if (index == 3) {
+      Navigator.pushNamed(context, '/map');
     }
-    // Add more navigation logic for other indices if needed
   }
 
   @override
@@ -102,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           backgroundColor: Colors.white,
                           backgroundImage: null,
                           child: Text(
-                            email[0].toUpperCase(),
+                            email.isNotEmpty ? email[0].toUpperCase() : '',
                             style: const TextStyle(
                               fontSize: 36,
                               color: Colors.black,
@@ -235,22 +240,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     selected: _selectedIndex == 0,
                     onTap: () => _onItemTapped(0),
                   ),
-                  _NavIcon(
-                    icon: Icons.person,
-                    label: 'Profile',
-                    selected: _selectedIndex == 1,
-                    onTap: () => _onItemTapped(1),
-                  ),
+                  // Profile button removed
                   _NavIcon(
                     icon: Icons.settings,
                     label: 'Settings',
-                    selected: _selectedIndex == 2,
+                    selected: _selectedIndex == 1,
                     onTap: () => _onItemTapped(2),
                   ),
                   _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
-                    selected: _selectedIndex == 3,
+                    selected: _selectedIndex == 2,
                     onTap: () => _onItemTapped(3),
                   ),
                 ],

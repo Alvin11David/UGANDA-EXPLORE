@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -13,7 +14,7 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   File? _profileImage;
   final String email = "user@email.com"; // Replace with actual user email
 
@@ -28,8 +29,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _selectedIndex = index;
     });
     if (index == 0) Navigator.pushReplacementNamed(context, '/home');
-    if (index == 1) Navigator.pushReplacementNamed(context, '/profile');
-    // Add more navigation as needed
+    if (index == 1) Navigator.pushReplacementNamed(context, '/settings');
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _onChangePicture() async {
@@ -156,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Glass Container for Fields, Update Button, and Nav Bar
+                // Glass Container for Fields and Update Button
                 ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
@@ -266,68 +277,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Bottom Nav Bar (4 icons only)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 0,
-                              vertical: 8,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(40),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 12,
-                                  sigmaY: 12,
-                                ),
-                                child: Container(
-                                  height: 64,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.3),
-                                    borderRadius: BorderRadius.circular(40),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.4),
-                                      width: 1.2,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: [
-                                      _NavIcon(
-                                        icon: Icons.home,
-                                        label: 'Home',
-                                        selected: _selectedIndex == 0,
-                                        onTap: () => _onItemTapped(0),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
-                                        icon: Icons.person,
-                                        label: 'Profile',
-                                        selected: _selectedIndex == 1,
-                                        onTap: () => _onItemTapped(1),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
-                                        icon: Icons.settings,
-                                        label: 'Settings',
-                                        selected: _selectedIndex == 2,
-                                        onTap: () => _onItemTapped(2),
-                                        color: mainGreen,
-                                      ),
-                                      _NavIcon(
-                                        icon: Icons.map,
-                                        label: 'Map',
-                                        selected: _selectedIndex == 3,
-                                        onTap: () => _onItemTapped(3),
-                                        color: mainGreen,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -335,6 +284,52 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 24),
               ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.4),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _NavIcon(
+                    icon: Icons.home,
+                    label: 'Home',
+                    selected: _selectedIndex == 0,
+                    onTap: () => _onItemTapped(0),
+                    color: mainGreen,
+                  ),
+                  _NavIcon(
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    selected: _selectedIndex == 1,
+                    onTap: () => _onItemTapped(1),
+                    color: mainGreen,
+                  ),
+                  _NavIcon(
+                    icon: Icons.map,
+                    label: 'Map',
+                    selected: _selectedIndex == 2,
+                    onTap: () => _onItemTapped(2),
+                    color: mainGreen,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -371,11 +366,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           filled: true,
           fillColor: Colors.white.withOpacity(0.15),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
             borderSide: const BorderSide(color: Colors.green, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
             borderSide: const BorderSide(color: Colors.green, width: 2),
           ),
           suffixIcon: const Icon(Icons.edit, size: 19, color: Colors.black),
@@ -418,7 +413,7 @@ class _NavIcon extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : color, size: 24),
+            Icon(icon, color: Colors.black, size: 24),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(
