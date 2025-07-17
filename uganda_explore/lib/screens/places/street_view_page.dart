@@ -22,7 +22,7 @@ class StreetViewPage extends StatefulWidget {
 }
 
 class _StreetViewPageState extends State<StreetViewPage> {
-  late WebViewController _webViewController;
+  WebViewController? _webViewController;
   bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
@@ -32,8 +32,9 @@ class _StreetViewPageState extends State<StreetViewPage> {
   double? _userLatitude;
   double? _userLongitude;
 
-  // Your Google Maps API key (same as used in MapViewScreen)
-  static const String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+  // TODO: Replace with your actual Google Maps API key
+  // This should be for Google Maps JavaScript API, NOT Street View Publish API
+  static const String _apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
 
   @override
   void initState() {
@@ -43,13 +44,17 @@ class _StreetViewPageState extends State<StreetViewPage> {
   }
 
   Future<void> _initializeStreetView() async {
-    // Use provided coordinates or fetch from Firestore
-    if (widget.latitude != null && widget.longitude != null) {
-      _siteLatitude = widget.latitude;
-      _siteLongitude = widget.longitude;
-      _setupWebView();
-    } else {
-      await _fetchCoordinatesFromFirestore();
+    try {
+      // Use provided coordinates or fetch from Firestore
+      if (widget.latitude != null && widget.longitude != null) {
+        _siteLatitude = widget.latitude;
+        _siteLongitude = widget.longitude;
+        _setupWebView();
+      } else {
+        await _fetchCoordinatesFromFirestore();
+      }
+    } catch (e) {
+      _setError('Error initializing Street View: $e');
     }
   }
 
@@ -149,30 +154,41 @@ class _StreetViewPageState extends State<StreetViewPage> {
   }
 
   void _setupWebView() {
-    if (_siteLatitude == null || _siteLongitude == null) return;
+    if (_siteLatitude == null || _siteLongitude == null) {
+      _setError('Coordinates not available');
+      return;
+    }
 
-    final streetViewHtml = _generateStreetViewHtml();
-    
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            setState(() {
-              _isLoading = true;
-            });
-          },
-          onPageFinished: (String url) {
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onWebResourceError: (WebResourceError error) {
-            _setError('Street View failed to load: ${error.description}');
-          },
-        ),
-      )
-      ..loadHtmlString(streetViewHtml);
+    try {
+      final streetViewHtml = _generateStreetViewHtml();
+      
+      _webViewController = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onPageStarted: (String url) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = true;
+                });
+              }
+            },
+            onPageFinished: (String url) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+            },
+            onWebResourceError: (WebResourceError error) {
+              _setError('Street View failed to load: ${error.description}');
+            },
+          ),
+        )
+        ..loadHtmlString(streetViewHtml);
+    } catch (e) {
+      _setError('Error setting up WebView: $e');
+    }
   }
 
   String _generateStreetViewHtml() {
@@ -199,6 +215,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 border-radius: 10px;
                 text-align: center;
                 z-index: 1000;
+                max-width: 300px;
             }
             .loading {
                 position: absolute;
@@ -207,6 +224,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 transform: translate(-50%, -50%);
                 color: #333;
                 font-size: 16px;
+                text-align: center;
             }
         </style>
     </head>
@@ -220,23 +238,27 @@ class _StreetViewPageState extends State<StreetViewPage> {
             let streetViewService;
             
             function initStreetView() {
+                console.log('Initializing Street View...');
                 const targetLocation = { lat: $_siteLatitude, lng: $_siteLongitude };
+                console.log('Target location:', targetLocation);
                 
                 streetViewService = new google.maps.StreetViewService();
                 
                 // Check if Street View is available at this location
                 streetViewService.getPanorama({
                     location: targetLocation,
-                    radius: 50,
+                    radius: 100, // Increased radius for better coverage
                     source: google.maps.StreetViewSource.OUTDOOR
                 }, processSVData);
             }
             
             function processSVData(data, status) {
+                console.log('Street View status:', status);
                 const loading = document.getElementById('loading');
                 const errorDiv = document.getElementById('error-message');
                 
                 if (status === 'OK') {
+                    console.log('Street View data found:', data);
                     loading.style.display = 'none';
                     
                     panorama = new google.maps.StreetViewPanorama(
@@ -250,31 +272,57 @@ class _StreetViewPageState extends State<StreetViewPage> {
                             zoom: 1,
                             motionTracking: false,
                             motionTrackingControl: false,
-                            addressControl: false,
+                            addressControl: true,
                             linksControl: true,
                             panControl: true,
+                            zoomControl: true,
                             enableCloseButton: false,
-                            showRoadLabels: false
+                            showRoadLabels: true,
+                            clickToGo: true,
+                            scrollwheel: true,
+                            disableDoubleClickZoom: false
                         }
                     );
+                    
+                    // Add error handling for panorama
+                    panorama.addListener('status_changed', function() {
+                        if (panorama.getStatus() !== 'OK') {
+                            console.log('Panorama status changed:', panorama.getStatus());
+                            showError('Street View panorama failed to load');
+                        }
+                    });
+                    
                 } else {
-                    loading.style.display = 'none';
-                    errorDiv.innerHTML = 'Street View not available for this location<br><small>Try a different location or check back later</small>';
-                    errorDiv.style.display = 'block';
+                    console.log('Street View not available, status:', status);
+                    showError('Street View not available for this location<br><small>This location may not have Street View coverage</small>');
                 }
             }
             
-            window.onerror = function(msg, url, line, col, error) {
+            function showError(message) {
                 const loading = document.getElementById('loading');
                 const errorDiv = document.getElementById('error-message');
                 loading.style.display = 'none';
-                errorDiv.innerHTML = 'Error loading Street View<br><small>Please check your internet connection</small>';
+                errorDiv.innerHTML = message;
                 errorDiv.style.display = 'block';
+            }
+            
+            // Enhanced error handling
+            window.onerror = function(msg, url, line, col, error) {
+                console.error('JavaScript error:', msg, 'at', url, ':', line);
+                showError('Error loading Street View<br><small>Please check your internet connection and API key</small>');
+                return true;
+            };
+            
+            // Handle API loading errors
+            window.gm_authFailure = function() {
+                console.error('Google Maps API authentication failed');
+                showError('Street View authentication failed<br><small>Please check your API key</small>');
             };
         </script>
         
         <script async defer 
-            src="https://maps.googleapis.com/maps/api/js?key=$_apiKey&callback=initStreetView">
+            src="https://maps.googleapis.com/maps/api/js?key=$_apiKey&callback=initStreetView&libraries=geometry"
+            onerror="showError('Failed to load Google Maps API<br><small>Please check your internet connection</small>')">
         </script>
     </body>
     </html>
@@ -282,11 +330,13 @@ class _StreetViewPageState extends State<StreetViewPage> {
   }
 
   void _setError(String message) {
-    setState(() {
-      _hasError = true;
-      _errorMessage = message;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = message;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -346,8 +396,8 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 ),
               ),
             )
-          else if (_siteLatitude != null && _siteLongitude != null)
-            WebViewWidget(controller: _webViewController),
+          else if (_webViewController != null)
+            WebViewWidget(controller: _webViewController!),
           
           // Loading indicator
           if (_isLoading && !_hasError)
@@ -357,7 +407,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
               ),
             ),
           
-          // Custom app bar with blur effect (matching your existing style)
+          // Custom app bar with blur effect
           Positioned(
             top: 0,
             left: 0,
@@ -438,11 +488,11 @@ class _StreetViewPageState extends State<StreetViewPage> {
             ),
           ),
           
-          // Bottom info panel (matching your existing style)
+          // Bottom info panel
           Positioned(
             left: 4,
             right: 4,
-            bottom: 0,
+            bottom: 0,            
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
