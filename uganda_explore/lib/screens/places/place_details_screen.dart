@@ -591,46 +591,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                // Street View
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: ClipOval(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                          child: Container(
-                            width: 45,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.streetview,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    const Text(
-                      "Street View",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 15),
                 // Location
                 Column(
                   children: [
