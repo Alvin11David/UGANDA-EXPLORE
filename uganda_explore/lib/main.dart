@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
         '/admin_dashboard': (context) => const AdminDashboard(),
         '/termsandprivacy': (context) => const TermsPrivacyScreen(),
       },
-      home: HomeScreen(),
+      home: const SignInScreen(),
     );
   }
 }
