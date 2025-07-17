@@ -10,10 +10,10 @@ class ARScanScreen extends StatefulWidget {
   final double destinationLng;
 
   const ARScanScreen({
-    Key? key,
+    super.key,
     required this.destinationLat,
     required this.destinationLng,
-  }) : super(key: key);
+  });
 
   @override
   State<ARScanScreen> createState() => _ARScanScreenState();

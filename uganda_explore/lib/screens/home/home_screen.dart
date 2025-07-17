@@ -259,8 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () {
                                 final selectedCategories = <String>[];
                                 for (int i = 0; i < categories.length; i++) {
-                                  if (checked[i])
+                                  if (checked[i]) {
                                     selectedCategories.add(categories[i]);
+                                  }
                                 }
 
                                 if (selectedCategories.isEmpty) {

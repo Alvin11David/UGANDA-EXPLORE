@@ -5,6 +5,8 @@ import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/places/street_view_page.dart';
+import 'package:just_audio/just_audio.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
   final String siteName;
@@ -260,6 +262,41 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     );
   }
 
+  // Fetch audios for the site
+  Future<List<String>> fetchSiteAudios(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase() == trimmedSiteName) {
+        final audios = List<String>.from(data['audios'] ?? []);
+        return audios;
+      }
+    }
+    return [];
+  }
+
+  // Fetch category for the site
+  Future<String?> fetchSiteCategory(String siteName) async {
+    final trimmedSiteName = siteName.trim().toLowerCase();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+
+    for (var doc in query.docs) {
+      final data = doc.data();
+      final dbName = (data['name'] ?? '').toString();
+      if (dbName.toLowerCase() == trimmedSiteName) {
+        return data['category']?.toString();
+      }
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -413,6 +450,73 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     const SizedBox(height: 1),
                     const Text(
                       "360° Tour",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                        fontFamily: 'Poppins',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 15),
+                // Street View
+                Column(
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        print(
+                          'Street View button tapped for: ${widget.siteName}',
+                        );
+                        final latLng = await fetchLatLng(
+                          widget.siteName.trim(),
+                        );
+                        if (latLng != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => StreetViewPage(
+                                siteName: widget.siteName.trim(),
+                                latitude: latLng['lat'],
+                                longitude: latLng['lng'],
+                              ),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'Location coordinates not found for Street View.',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: ClipOval(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.streetview,
+                                color: Colors.white,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    const Text(
+                      "Street View",
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -578,6 +682,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ],
             ),
           ),
+
           Positioned(
             top: 170,
             left: 10,
@@ -864,6 +969,60 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
+                                // AUDIO PLAYER SECTION (debug version)
+                                FutureBuilder<String?>(
+                                  future: fetchSiteCategory(widget.siteName),
+                                  builder: (context, categorySnapshot) {
+                                    if (categorySnapshot.connectionState == ConnectionState.waiting) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    final category = categorySnapshot.data;
+                                    print('DEBUG: category fetched = '
+                                        '${categorySnapshot.data}');
+                                    // Show audio player for ALL categories for debugging
+                                    return FutureBuilder<List<String>>(
+                                      future: fetchSiteAudios(widget.siteName),
+                                      builder: (context, audioSnapshot) {
+                                        if (audioSnapshot.connectionState == ConnectionState.waiting) {
+                                          return const SizedBox.shrink();
+                                        }
+                                        final audios = audioSnapshot.data ?? [];
+                                        print('DEBUG: audios fetched = '
+                                            ' [32m$audios [0m');
+                                        if (audios.isEmpty) {
+                                          return const Text(
+                                            "No audios found for this site.",
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontFamily: 'Poppins',
+                                              fontSize: 14,
+                                            ),
+                                          );
+                                        }
+                                        return Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              "Audio Guide (Debug Mode)",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            ...audios.map((url) => Padding(
+                                              padding: const EdgeInsets.only(bottom: 8.0),
+                                              child: SimpleAudioPlayer(url: url),
+                                            )),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                const SizedBox(height: 12),
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 0,
@@ -1105,6 +1264,97 @@ class _NavIcon extends StatelessWidget {
             ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+// Simple audio player widget for a single audio URL
+class SimpleAudioPlayer extends StatefulWidget {
+  final String url;
+  const SimpleAudioPlayer({required this.url, Key? key}) : super(key: key);
+
+  @override
+  State<SimpleAudioPlayer> createState() => _SimpleAudioPlayerState();
+}
+
+class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
+  late AudioPlayer _player;
+  bool _isPlaying = false;
+  Duration? _duration;
+  Duration? _position;
+
+  @override
+  void initState() {
+    super.initState();
+    _player = AudioPlayer();
+    _player.setUrl(widget.url);
+    _player.durationStream.listen((d) {
+      setState(() {
+        _duration = d;
+      });
+    });
+    _player.positionStream.listen((p) {
+      setState(() {
+        _position = p;
+      });
+    });
+    _player.playerStateStream.listen((state) {
+      setState(() {
+        _isPlaying = state.playing;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration? d) {
+    if (d == null) return "0:00";
+    final minutes = d.inMinutes;
+    final seconds = d.inSeconds % 60;
+    return "$minutes:${seconds.toString().padLeft(2, '0')}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.black12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.black),
+            onPressed: () {
+              if (_isPlaying) {
+                _player.pause();
+              } else {
+                _player.play();
+              }
+            },
+          ),
+          Text(_formatDuration(_position)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Slider(
+              value: (_position?.inMilliseconds ?? 0).toDouble(),
+              min: 0,
+              max: (_duration?.inMilliseconds ?? 1).toDouble(),
+              onChanged: (value) {
+                _player.seek(Duration(milliseconds: value.toInt()));
+              },
+            ),
+          ),
+          Text(_formatDuration(_duration)),
+        ],
       ),
     );
   }
