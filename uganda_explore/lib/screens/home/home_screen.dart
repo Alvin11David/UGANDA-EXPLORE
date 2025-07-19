@@ -976,7 +976,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  // Images Row for selected category
                   if (_selectedCategory.isNotEmpty)
                     StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _fetchSites(_selectedCategory),
@@ -1063,6 +1062,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ),
                                                         ),
                                                   ),
+                                                  // 360° icon button in the top right corner if Street View is available
+                                                  if (site['streetViewLat'] !=
+                                                          null &&
+                                                      site['streetViewLng'] !=
+                                                          null)
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 10,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          // TODO: Implement StreetViewScreen navigation
+                                                        },
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                      0.55,
+                                                                    ),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                          child: const Icon(
+                                                            Icons.threesixty,
+                                                            color: Color(
+                                                              0xFF1FF813,
+                                                            ),
+                                                            size: 26,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   Positioned(
                                                     left: 0,
                                                     right: 0,
@@ -1197,7 +1233,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            
                           ],
                         );
                       },
@@ -1215,7 +1250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: const Color(0xFF1E3A8A), // Navy blue
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.25),
@@ -1276,12 +1311,16 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            Icon(
+              icon,
+              color: selected ? Colors.white : Colors.black,
+              size: 24,
+            ),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(

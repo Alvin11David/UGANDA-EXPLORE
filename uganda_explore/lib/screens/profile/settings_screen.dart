@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -9,7 +10,10 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedIndex = 1; 
+  int _selectedIndex = 1;
+
+  
+  final User? user = FirebaseAuth.instance.currentUser;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -25,8 +29,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String email = 'john.doe@email.com';
-    final String name = 'John Doe';
+    // Use values from FirebaseAuth user
+    final String email = user?.email ?? '';
+    final String name = user?.displayName ?? 'User';
+    final String profileLetter = name.isNotEmpty
+        ? name[0].toUpperCase()
+        : (email.isNotEmpty ? email[0].toUpperCase() : '');
 
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
@@ -79,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       backgroundImage: null,
                       child: Text(
-                        email[0].toUpperCase(),
+                        profileLetter,
                         style: const TextStyle(
                           fontSize: 36,
                           color: Colors.black,
@@ -149,7 +157,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () => Navigator.pushNamed(context, '/termsandprivacy'),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
