@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -390,8 +391,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               onPressed: () {
                                 final selectedCategories = <String>[];
                                 for (int i = 0; i < categories.length; i++) {
-                                  if (checked[i])
+                                  if (checked[i]) {
                                     selectedCategories.add(categories[i]);
+                                  }
                                 }
 
                                 if (selectedCategories.isEmpty) {
@@ -582,12 +584,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
         .where('name', isGreaterThanOrEqualTo: keyword)
-        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .where('name', isLessThanOrEqualTo: '$keyword\uf8ff')
         .limit(6)
         .get();
     setState(() {
       _suggestions = query.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
+          .map((doc) => doc.data())
           .toList();
       _isLoadingSuggestions = false;
     });
@@ -611,12 +613,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
         .where('name', isGreaterThanOrEqualTo: keyword)
-        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .where('name', isLessThanOrEqualTo: '$keyword\uf8ff')
         .limit(6)
         .get();
     setState(() {
       _suggestions = query.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
+          .map((doc) => doc.data())
           .toList();
       _isLoadingSuggestions = false;
     });
@@ -634,7 +636,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
+              .map((doc) => doc.data())
               .toList(),
         );
   }
@@ -874,6 +876,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: const TextStyle(
                                               fontFamily: 'Poppins',
                                               fontSize: 16,
+                                              color: Colors.black,
                                             ),
                                             onChanged: (value) {
                                               _fetchSuggestionsDropdown(
@@ -1416,6 +1419,87 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0),
+        child: FloatingActionButton(
+          backgroundColor: const Color(0xFF3B82F6),
+          child: Icon(
+            Icons.smart_toy_outlined,
+             color: Colors.white
+            ),
+          tooltip: 'Virtual Guide',
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (context) => Container(
+                padding: const EdgeInsets.all(20),
+                height: 320,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.chat_bubble, color: Color(0xFF3B82F6)),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Virtual Guide',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Hi! I'm your virtual guide. How can I help you explore Uganda?",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.threesixty, color: Colors.black),
+                      label: const Text(
+                        'Show me a virtual tour',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () {
+                        // Example: Navigate to a featured virtual tour
+                        Navigator.pop(context);
+                        // Add your navigation logic here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.map, color: Colors.black),
+                      label: const Text('Find attractions near me', style: TextStyle(color: Colors.black)),
+                      onPressed: () {
+                        // Example: Navigate to map or attractions
+                        Navigator.pop(context);
+                        // Add your navigation logic here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

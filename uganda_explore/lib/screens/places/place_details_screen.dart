@@ -1272,7 +1272,7 @@ class _NavIcon extends StatelessWidget {
 // Simple audio player widget for a single audio URL
 class SimpleAudioPlayer extends StatefulWidget {
   final String url;
-  const SimpleAudioPlayer({required this.url, Key? key}) : super(key: key);
+  const SimpleAudioPlayer({required this.url, super.key});
 
   @override
   State<SimpleAudioPlayer> createState() => _SimpleAudioPlayerState();
