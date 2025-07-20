@@ -4,16 +4,147 @@ import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
-import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
+import 'package:uganda_explore/screens/places/street_view_page.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class ImageCard extends StatelessWidget {
+  final Map<String, dynamic> site;
+
+  const ImageCard({super.key, required this.site});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            Image.asset(
+              site['image'],
+              height: 120,
+              width: 120,
+              fit: BoxFit.cover,
+              errorBuilder: (c, e, s) => Container(
+                height: 120,
+                width: 120,
+                color: Colors.grey[300],
+                child: const Icon(Icons.broken_image, color: Colors.grey),
+              ),
+            ),
+            // Virtual Tour Button (Street View icon) if supported
+            if (site['streetViewLat'] != null && site['streetViewLng'] != null)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    print('Virtual tour icon tapped!');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StreetViewPage(
+                          latitude: site['streetViewLat'],
+                          longitude: site['streetViewLng'],
+                          siteName: site['name'] ?? '',
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.55),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.threesixty,
+                      color: Color(0xFF1FF813),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          site['name'],
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1FF813),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text(
+                          'Explore',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -976,7 +1107,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  // Images Row for selected category
                   if (_selectedCategory.isNotEmpty)
                     StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _fetchSites(_selectedCategory),
@@ -1063,6 +1193,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ),
                                                         ),
                                                   ),
+                                                  // 360° icon button in the top right corner if Street View is available
+                                                  if (site['streetViewLat'] !=
+                                                          null &&
+                                                      site['streetViewLng'] !=
+                                                          null)
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 10,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          // TODO: Implement StreetViewScreen navigation
+                                                        },
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                      0.55,
+                                                                    ),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                          child: const Icon(
+                                                            Icons.threesixty,
+                                                            color: Color(
+                                                              0xFF1FF813,
+                                                            ),
+                                                            size: 26,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   Positioned(
                                                     left: 0,
                                                     right: 0,
@@ -1197,7 +1364,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            
                           ],
                         );
                       },
@@ -1215,7 +1381,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: const Color(0xFF1E3A8A), // Navy blue
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.25),
@@ -1276,12 +1442,16 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
           children: [
-            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
+            Icon(
+              icon,
+              color: selected ? Colors.white : Colors.black,
+              size: 24,
+            ),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(
@@ -1366,10 +1536,10 @@ class _CategoryButton extends StatelessWidget {
 }
 
 // Image Card Widget for static images in popular searches
-class ImageCard extends StatelessWidget {
+class SiteImageCard extends StatelessWidget {
   final Map<String, dynamic> site;
 
-  const ImageCard({super.key, required this.site});
+  const SiteImageCard({super.key, required this.site});
 
   @override
   Widget build(BuildContext context) {
@@ -1402,6 +1572,37 @@ class ImageCard extends StatelessWidget {
                 child: const Icon(Icons.broken_image, color: Colors.grey),
               ),
             ),
+            if (site['streetViewLat'] != null && site['streetViewLng'] != null)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StreetViewPage(
+                          latitude: site['streetViewLat'],
+                          longitude: site['streetViewLng'],
+                          siteName: site['name'] ?? '',
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.55),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.threesixty,
+                      color: Color(0xFF1FF813),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
               left: 0,
               right: 0,
@@ -1457,6 +1658,7 @@ class ImageCard extends StatelessWidget {
                 ),
               ),
             ),
+            
           ],
         ),
       ),

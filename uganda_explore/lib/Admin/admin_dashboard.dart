@@ -231,6 +231,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             tooltip: 'Add New Site',
             onPressed: _showAddDocumentDialog,
           ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Logout',
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/signin');
+            },
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
