@@ -8,7 +8,7 @@ import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
-
+import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,16 +61,24 @@ class ImageCard extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () {
                     print('Virtual tour icon tapped!');
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => StreetViewPage(
-                          latitude: site['streetViewLat'],
-                          longitude: site['streetViewLng'],
-                          siteName: site['name'] ?? '',
+                    print('site["name"]: ${site['name']}');
+                    print('site["streetViewLat"]: ${site['streetViewLat']}');
+                    print('site["streetViewLng"]: ${site['streetViewLng']}');
+                    try {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StreetViewPage(
+                            latitude: site['streetViewLat'],
+                            longitude: site['streetViewLng'],
+                            siteName: site['name'] ?? '',
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } catch (e, stack) {
+                      print('Navigation error: $e');
+                      print(stack);
+                    }
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -588,9 +596,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .limit(6)
         .get();
     setState(() {
-      _suggestions = query.docs
-          .map((doc) => doc.data())
-          .toList();
+      _suggestions = query.docs.map((doc) => doc.data()).toList();
       _isLoadingSuggestions = false;
     });
     if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
@@ -617,9 +623,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .limit(6)
         .get();
     setState(() {
-      _suggestions = query.docs
-          .map((doc) => doc.data())
-          .toList();
+      _suggestions = query.docs.map((doc) => doc.data()).toList();
       _isLoadingSuggestions = false;
     });
     if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
@@ -634,11 +638,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('tourismsites')
         .where('category', isEqualTo: category)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => doc.data())
-              .toList(),
-        );
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   @override
@@ -1424,10 +1424,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(bottom: 80.0),
         child: FloatingActionButton(
           backgroundColor: const Color(0xFF3B82F6),
-          child: Icon(
-            Icons.smart_toy_outlined,
-             color: Colors.white
-            ),
+          child: Icon(Icons.smart_toy_outlined, color: Colors.white),
           tooltip: 'Virtual Guide',
           onPressed: () {
             showModalBottomSheet(
@@ -1473,9 +1470,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(color: Colors.black),
                       ),
                       onPressed: () {
-                        // Example: Navigate to a featured virtual tour
                         Navigator.pop(context);
-                        // Add your navigation logic here
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const VirtualToursListScreen(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3B82F6),
@@ -1484,7 +1485,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.map, color: Colors.black),
-                      label: const Text('Find attractions near me', style: TextStyle(color: Colors.black)),
+                      label: const Text(
+                        'Find attractions near me',
+                        style: TextStyle(color: Colors.black),
+                      ),
                       onPressed: () {
                         // Example: Navigate to map or attractions
                         Navigator.pop(context);
@@ -1531,11 +1535,7 @@ class _NavIcon extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: selected ? Colors.white : Colors.black,
-              size: 24,
-            ),
+            Icon(icon, color: selected ? Colors.white : Colors.black, size: 24),
             if (selected) ...[
               const SizedBox(width: 6),
               Text(
@@ -1742,7 +1742,6 @@ class SiteImageCard extends StatelessWidget {
                 ),
               ),
             ),
-            
           ],
         ),
       ),

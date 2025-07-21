@@ -1,5 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -9,7 +12,51 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  int _selectedIndex = 1; 
+  int _selectedIndex = 1;
+  bool _showNavBar = true;
+  double _lastOffset = 0.0;
+  final ScrollController _scrollController = ScrollController();
+
+  String email = '';
+  String fullNames = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_handleScroll);
+    _fetchUserInfo();
+  }
+
+  Future<void> _fetchUserInfo() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      setState(() {
+        email = doc.data()?['email'] ?? user.email ?? '';
+        fullNames = doc.data()?['fullNames'] ?? '';
+      });
+    }
+  }
+
+  void _handleScroll() {
+    double offset = _scrollController.offset;
+    if (offset > _lastOffset + 10 && _showNavBar) {
+      setState(() => _showNavBar = false);
+    } else if (offset < _lastOffset - 10 && !_showNavBar) {
+      setState(() => _showNavBar = true);
+    }
+    _lastOffset = offset;
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -25,13 +72,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String email = 'john.doe@email.com';
-    final String name = 'John Doe';
-
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Container(
             decoration: BoxDecoration(
               color: const Color(0xFFEFE9DE),
@@ -79,7 +124,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       backgroundColor: Colors.white,
                       backgroundImage: null,
                       child: Text(
-                        email[0].toUpperCase(),
+                        (fullNames.isNotEmpty
+                                ? fullNames[0]
+                                : (email.isNotEmpty ? email[0] : ''))
+                            .toUpperCase(),
                         style: const TextStyle(
                           fontSize: 36,
                           color: Colors.black,
@@ -91,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  name,
+                  fullNames,
                   style: const TextStyle(
                     fontSize: 25,
                     fontWeight: FontWeight.bold,
@@ -149,7 +197,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.description,
                             label: 'Terms & Privacy',
-                            onTap: () => Navigator.pushNamed(context, '/termsandprivacy'),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
@@ -174,44 +225,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(40),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              height: 64,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                borderRadius: BorderRadius.circular(40),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.4),
-                  width: 1.2,
+      bottomNavigationBar: AnimatedSlide(
+        duration: const Duration(milliseconds: 300),
+        offset: _showNavBar ? Offset.zero : const Offset(0, 1),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(40),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.4),
+                    width: 1.2,
+                  ),
                 ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NavIcon(
-                    icon: Icons.home,
-                    label: 'Home',
-                    selected: _selectedIndex == 0,
-                    onTap: () => _onItemTapped(0),
-                  ),
-                  _NavIcon(
-                    icon: Icons.settings,
-                    label: 'Settings',
-                    selected: _selectedIndex == 1,
-                    onTap: () => _onItemTapped(1),
-                  ),
-                  _NavIcon(
-                    icon: Icons.map,
-                    label: 'Map',
-                    selected: _selectedIndex == 2,
-                    onTap: () => _onItemTapped(2),
-                  ),
-                ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _NavIcon(
+                      icon: Icons.home,
+                      label: 'Home',
+                      selected: _selectedIndex == 0,
+                      onTap: () => _onItemTapped(0),
+                    ),
+                    _NavIcon(
+                      icon: Icons.settings,
+                      label: 'Settings',
+                      selected: _selectedIndex == 1,
+                      onTap: () => _onItemTapped(1),
+                    ),
+                    _NavIcon(
+                      icon: Icons.map,
+                      label: 'Map',
+                      selected: _selectedIndex == 2,
+                      onTap: () => _onItemTapped(2),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -242,7 +297,7 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(

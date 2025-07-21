@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:flutter/scheduler.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
   final String siteName;
@@ -20,18 +21,51 @@ class PlaceDetailsScreen extends StatefulWidget {
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  List<String> _images = [];
+  bool _autoScrollStarted = false;
 
   List<VideoPlayerController> _videoControllers = [];
   int _playingIndex = -1;
   int _selectedIndex = 0; // For nav bar selection
 
+  final ValueNotifier<int> _currentPageNotifier = ValueNotifier<int>(0);
+
+  bool _showNavBar = true;
+  double _lastOffset = 0.0;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
+    // Fetch images and start auto-scroll when ready
+    fetchSiteImages(widget.siteName).then((imgs) {
+      if (mounted) {
+        setState(() {
+          _images = imgs;
+        });
+        if (_images.length > 1) {
+          _startAutoScroll();
+        }
+      }
+    });
+    _scrollController.addListener(_handleScroll);
+    // Do NOT fetch or setState for other data here, let FutureBuilders handle them
+  }
+
+  void _handleScroll() {
+    double offset = _scrollController.offset;
+    if (offset > _lastOffset + 10 && _showNavBar) {
+      setState(() => _showNavBar = false);
+    } else if (offset < _lastOffset - 10 && !_showNavBar) {
+      setState(() => _showNavBar = true);
+    }
+    _lastOffset = offset;
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_handleScroll);
+    _scrollController.dispose();
     for (var controller in _videoControllers) {
       controller.dispose();
     }
@@ -39,24 +73,18 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   }
 
   void _startAutoScroll() async {
-    while (mounted) {
+    if (_autoScrollStarted) return;
+    _autoScrollStarted = true;
+    while (mounted && _images.length > 1) {
       await Future.delayed(const Duration(seconds: 3));
       if (_pageController.hasClients) {
-        int nextPage = _currentPage + 1;
-        if (nextPage >=
-            (_pageController.positions.isNotEmpty
-                ? _pageController.positions.first.viewportDimension
-                : 1)) {
-          nextPage = 0;
-        }
+        int nextPage = (_currentPageNotifier.value + 1) % _images.length;
         _pageController.animateToPage(
           nextPage,
           duration: const Duration(milliseconds: 800),
           curve: Curves.easeInOut,
         );
-        setState(() {
-          _currentPage = nextPage;
-        });
+        _currentPageNotifier.value = nextPage;
       }
     }
   }
@@ -213,8 +241,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       final data = doc.data();
       final dbName = (data['name'] ?? '').toString();
       if (dbName.toLowerCase() == trimmedSiteName) {
-        final lat = data['latitude'];
-        final lng = data['longitude'];
+        final lat = data['streetViewLat'] ?? data['latitude'];
+        final lng = data['streetViewLng'] ?? data['longitude'];
         if (lat != null && lng != null) {
           return {
             'lat': (lat as num).toDouble(),
@@ -303,72 +331,68 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       backgroundColor: const Color(0xFFE5E3D4),
       body: Stack(
         children: [
-          // Circle at the top
+          // Circle at the top (image carousel)
           Positioned(
             top: -170,
             left: MediaQuery.of(context).size.width / 2 - 275,
             child: SizedBox(
               width: 550,
               height: 550,
-              child: FutureBuilder<List<String>>(
-                future: fetchSiteImages(widget.siteName),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Center(child: Text('No images found.'));
-                  }
-                  final images = snapshot.data!;
-                  return ClipOval(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: images.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPage = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        return Image.network(
-                          images[index],
-                          width: 550,
-                          height: 550,
-                          fit: BoxFit.cover,
-                        );
-                      },
+              child: _images.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : ClipOval(
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: _images.length,
+                        onPageChanged: (index) {
+                          _currentPageNotifier.value = index;
+                        },
+                        itemBuilder: (context, index) {
+                          return Image.network(
+                            _images[index],
+                            width: 550,
+                            height: 550,
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
             ),
           ),
           Positioned(
             top: 350,
             left: 0,
             right: 0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(3, (index) {
-                final bool isActive = _currentPage == index;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: isActive ? 20 : 15,
-                    height: isActive ? 20 : 15,
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? Colors.transparent
-                          : const Color(0xFF1FF813),
-                      shape: BoxShape.circle,
-                      border: isActive
-                          ? Border.all(color: const Color(0xFF1FF813), width: 3)
-                          : null,
-                    ),
-                  ),
+            child: ValueListenableBuilder<int>(
+              valueListenable: _currentPageNotifier,
+              builder: (context, currentPage, _) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_images.length, (index) {
+                    final bool isActive = currentPage == index;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: isActive ? 20 : 15,
+                        height: isActive ? 20 : 15,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? Colors.transparent
+                              : const Color(0xFF3B82F6),
+                          shape: BoxShape.circle,
+                          border: isActive
+                              ? Border.all(
+                                  color: const Color(0xFF1FF813),
+                                  width: 3,
+                                )
+                              : null,
+                        ),
+                      ),
+                    );
+                  }),
                 );
-              }),
+              },
             ),
           ),
           Positioned(
@@ -405,7 +429,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ),
           Positioned(
             top: 90,
-            right: 100,
+            right: 70,
             child: Row(
               children: [
                 // 360° Tour
@@ -591,46 +615,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                // Street View
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: ClipOval(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                          child: Container(
-                            width: 45,
-                            height: 45,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.3),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: Colors.white, width: 1),
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.streetview,
-                                color: Colors.white,
-                                size: 30,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 1),
-                    const Text(
-                      "Street View",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 15),
                 // Location
                 Column(
                   children: [
@@ -800,6 +784,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: SingleChildScrollView(
+                    controller: _scrollController, // <-- attach controller here
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
@@ -824,12 +809,37 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return const SizedBox.shrink();
+                              // Show loading placeholders for videos
+                              return SizedBox(
+                                height: 80,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: 3,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(width: 16),
+                                  itemBuilder: (context, index) => Container(
+                                    width: 100,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black12,
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  ),
+                                ),
+                              );
                             }
                             if (!snapshot.hasData || snapshot.data!.isEmpty) {
                               return const SizedBox.shrink();
                             }
                             final videos = snapshot.data!;
+                            // Initialize controllers only once
                             if (_videoControllers.length != videos.length) {
                               for (var controller in _videoControllers) {
                                 controller.dispose();
@@ -841,9 +851,11 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                       ..initialize(),
                                   )
                                   .toList();
+                              // Immediately trigger a rebuild after initialization
                               Future.wait(
                                 _videoControllers.map((c) => c.initialize()),
                               ).then((_) {
+                                if (mounted) setState(() {});
                                 if (mounted) _autoPlayVideos();
                               });
                             }
@@ -866,9 +878,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         _playingIndex = index;
                                       });
                                       await controller.play();
-                                      _showFullscreenVideo(
-                                        controller,
-                                      );
+                                      _showFullscreenVideo(controller);
                                     },
                                     child: Container(
                                       width: 100,
@@ -914,6 +924,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                                     width: 100,
                                                     height: 80,
                                                     color: Colors.black12,
+                                                    child: const Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    ),
                                                   ),
                                           ),
                                           if (_playingIndex != index)
@@ -973,22 +987,28 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                 FutureBuilder<String?>(
                                   future: fetchSiteCategory(widget.siteName),
                                   builder: (context, categorySnapshot) {
-                                    if (categorySnapshot.connectionState == ConnectionState.waiting) {
+                                    if (categorySnapshot.connectionState ==
+                                        ConnectionState.waiting) {
                                       return const SizedBox.shrink();
                                     }
                                     final category = categorySnapshot.data;
-                                    print('DEBUG: category fetched = '
-                                        '${categorySnapshot.data}');
+                                    print(
+                                      'DEBUG: category fetched = '
+                                      '${categorySnapshot.data}',
+                                    );
                                     // Show audio player for ALL categories for debugging
                                     return FutureBuilder<List<String>>(
                                       future: fetchSiteAudios(widget.siteName),
                                       builder: (context, audioSnapshot) {
-                                        if (audioSnapshot.connectionState == ConnectionState.waiting) {
+                                        if (audioSnapshot.connectionState ==
+                                            ConnectionState.waiting) {
                                           return const SizedBox.shrink();
                                         }
                                         final audios = audioSnapshot.data ?? [];
-                                        print('DEBUG: audios fetched = '
-                                            ' [32m$audios [0m');
+                                        print(
+                                          'DEBUG: audios fetched = '
+                                          ' [32m$audios [0m',
+                                        );
                                         if (audios.isEmpty) {
                                           return const Text(
                                             "No audios found for this site.",
@@ -1000,7 +1020,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                           );
                                         }
                                         return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             const Text(
                                               "Audio Guide (Debug Mode)",
@@ -1012,10 +1033,16 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                               ),
                                             ),
                                             const SizedBox(height: 8),
-                                            ...audios.map((url) => Padding(
-                                              padding: const EdgeInsets.only(bottom: 8.0),
-                                              child: SimpleAudioPlayer(url: url),
-                                            )),
+                                            ...audios.map(
+                                              (url) => Padding(
+                                                padding: const EdgeInsets.only(
+                                                  bottom: 8.0,
+                                                ),
+                                                child: SimpleAudioPlayer(
+                                                  url: url,
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         );
                                       },
@@ -1175,44 +1202,53 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             left: 0,
             right: 0,
             bottom: 0,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Container(
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.3),
-                      borderRadius: BorderRadius.circular(40),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.4),
-                        width: 1.2,
+            child: AnimatedSlide(
+              duration: const Duration(milliseconds: 300),
+              offset: _showNavBar ? Offset.zero : const Offset(0, 1),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(40),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: const Color(
+                          0xFF1E3A8A,
+                        ), // Navy Blue (same as home screen)
+                        borderRadius: BorderRadius.circular(40),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.25),
+                          width: 1.2,
+                        ),
                       ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _NavIcon(
-                          icon: Icons.home,
-                          label: 'Home',
-                          selected: _selectedIndex == 0,
-                          onTap: () => _onItemTapped(0),
-                        ),
-                        _NavIcon(
-                          icon: Icons.settings,
-                          label: 'Settings',
-                          selected: _selectedIndex == 1,
-                          onTap: () => _onItemTapped(1),
-                        ),
-                        _NavIcon(
-                          icon: Icons.map,
-                          label: 'Map',
-                          selected: _selectedIndex == 2,
-                          onTap: () => _onItemTapped(2),
-                        ),
-                      ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _NavIcon(
+                            icon: Icons.home,
+                            label: 'Home',
+                            selected: _selectedIndex == 0,
+                            onTap: () => _onItemTapped(0),
+                          ),
+                          _NavIcon(
+                            icon: Icons.settings,
+                            label: 'Settings',
+                            selected: _selectedIndex == 1,
+                            onTap: () => _onItemTapped(1),
+                          ),
+                          _NavIcon(
+                            icon: Icons.map,
+                            label: 'Map',
+                            selected: _selectedIndex == 2,
+                            onTap: () => _onItemTapped(2),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1246,7 +1282,7 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
@@ -1332,7 +1368,10 @@ class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.black),
+            icon: Icon(
+              _isPlaying ? Icons.pause : Icons.play_arrow,
+              color: Colors.black,
+            ),
             onPressed: () {
               if (_isPlaying) {
                 _player.pause();

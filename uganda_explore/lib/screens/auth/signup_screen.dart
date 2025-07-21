@@ -44,6 +44,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
             'createdAt': FieldValue.serverTimestamp(),
           });
 
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+            'email': userCredential.user!.email,
+            'fullNames': _fullNamesController.text
+                .trim(), // from your sign up form
+            // ...other fields
+          });
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Sign Up Successful!')));
