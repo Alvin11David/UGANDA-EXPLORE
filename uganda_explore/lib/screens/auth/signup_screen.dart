@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -96,6 +98,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeNotifier>(context).isDarkMode;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -117,21 +120,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 60),
               Center(
                 child: Image.asset(
-                  'assets/logo/whitelogo.png',
+                  isDarkMode
+                      ? 'assets/logo/whitelogo.png'
+                      : 'assets/logo/blacklogo.png',
+                  
                   width: 80,
                   height: 80,
                   fit: BoxFit.contain,
                 ),
               ),
               const SizedBox(height: 15),
-              const Text(
+              Text(
                 "Let's get you\n signed up!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
               const SizedBox(height: 20),
@@ -143,7 +149,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 20,
                       offset: Offset(0, -5),
                     ),
@@ -155,10 +160,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "SignUp",
                         style: TextStyle(
-                          color: Color(0xFF1E3A8A), // Navy blue
+                          color: isDarkMode ? Colors.white : Colors.black, // Gray
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Inter',
@@ -166,10 +171,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 5),
-                      const Text(
+                      Text(
                         "Please enter the details to continue.",
                         style: TextStyle(
-                          color: Color(0xFF6B7280), // Gray
+                          color: isDarkMode ? Colors.white : Colors.black, // Gray
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Poppins',
@@ -195,28 +200,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _signUp,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF1E3A8A), // Navy blue
-                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              elevation: 2,
+                              padding: EdgeInsets.zero,
                             ),
-                            child: _isLoading
-                                ? const CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  )
-                                : const Text(
-                                    'Sign Up',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Poppins',
-                                    ),
-                                  ),
+                            child: Ink(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF1E3A8A), // Navy blue
+                                    Color(0xFF3B82F6), // Blue
+                                  ],
+                                  stops: [0.0, 0.47],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: _isLoading
+                                    ? const CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.white,
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Sign Up',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'Poppins',
+                                        ),
+                                      ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -236,7 +259,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         children: const [
                           Expanded(
                             child: Divider(
-                              color: Color(0xFFE5E7EB), // Light gray
+                              color: Color(0xFF000000), // Light gray
                               thickness: 1,
                               indent: 20,
                             ),
@@ -244,7 +267,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Text(
                             "Or Sign Up With",
                             style: TextStyle(
-                              color: Color(0xFF6B7280), // Gray
+                              color: Color(0xFF000000), // Gray
                               fontFamily: "Poppins",
                               fontWeight: FontWeight.w400,
                               fontSize: 14,
@@ -253,7 +276,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           Expanded(
                             child: Divider(
-                              color: Color(0xFFE5E7EB), // Light gray
+                              color: Color(0xFF000000), // Light gray
                               thickness: 1,
                               endIndent: 20,
                             ),
@@ -270,7 +293,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             const Text(
                               "Already have an account? ",
                               style: TextStyle(
-                                color: Color(0xFF6B7280), // Gray
+                                color: Color(0xFF000000), // Gray
                                 fontFamily: 'Poppins',
                                 fontWeight: FontWeight.w400,
                                 fontSize: 17,
@@ -384,14 +407,14 @@ class _PasswordState extends State<Password> {
               decoration: InputDecoration(
                 labelText: 'Password',
                 labelStyle: const TextStyle(
-                  color: Color(0xFF374151), // Dark gray
+                  color: Color.fromARGB(255, 0, 0, 0), // Dark gray
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
                 hintText: 'Enter Your Password',
                 hintStyle: const TextStyle(
-                  color: Color(0xFF9CA3AF), // Light gray
+                  color: Color(0xFF000000), // Light gray
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w400,
                   fontSize: 14,
@@ -400,7 +423,7 @@ class _PasswordState extends State<Password> {
                 fillColor: Colors.white,
                 prefixIcon: Padding(
                   padding: const EdgeInsets.only(left: 6),
-                  child: Icon(Icons.lock, color: Color(0xFF6B7280)), // Gray
+                  child: Icon(Icons.lock, color: Color(0xFF000000)), // Gray
                 ),
                 prefixIconConstraints: const BoxConstraints(
                   minWidth: 0,
@@ -416,14 +439,14 @@ class _PasswordState extends State<Password> {
                     },
                     icon: Icon(
                       _isObscured ? Icons.visibility_off : Icons.visibility,
-                      color: Color(0xFF9CA3AF), // Light gray
+                      color: Color(0xFF000000), // Light gray
                     ),
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: const BorderSide(
-                    color: Color(0xFFE5E7EB), // Light gray
+                    color: Color(0xFF000000), // Light gray
                     width: 1,
                   ),
                 ),
@@ -461,7 +484,7 @@ class _PasswordState extends State<Password> {
                 floatingLabelBehavior: FloatingLabelBehavior.auto,
               ),
               style: const TextStyle(
-                color: Color(0xFF374151), // Dark gray
+                color: Color(0xFF000000), // Dark gray
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.w400,
                 fontSize: 15,
@@ -476,7 +499,7 @@ class _PasswordState extends State<Password> {
                 child: LinearProgressIndicator(
                   value: _strength,
                   minHeight: 5,
-                  backgroundColor: Color(0xFFE5E7EB), // Light gray
+                  backgroundColor: Colors.white, // Light gray
                   valueColor: AlwaysStoppedAnimation<Color>(
                     _getStrengthColor(_strength),
                   ),
@@ -525,14 +548,14 @@ class FullNames extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Full Names',
             labelStyle: const TextStyle(
-              color: Color(0xFF374151), // Dark gray
+              color: Color(0xFF000000), // Dark gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Enter Your Full Names',
             hintStyle: const TextStyle(
-              color: Color(0xFF9CA3AF), // Light gray
+              color: Color(0xFF000000), // Light gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
@@ -541,7 +564,7 @@ class FullNames extends StatelessWidget {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.person, color: Color(0xFF6B7280)), // Gray
+              child: Icon(Icons.person, color: Color(0xFF000000)), // Gray
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -550,7 +573,7 @@ class FullNames extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
-                color: Color(0xFFE5E7EB), // Light gray
+                color: Color(0xFF000000), // Light gray
                 width: 1,
               ),
             ),
@@ -588,7 +611,7 @@ class FullNames extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
-            color: Color(0xFF374151), // Dark gray
+            color: Color(0xFF000000), // Dark gray
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             fontSize: 15,
@@ -626,14 +649,14 @@ class Email extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
-              color: Color(0xFF374151), // Dark gray
+              color: Color(0xFF000000), // Dark gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Enter Your Email Address',
             hintStyle: const TextStyle(
-              color: Color(0xFF9CA3AF), // Light gray
+              color: Color(0xFF000000), // Light gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
@@ -642,7 +665,7 @@ class Email extends StatelessWidget {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.mail, color: Color(0xFF6B7280)), // Gray
+              child: Icon(Icons.mail, color: Color(0xFF000000)), // Gray
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -651,7 +674,7 @@ class Email extends StatelessWidget {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
-                color: Color(0xFFE5E7EB), // Light gray
+                color: Color(0xFF000000), // Light gray
                 width: 1,
               ),
             ),
@@ -689,7 +712,7 @@ class Email extends StatelessWidget {
             floatingLabelBehavior: FloatingLabelBehavior.auto,
           ),
           style: const TextStyle(
-            color: Color(0xFF374151), // Dark gray
+            color: Color(0xFF000000), // Dark gray
             fontFamily: 'Poppins',
             fontWeight: FontWeight.w400,
             fontSize: 15,
@@ -737,14 +760,14 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
           decoration: InputDecoration(
             labelText: 'Confirm Password',
             labelStyle: const TextStyle(
-              color: Color(0xFF374151), // Dark gray
+              color: Color(0xFF000000), // Dark gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
             ),
             hintText: 'Confirm Your Password',
             hintStyle: const TextStyle(
-              color: Color(0xFF9CA3AF), // Light gray
+              color: Color(0xFF000000), // Light gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w400,
               fontSize: 14,
@@ -753,7 +776,7 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
             fillColor: Colors.white,
             prefixIcon: Padding(
               padding: const EdgeInsets.only(left: 6),
-              child: Icon(Icons.lock, color: Color(0xFF6B7280)), // Gray
+              child: Icon(Icons.lock, color: Color(0xFF000000)), // Gray
             ),
             prefixIconConstraints: const BoxConstraints(
               minWidth: 0,
@@ -769,14 +792,14 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
                 },
                 icon: Icon(
                   _isObscuredText ? Icons.visibility_off : Icons.visibility,
-                  color: Color(0xFF9CA3AF), // Light gray
+                  color: Color(0xFF000000), // Light gray
                 ),
               ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
-                color: Color(0xFFE5E7EB), // Light gray
+                color: Color(0xFF000000), // Light gray
                 width: 1,
               ),
             ),
@@ -825,3 +848,8 @@ class _ConfirmPasswordState extends State<ConfirmPassword> {
     );
   }
 }
+
+
+
+
+
