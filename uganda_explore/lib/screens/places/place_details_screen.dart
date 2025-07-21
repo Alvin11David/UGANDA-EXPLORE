@@ -280,23 +280,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     return [];
   }
 
-  // Fetch category for the site
-  Future<String?> fetchSiteCategory(String siteName) async {
-    final trimmedSiteName = siteName.trim().toLowerCase();
-    final query = await FirebaseFirestore.instance
-        .collection('tourismsites')
-        .get();
-
-    for (var doc in query.docs) {
-      final data = doc.data();
-      final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase() == trimmedSiteName) {
-        return data['category']?.toString();
-      }
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -929,57 +912,18 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
-                                // AUDIO PLAYER SECTION (debug version)
-                                FutureBuilder<String?>(
-                                  future: fetchSiteCategory(widget.siteName),
-                                  builder: (context, categorySnapshot) {
-                                    if (categorySnapshot.connectionState == ConnectionState.waiting) {
+                                // BACKGROUND AUDIO PLAYER SECTION
+                                FutureBuilder<List<String>>(
+                                  future: fetchSiteAudios(widget.siteName),
+                                  builder: (context, audioSnapshot) {
+                                    if (audioSnapshot.connectionState == ConnectionState.waiting) {
                                       return const SizedBox.shrink();
                                     }
-                                    final category = categorySnapshot.data;
-                                    print('DEBUG: category fetched = '
-                                        '${categorySnapshot.data}');
-                                    // Show audio player for ALL categories for debugging
-                                    return FutureBuilder<List<String>>(
-                                      future: fetchSiteAudios(widget.siteName),
-                                      builder: (context, audioSnapshot) {
-                                        if (audioSnapshot.connectionState == ConnectionState.waiting) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        final audios = audioSnapshot.data ?? [];
-                                        print('DEBUG: audios fetched = '
-                                            ' [32m$audios [0m');
-                                        if (audios.isEmpty) {
-                                          return const Text(
-                                            "No audios found for this site.",
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontFamily: 'Poppins',
-                                              fontSize: 14,
-                                            ),
-                                          );
-                                        }
-                                        return Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Audio Guide (Debug Mode)",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            ...audios.map((url) => Padding(
-                                              padding: const EdgeInsets.only(bottom: 8.0),
-                                              child: SimpleAudioPlayer(url: url),
-                                            )),
-                                          ],
-                                        );
-                                      },
-                                    );
+                                    final audios = audioSnapshot.data ?? [];
+                                    if (audios.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return BackgroundAudioPlayer(urls: audios);
                                   },
                                 ),
                                 const SizedBox(height: 12),
@@ -1229,41 +1173,37 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-// Simple audio player widget for a single audio URL
-class SimpleAudioPlayer extends StatefulWidget {
-  final String url;
-  const SimpleAudioPlayer({required this.url, Key? key}) : super(key: key);
+class BackgroundAudioPlayer extends StatefulWidget {
+  final List<String> urls;
+  const BackgroundAudioPlayer({required this.urls, Key? key}) : super(key: key);
 
   @override
-  State<SimpleAudioPlayer> createState() => _SimpleAudioPlayerState();
+  State<BackgroundAudioPlayer> createState() => _BackgroundAudioPlayerState();
 }
 
-class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
+class _BackgroundAudioPlayerState extends State<BackgroundAudioPlayer> {
   late AudioPlayer _player;
   bool _isPlaying = false;
-  Duration? _duration;
-  Duration? _position;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    _player.setUrl(widget.url);
-    _player.durationStream.listen((d) {
-      setState(() {
-        _duration = d;
-      });
-    });
-    _player.positionStream.listen((p) {
-      setState(() {
-        _position = p;
-      });
-    });
+    _initPlaylist();
     _player.playerStateStream.listen((state) {
       setState(() {
         _isPlaying = state.playing;
       });
     });
+  }
+
+  Future<void> _initPlaylist() async {
+    final playlist = ConcatenatingAudioSource(
+      children: widget.urls.map((url) => AudioSource.uri(Uri.parse(url))).toList(),
+    );
+    await _player.setAudioSource(playlist);
+    await _player.setLoopMode(LoopMode.all); 
+    _player.play();
   }
 
   @override
@@ -1272,50 +1212,22 @@ class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
     super.dispose();
   }
 
-  String _formatDuration(Duration? d) {
-    if (d == null) return "0:00";
-    final minutes = d.inMinutes;
-    final seconds = d.inSeconds % 60;
-    return "$minutes:${seconds.toString().padLeft(2, '0')}";
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.black),
-            onPressed: () {
-              if (_isPlaying) {
-                _player.pause();
-              } else {
-                _player.play();
-              }
-            },
-          ),
-          Text(_formatDuration(_position)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Slider(
-              value: (_position?.inMilliseconds ?? 0).toDouble(),
-              min: 0,
-              max: (_duration?.inMilliseconds ?? 1).toDouble(),
-              onChanged: (value) {
-                _player.seek(Duration(milliseconds: value.toInt()));
-              },
-            ),
-          ),
-          Text(_formatDuration(_duration)),
-        ],
-      ),
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, color: Colors.black),
+          onPressed: () {
+            if (_isPlaying) {
+              _player.pause();
+            } else {
+              _player.play();
+            }
+          },
+        ),
+        Text(_isPlaying ? "Playing background audio" : "Paused"),
+      ],
     );
   }
 }
