@@ -55,7 +55,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Color mainGreen = const Color(0xFF1FF813);
+    final Color mainGreen = const Color(0xFF3B82F6);
 
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
@@ -248,7 +248,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 );
                                 Navigator.pop(
                                   context,
-                                ); // Optionally go back to profile screen
+                                );
                               }
                             },
                             child: Container(
@@ -359,24 +359,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           prefixIcon: Icon(
             icon,
-            color: icon == Icons.edit
-                ? Colors.black
-                : (iconColor ?? Colors.black),
+            color: Colors.black,
           ),
           filled: true,
           fillColor: Colors.white.withOpacity(0.15),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
-            borderSide: const BorderSide(color: Colors.green, width: 1),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Colors.white, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30), // Change this value for field border radius
-            borderSide: const BorderSide(color: Colors.green, width: 2),
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color:  Color(0xFF3B82F6), width: 2),
           ),
           suffixIcon: const Icon(Icons.edit, size: 19, color: Colors.black),
         ),
         style: const TextStyle(
-          color: Colors.black87,
+          color: Colors.black,
           fontSize: 16,
           fontFamily: 'Poppins',
         ),
@@ -419,7 +417,7 @@ class _NavIcon extends StatelessWidget {
               Text(
                 label,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.w500,
                   fontFamily: 'Poppins',
                 ),

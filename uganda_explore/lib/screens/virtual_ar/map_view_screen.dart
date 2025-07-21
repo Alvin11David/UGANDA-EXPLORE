@@ -92,7 +92,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
   void _startEnhancedLocationTracking() {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 1, // Update every meter for better motion tracking
+      distanceFilter: 10, 
     );
     
     _positionStream = Geolocator.getPositionStream(
@@ -124,10 +124,10 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       isMoving = userSpeed > 0.5; // Consider moving if speed > 0.5 km/h
     });
     
-    // Update camera to follow user smoothly if moving
-    if (isMoving && mapController != null) {
-      _smoothCameraFollow();
-    }
+     //Update camera to follow user smoothly if moving
+      if (isMoving && mapController != null) {
+    _smoothCameraFollow();
+   }
     
     // Update route if both locations are available
     if (siteLatLng != null && !isLoadingRoute) {
@@ -492,9 +492,9 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                   Polyline(
                     polylineId: const PolylineId('route'),
                     points: routePolyline,
-                    color: isMoving ? const Color(0xFF00FF00) : const Color(0xFF1FF813),
+                    color: isMoving ? const Color.fromARGB(255, 41, 78, 41) : const Color(0xFF1FF813),
                     width: isMoving ? 6 : 4,
-                    patterns: isMoving ? [PatternItem.dash(20), PatternItem.gap(10)] : [],
+                    patterns: isMoving ? [PatternItem.dash(20), PatternItem.gap(5)] : [],
                   ),
               },
               onMapCreated: (controller) => mapController = controller,
