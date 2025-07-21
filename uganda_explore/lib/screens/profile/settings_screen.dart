@@ -107,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: const Color(0xFF1FF813),
+                        color: const Color(0xFF3B82F6),
                         width: 1,
                       ),
                       boxShadow: [
@@ -346,7 +346,7 @@ class _SettingsOptionButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.22),
               border: Border.all(
-                color: const Color(0xFF1FF813).withOpacity(0.7),
+                color: const Color(0xFF3B82F6).withOpacity(0.7),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(30),

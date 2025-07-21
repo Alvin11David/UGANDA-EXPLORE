@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFF1FF813),
+                            color: const Color(0xFF3B82F6),
                             width: 1,
                           ),
                           boxShadow: [
@@ -284,7 +284,7 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
@@ -333,7 +333,7 @@ class _ProfileOptionButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.22),
               border: Border.all(
-                color: const Color(0xFF1FF813).withOpacity(0.7),
+                color: const Color(0xFF3B82F6).withOpacity(0.7),
                 width: 1,
               ),
               borderRadius: BorderRadius.circular(30),
@@ -361,3 +361,64 @@ class _ProfileOptionButton extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

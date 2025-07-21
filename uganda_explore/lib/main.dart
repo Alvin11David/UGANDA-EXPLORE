@@ -10,6 +10,7 @@ import 'package:uganda_explore/firebase_options.dart';
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
+import 'package:uganda_explore/screens/auth/signup_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
@@ -88,7 +89,8 @@ class MyApp extends StatelessWidget {
             '/admin_dashboard': (context) => const AdminDashboard(),
             '/termsandprivacy': (context) => const TermsPrivacyScreen(),
           },
-          home: const SignInScreen(),
+          
+          home: const HomeScreen(),
         );
       },
     );
