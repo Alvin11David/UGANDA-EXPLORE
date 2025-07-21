@@ -26,7 +26,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
   List<VideoPlayerController> _videoControllers = [];
   int _playingIndex = -1;
-  int _selectedIndex = 0; // For nav bar selection
+  int _selectedIndex = 0;
 
   final ValueNotifier<int> _currentPageNotifier = ValueNotifier<int>(0);
 
@@ -37,7 +37,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch images and start auto-scroll when ready
     fetchSiteImages(widget.siteName).then((imgs) {
       if (mounted) {
         setState(() {
@@ -49,7 +48,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       }
     });
     _scrollController.addListener(_handleScroll);
-    // Do NOT fetch or setState for other data here, let FutureBuilders handle them
   }
 
   void _handleScroll() {
@@ -69,6 +67,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     for (var controller in _videoControllers) {
       controller.dispose();
     }
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -218,7 +217,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       });
       Navigator.pushReplacementNamed(context, '/settings');
     } else if (index == 2) {
-      // Map
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -290,7 +288,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     );
   }
 
-  // Fetch audios for the site
   Future<List<String>> fetchSiteAudios(String siteName) async {
     final trimmedSiteName = siteName.trim().toLowerCase();
     final query = await FirebaseFirestore.instance
@@ -308,30 +305,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     return [];
   }
 
-  // Fetch category for the site
-  Future<String?> fetchSiteCategory(String siteName) async {
-    final trimmedSiteName = siteName.trim().toLowerCase();
-    final query = await FirebaseFirestore.instance
-        .collection('tourismsites')
-        .get();
-
-    for (var doc in query.docs) {
-      final data = doc.data();
-      final dbName = (data['name'] ?? '').toString();
-      if (dbName.toLowerCase() == trimmedSiteName) {
-        return data['category']?.toString();
-      }
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
       body: Stack(
         children: [
-          // Circle at the top (image carousel)
           Positioned(
             top: -170,
             left: MediaQuery.of(context).size.width / 2 - 275,
@@ -400,9 +379,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             left: 8,
             child: GestureDetector(
               onTap: () {
-                Navigator.of(
-                  context,
-                ).pop(); // Pops back to the previous screen (SearchScreen)
+                Navigator.of(context).pop();
               },
               child: ClipOval(
                 child: BackdropFilter(
@@ -432,14 +409,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             right: 70,
             child: Row(
               children: [
-                // 360° Tour
                 Column(
                   children: [
                     GestureDetector(
                       onTap: () {
-                        print(
-                          '360° Tour button tapped for: ${widget.siteName}',
-                        );
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -484,14 +457,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                // Street View
                 Column(
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        print(
-                          'Street View button tapped for: ${widget.siteName}',
-                        );
                         final latLng = await fetchLatLng(
                           widget.siteName.trim(),
                         );
@@ -551,12 +520,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                // AR View
                 Column(
                   children: [
                     GestureDetector(
                       onTap: () async {
-                        print('AR Scan button tapped');
                         final latLng = await fetchLatLng(
                           widget.siteName.trim(),
                         );
@@ -615,12 +582,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                   ],
                 ),
                 const SizedBox(width: 15),
-                // Location
                 Column(
                   children: [
                     GestureDetector(
                       onTap: () {
-                        print('Location button tapped for: ${widget.siteName}');
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -666,7 +631,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ],
             ),
           ),
-
           Positioned(
             top: 170,
             left: 10,
@@ -771,12 +735,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 child: Container(
                   height: 400,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                      255,
-                      255,
-                      255,
-                      255,
-                    ).withOpacity(0.3),
+                    color: const Color.fromARGB(255, 255, 255, 255)
+                        .withOpacity(0.3),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
@@ -784,7 +744,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     border: Border.all(color: Colors.white, width: 2),
                   ),
                   child: SingleChildScrollView(
-                    controller: _scrollController, // <-- attach controller here
+                    controller: _scrollController,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 16,
@@ -809,7 +769,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              // Show loading placeholders for videos
                               return SizedBox(
                                 height: 80,
                                 child: ListView.separated(
@@ -839,7 +798,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                               return const SizedBox.shrink();
                             }
                             final videos = snapshot.data!;
-                            // Initialize controllers only once
                             if (_videoControllers.length != videos.length) {
                               for (var controller in _videoControllers) {
                                 controller.dispose();
@@ -851,7 +809,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                       ..initialize(),
                                   )
                                   .toList();
-                              // Immediately trigger a rebuild after initialization
                               Future.wait(
                                 _videoControllers.map((c) => c.initialize()),
                               ).then((_) {
@@ -895,11 +852,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         alignment: Alignment.center,
                                         children: [
                                           ClipRRect(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                            child:
-                                                controller.value.isInitialized
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            child: controller
+                                                    .value.isInitialized
                                                 ? SizedBox(
                                                     width: 100,
                                                     height: 80,
@@ -983,70 +939,18 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 12),
-                                // AUDIO PLAYER SECTION (debug version)
-                                FutureBuilder<String?>(
-                                  future: fetchSiteCategory(widget.siteName),
-                                  builder: (context, categorySnapshot) {
-                                    if (categorySnapshot.connectionState ==
+                                FutureBuilder<List<String>>(
+                                  future: fetchSiteAudios(widget.siteName),
+                                  builder: (context, audioSnapshot) {
+                                    if (audioSnapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return const SizedBox.shrink();
                                     }
-                                    final category = categorySnapshot.data;
-                                    print(
-                                      'DEBUG: category fetched = '
-                                      '${categorySnapshot.data}',
-                                    );
-                                    // Show audio player for ALL categories for debugging
-                                    return FutureBuilder<List<String>>(
-                                      future: fetchSiteAudios(widget.siteName),
-                                      builder: (context, audioSnapshot) {
-                                        if (audioSnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const SizedBox.shrink();
-                                        }
-                                        final audios = audioSnapshot.data ?? [];
-                                        print(
-                                          'DEBUG: audios fetched = '
-                                          ' [32m$audios [0m',
-                                        );
-                                        if (audios.isEmpty) {
-                                          return const Text(
-                                            "No audios found for this site.",
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                              fontFamily: 'Poppins',
-                                              fontSize: 14,
-                                            ),
-                                          );
-                                        }
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            const Text(
-                                              "Audio Guide (Debug Mode)",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 18,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 8),
-                                            ...audios.map(
-                                              (url) => Padding(
-                                                padding: const EdgeInsets.only(
-                                                  bottom: 8.0,
-                                                ),
-                                                child: SimpleAudioPlayer(
-                                                  url: url,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
+                                    final audios = audioSnapshot.data ?? [];
+                                    if (audios.isEmpty) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return BackgroundAudioPlayer(urls: audios);
                                   },
                                 ),
                                 const SizedBox(height: 12),
@@ -1104,9 +1008,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                               size: 20,
                                             ),
                                             const SizedBox(width: 8),
-                                            Text(
+                                            const Text(
                                               "Entry Fee: ",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.black,
                                                 fontFamily: 'Poppins',
                                                 fontWeight: FontWeight.w600,
@@ -1133,9 +1037,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                               size: 20,
                                             ),
                                             const SizedBox(width: 8),
-                                            Text(
+                                            const Text(
                                               "Opening: ",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.black,
                                                 fontFamily: 'Poppins',
                                                 fontWeight: FontWeight.w600,
@@ -1162,9 +1066,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                               size: 20,
                                             ),
                                             const SizedBox(width: 8),
-                                            Text(
+                                            const Text(
                                               "Closing: ",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.black,
                                                 fontFamily: 'Poppins',
                                                 fontWeight: FontWeight.w600,
@@ -1197,7 +1101,6 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ),
             ),
           ),
-          // Custom nav bar at the bottom (Profile button removed)
           Positioned(
             left: 0,
             right: 0,
@@ -1217,9 +1120,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                     child: Container(
                       height: 64,
                       decoration: BoxDecoration(
-                        color: const Color(
-                          0xFF1E3A8A,
-                        ), // Navy Blue (same as home screen)
+                        color: const Color(0xFF1E3A8A),
                         borderRadius: BorderRadius.circular(40),
                         border: Border.all(
                           color: Colors.white.withOpacity(0.25),
@@ -1305,41 +1206,39 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
-// Simple audio player widget for a single audio URL
-class SimpleAudioPlayer extends StatefulWidget {
-  final String url;
-  const SimpleAudioPlayer({required this.url, super.key});
+class BackgroundAudioPlayer extends StatefulWidget {
+  final List<String> urls;
+  const BackgroundAudioPlayer({required this.urls, Key? key}) : super(key: key);
 
   @override
-  State<SimpleAudioPlayer> createState() => _SimpleAudioPlayerState();
+  State<BackgroundAudioPlayer> createState() => _BackgroundAudioPlayerState();
 }
 
-class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
+class _BackgroundAudioPlayerState extends State<BackgroundAudioPlayer> {
   late AudioPlayer _player;
   bool _isPlaying = false;
-  Duration? _duration;
-  Duration? _position;
 
   @override
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    _player.setUrl(widget.url);
-    _player.durationStream.listen((d) {
-      setState(() {
-        _duration = d;
-      });
-    });
-    _player.positionStream.listen((p) {
-      setState(() {
-        _position = p;
-      });
-    });
+    _initPlaylist();
     _player.playerStateStream.listen((state) {
       setState(() {
         _isPlaying = state.playing;
       });
     });
+  }
+
+  Future<void> _initPlaylist() async {
+    final playlist = ConcatenatingAudioSource(
+      children: widget.urls
+          .map((url) => AudioSource.uri(Uri.parse(url)))
+          .toList(),
+    );
+    await _player.setAudioSource(playlist);
+    await _player.setLoopMode(LoopMode.all);
+    _player.play();
   }
 
   @override
@@ -1348,53 +1247,24 @@ class _SimpleAudioPlayerState extends State<SimpleAudioPlayer> {
     super.dispose();
   }
 
-  String _formatDuration(Duration? d) {
-    if (d == null) return "0:00";
-    final minutes = d.inMinutes;
-    final seconds = d.inSeconds % 60;
-    return "$minutes:${seconds.toString().padLeft(2, '0')}";
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          IconButton(
-            icon: Icon(
+    return Row(
+      children: [
+        IconButton(
+          icon: Icon(
               _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.black,
-            ),
-            onPressed: () {
-              if (_isPlaying) {
-                _player.pause();
-              } else {
-                _player.play();
-              }
-            },
-          ),
-          Text(_formatDuration(_position)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Slider(
-              value: (_position?.inMilliseconds ?? 0).toDouble(),
-              min: 0,
-              max: (_duration?.inMilliseconds ?? 1).toDouble(),
-              onChanged: (value) {
-                _player.seek(Duration(milliseconds: value.toInt()));
-              },
-            ),
-          ),
-          Text(_formatDuration(_duration)),
-        ],
-      ),
+              color: Colors.black),
+          onPressed: () {
+            if (_isPlaying) {
+              _player.pause();
+            } else {
+              _player.play();
+            }
+          },
+        ),
+        Text(_isPlaying ? "Playing background audio" : "Paused"),
+      ],
     );
   }
 }
