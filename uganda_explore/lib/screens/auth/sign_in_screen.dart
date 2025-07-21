@@ -72,7 +72,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   color: Colors.white,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 70),
               Container(
                 width: 490,
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),

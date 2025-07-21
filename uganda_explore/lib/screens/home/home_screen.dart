@@ -4,16 +4,156 @@ import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
-import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
+import 'package:uganda_explore/screens/places/street_view_page.dart';
+import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class ImageCard extends StatelessWidget {
+  final Map<String, dynamic> site;
+
+  const ImageCard({super.key, required this.site});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      width: 120,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            Image.asset(
+              site['image'],
+              height: 120,
+              width: 120,
+              fit: BoxFit.cover,
+              errorBuilder: (c, e, s) => Container(
+                height: 120,
+                width: 120,
+                color: Colors.grey[300],
+                child: const Icon(Icons.broken_image, color: Colors.grey),
+              ),
+            ),
+            // Virtual Tour Button (Street View icon) if supported
+            if (site['streetViewLat'] != null && site['streetViewLng'] != null)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    print('Virtual tour icon tapped!');
+                    print('site["name"]: ${site['name']}');
+                    print('site["streetViewLat"]: ${site['streetViewLat']}');
+                    print('site["streetViewLng"]: ${site['streetViewLng']}');
+                    try {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StreetViewPage(
+                            latitude: site['streetViewLat'],
+                            longitude: site['streetViewLng'],
+                            siteName: site['name'] ?? '',
+                          ),
+                        ),
+                      );
+                    } catch (e, stack) {
+                      print('Navigation error: $e');
+                      print(stack);
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.55),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.threesixty,
+                      color: Color(0xFF1FF813),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          site['name'],
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 4,
+                          horizontal: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1FF813),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Text(
+                          'Explore',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -452,13 +592,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
         .where('name', isGreaterThanOrEqualTo: keyword)
-        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .where('name', isLessThanOrEqualTo: '$keyword\uf8ff')
         .limit(6)
         .get();
     setState(() {
-      _suggestions = query.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      _suggestions = query.docs.map((doc) => doc.data()).toList();
       _isLoadingSuggestions = false;
     });
     if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
@@ -481,13 +619,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final query = await FirebaseFirestore.instance
         .collection('tourismsites')
         .where('name', isGreaterThanOrEqualTo: keyword)
-        .where('name', isLessThanOrEqualTo: keyword + '\uf8ff')
+        .where('name', isLessThanOrEqualTo: '$keyword\uf8ff')
         .limit(6)
         .get();
     setState(() {
-      _suggestions = query.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
+      _suggestions = query.docs.map((doc) => doc.data()).toList();
       _isLoadingSuggestions = false;
     });
     if (_searchFocusNode.hasFocus && _suggestions.isNotEmpty) {
@@ -502,11 +638,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .collection('tourismsites')
         .where('category', isEqualTo: category)
         .snapshots()
-        .map(
-          (snapshot) => snapshot.docs
-              .map((doc) => doc.data() as Map<String, dynamic>)
-              .toList(),
-        );
+        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
   @override
@@ -744,6 +876,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: const TextStyle(
                                               fontFamily: 'Poppins',
                                               fontSize: 16,
+                                              color: Colors.black,
                                             ),
                                             onChanged: (value) {
                                               _fetchSuggestionsDropdown(
@@ -977,7 +1110,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 25),
-                  // Images Row for selected category
                   if (_selectedCategory.isNotEmpty)
                     StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _fetchSites(_selectedCategory),
@@ -1064,6 +1196,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           ),
                                                         ),
                                                   ),
+                                                  // 360° icon button in the top right corner if Street View is available
+                                                  if (site['streetViewLat'] !=
+                                                          null &&
+                                                      site['streetViewLng'] !=
+                                                          null)
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 10,
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          // TODO: Implement StreetViewScreen navigation
+                                                        },
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                      0.55,
+                                                                    ),
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                          padding:
+                                                              const EdgeInsets.all(
+                                                                8,
+                                                              ),
+                                                          child: const Icon(
+                                                            Icons.threesixty,
+                                                            color: Color(
+                                                              0xFF1FF813,
+                                                            ),
+                                                            size: 26,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   Positioned(
                                                     left: 0,
                                                     right: 0,
@@ -1198,453 +1367,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            // --- ADD YOUR WIDGETS BELOW THE IMAGES ROW ---
-                            const SizedBox(height: 15),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Text(
-                                    "Popular Searches",
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            // Static Images Row
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 4,
-                                      right: 4,
-                                    ),
-                                    child: ImageCard(
-                                      site: {
-                                        'image': 'assets/images/waterfall1.png',
-                                        'name': 'Sipi Falls',
-                                        'location': 'Kapchorwa',
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 4,
-                                      right: 4,
-                                    ),
-                                    child: ImageCard(
-                                      site: {
-                                        'image': 'assets/images/gameparks.png',
-                                        'name': 'Queen Elizabeth N.P',
-                                        'location': 'Kasese',
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 4,
-                                      right: 4,
-                                    ),
-                                    child: ImageCard(
-                                      site: {
-                                        'image': 'assets/images/lakes.png',
-                                        'name': 'Lake Victoria',
-                                        'location': 'Entebbe',
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            // Popular Searches Buttons BELOW images
-                            Padding(
-                              padding: const EdgeInsets.only(left: 4, right: 4),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText: "Waterfall",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/waterfall1.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 25,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.waterfall_chart,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "Waterfall",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText:
-                                                      "Historical Site",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/culturalsites.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 18,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.museum,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "Cultural",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText: "National Park",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/gameparks.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 5,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.nature,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "GameParks",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText: "Forest",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/forest.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 25,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.forest,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "Forests",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText: "Lakes",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/lakes.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 25,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.water,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "Lakes",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (_) => ResultsScreen(
-                                                  selectedText: "Mountain",
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              image: const DecorationImage(
-                                                image: AssetImage(
-                                                  'assets/images/wildlife.png',
-                                                ),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            child: Row(
-                                              children: [
-                                                const Padding(
-                                                  padding: EdgeInsets.only(
-                                                    left: 15,
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.terrain,
-                                                    color: Colors.white,
-                                                    size: 28,
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 10),
-                                                const Text(
-                                                  "Mountains",
-                                                  style: TextStyle(
-                                                    fontFamily: 'Poppins',
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.white,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color: Colors.black,
-                                                        blurRadius: 5,
-                                                        offset: Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
                           ],
                         );
                       },
                     ),
-                  // ...rest of your page...
                 ],
               ),
             ),
@@ -1658,7 +1384,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
+                    color: const Color(0xFF1E3A8A), // Navy blue
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.25),
@@ -1694,6 +1420,91 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0),
+        child: FloatingActionButton(
+          backgroundColor: const Color(0xFF3B82F6),
+          child: Icon(Icons.smart_toy_outlined, color: Colors.white),
+          tooltip: 'Virtual Guide',
+          onPressed: () {
+            showModalBottomSheet(
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              builder: (context) => Container(
+                padding: const EdgeInsets.all(20),
+                height: 320,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.chat_bubble, color: Color(0xFF3B82F6)),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Virtual Guide',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "Hi! I'm your virtual guide. How can I help you explore Uganda?",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.threesixty, color: Colors.black),
+                      label: const Text(
+                        'Show me a virtual tour',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const VirtualToursListScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.map, color: Colors.black),
+                      label: const Text(
+                        'Find attractions near me',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () {
+                        // Example: Navigate to map or attractions
+                        Navigator.pop(context);
+                        // Add your navigation logic here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }
@@ -1719,7 +1530,7 @@ class _NavIcon extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1FF813) : Colors.white,
+          color: selected ? const Color(0xFF3B82F6) : Colors.white,
           borderRadius: BorderRadius.circular(30),
         ),
         child: Row(
@@ -1809,10 +1620,10 @@ class _CategoryButton extends StatelessWidget {
 }
 
 // Image Card Widget for static images in popular searches
-class ImageCard extends StatelessWidget {
+class SiteImageCard extends StatelessWidget {
   final Map<String, dynamic> site;
 
-  const ImageCard({super.key, required this.site});
+  const SiteImageCard({super.key, required this.site});
 
   @override
   Widget build(BuildContext context) {
@@ -1845,6 +1656,37 @@ class ImageCard extends StatelessWidget {
                 child: const Icon(Icons.broken_image, color: Colors.grey),
               ),
             ),
+            if (site['streetViewLat'] != null && site['streetViewLng'] != null)
+              Positioned(
+                top: 10,
+                right: 10,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StreetViewPage(
+                          latitude: site['streetViewLat'],
+                          longitude: site['streetViewLng'],
+                          siteName: site['name'] ?? '',
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.55),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.threesixty,
+                      color: Color(0xFF1FF813),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
             Positioned(
               left: 0,
               right: 0,

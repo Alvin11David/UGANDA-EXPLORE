@@ -23,9 +23,8 @@ class PageNotFoundScreen extends StatelessWidget {
             center: Alignment.center,
             radius: 1.0,
             colors: [
-              Color(0xFF0C0F0A),
-              Color(0xFF1EF813),
-            ],
+              Color(0xFF1E3A8A), 
+              Color(0xFF3B82F6)],
             stops: [0.03, 0.63],
           ),
         ),
@@ -120,7 +119,7 @@ class NotFoundIcon extends StatelessWidget {
       height: 80,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        color: Color(0xFF1EF813),
+        color: Color(0xFF3B82F6),
       ),
       child: const Icon(
         Icons.help_outline,
@@ -145,7 +144,7 @@ class HomeButton extends StatelessWidget {
       child: Container(
         height: 50,
         decoration: ShapeDecoration(
-          color: const Color(0xFF1EF813),
+          color:  Color(0xFF3B82F6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
@@ -202,7 +201,7 @@ class ReloadButton extends StatelessWidget {
       child: Container(
         height: 50,
         decoration: ShapeDecoration(
-          color: const Color(0xFF0F7709),
+          color: Color(0xFF3B82F6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
@@ -239,3 +238,4 @@ class ReloadButton extends StatelessWidget {
     );
   }
 }
+
