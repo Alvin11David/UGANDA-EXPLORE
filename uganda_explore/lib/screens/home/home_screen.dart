@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:uganda_explore/screens/home/chat_screen_dart.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
+import 'package:uganda_explore/screens/map/near_by_attractions_screen.dart.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
@@ -479,8 +480,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             );
-            },
-          );
+          },
+        );
       },
     );
   }
@@ -1433,7 +1434,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               builder: (context) => Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 height: 380,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1462,59 +1463,119 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Hi! I'm your virtual guide. How can I help you explore Uganda?",
                       style: TextStyle(fontSize: 16),
                     ),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.threesixty, color: Colors.black),
-                      label: const Text(
-                        'Show me a virtual tour',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const VirtualToursListScreen(),
+                    const SizedBox(height: 24),
+                    // Organized button group
+                    Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.threesixty,
+                              color: Colors.black,
+                            ),
+                            label: const Text(
+                              'Show me a virtual tour',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const VirtualToursListScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              side: const BorderSide(
+                                color: Color(0xFF3B82F6),
+                                width: 1.5,
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.map, color: Colors.black),
-                      label: const Text(
-                        'Find attractions near me',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Add your navigation logic here
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.chat_bubble_outline, color: Colors.black),
-                      label: const Text(
-                        'Chat with AI',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const ChatScreen(),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.map, color: Colors.black),
+                            label: const Text(
+                              'Find attractions near me',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const NearbyAttractionsScreen(),
+                                ),
+                              ); 
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              side: const BorderSide(
+                                color: Color(0xFF3B82F6),
+                                width: 1.5,
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF3B82F6),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            icon: const Icon(
+                              Icons.chat_bubble_outline,
+                              color: Colors.black,
+                            ),
+                            label: const Text(
+                              'Chat with AI',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const ChatScreen(),
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              side: const BorderSide(
+                                color: Color(0xFF3B82F6),
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
