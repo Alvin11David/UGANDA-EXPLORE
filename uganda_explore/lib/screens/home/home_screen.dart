@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:uganda_explore/screens/home/chat_screen_dart.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -478,8 +479,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             );
-          },
-        );
+            },
+          );
       },
     );
   }
@@ -1424,7 +1425,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(bottom: 80.0),
         child: FloatingActionButton(
           backgroundColor: const Color(0xFF3B82F6),
-          child: Icon(Icons.smart_toy_outlined, color: Colors.white),
+          child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
           tooltip: 'Virtual Guide',
           onPressed: () {
             showModalBottomSheet(
@@ -1434,7 +1435,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               builder: (context) => Container(
                 padding: const EdgeInsets.all(20),
-                height: 320,
+                height: 380,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -1490,9 +1491,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(color: Colors.black),
                       ),
                       onPressed: () {
-                        // Example: Navigate to map or attractions
                         Navigator.pop(context);
                         // Add your navigation logic here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B82F6),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.chat_bubble_outline, color: Colors.black),
+                      label: const Text(
+                        'Chat with AI',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ChatScreen(),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3B82F6),
