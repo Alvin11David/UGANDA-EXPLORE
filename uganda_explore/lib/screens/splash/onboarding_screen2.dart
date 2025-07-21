@@ -1,5 +1,6 @@
 import 'dart:ui';
-
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
 import 'package:flutter/material.dart';
 
 class OnboardingScreen2 extends StatelessWidget {
@@ -7,7 +8,10 @@ class OnboardingScreen2 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeNotifier>(context).isDarkMode;
+
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           SizedBox.expand(
@@ -32,7 +36,9 @@ class OnboardingScreen2 extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                'assets/logo/blackugandaexplore.png',
+                isDarkMode
+                    ? 'assets/logo/whiteugandaexplore.png'
+                    : 'assets/logo/blackugandaexplore.png',
                 width: 220,
                 height: 90,
                 fit: BoxFit.contain,
@@ -49,7 +55,9 @@ class OnboardingScreen2 extends StatelessWidget {
                   width: 45,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: isDarkMode
+                        ? Colors.black.withOpacity(0.15)
+                        : Colors.white.withOpacity(0.15),
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: Color(0xFF3B82F6), // Blue
@@ -82,7 +90,9 @@ class OnboardingScreen2 extends StatelessWidget {
                 child: Container(
                   height: 386,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: isDarkMode
+                        ? Colors.black.withOpacity(0.15)
+                        : Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(color: Colors.white, width: 1),
                   ),
@@ -95,9 +105,9 @@ class OnboardingScreen2 extends StatelessWidget {
                           Container(
                             width: 15,
                             height: 15,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1E3A8A), // Navy Blue
+                              color: const Color(0xFF3B82F6), // Navy Blue
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -126,26 +136,30 @@ class OnboardingScreen2 extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       // Main text
-                      const Text(
+                      Text(
                         "See Before You\n Go",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontWeight: FontWeight.bold,
                           fontSize: 25,
-                          color: Color(0xFF1E3A8A), // Navy Blue
+                          color: isDarkMode
+                              ? Colors.white
+                              : Colors.black, // Navy Blue
                         ),
                       ),
                       const SizedBox(height: 24),
                       // Subtitle
-                      const Text(
+                      Text(
                         "Take 3D and 360° virtual tours of tourist\n sites from anywhere in the\n world.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF374151), // Dark Gray
+                          color: isDarkMode
+                              ? Colors.white
+                              : Colors.black, // Dark Gray
                         ),
                       ),
                       const SizedBox(height: 22),
@@ -193,7 +207,9 @@ class OnboardingScreen2 extends StatelessWidget {
                                       fontFamily: 'Outfit',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22,
-                                      color: Color(0xFFE5E7EB), // Light Gray
+                                      color: isDarkMode
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                 ),

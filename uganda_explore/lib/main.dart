@@ -1,15 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:uganda_explore/Admin/Admin_Dashboard.dart';
 import 'package:uganda_explore/apptheme/apptheme.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
 import 'package:uganda_explore/firebase_options.dart';
 
 // Auth Screens
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
-import 'package:uganda_explore/screens/auth/signup_screen.dart';
-import 'package:uganda_explore/screens/error/error_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
@@ -27,10 +27,10 @@ import 'package:uganda_explore/screens/profile/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Initialize WebView Platform - This is crucial for Street View to work
   try {
     // This ensures the WebView platform is properly initialized
@@ -39,8 +39,13 @@ void main() async {
   } catch (e) {
     print('Error initializing WebView platform: $e');
   }
-  
-  runApp(const MyApp());
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -48,602 +53,44 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Uganda Explore',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      onGenerateRoute: (settings) {
-        if (settings.name == '/place_details') {
-          final siteName = settings.arguments as String;
-          return MaterialPageRoute(
-            builder: (context) => PlaceDetailsScreen(siteName: siteName),
-          );
-        }
-        return null;
+    return Consumer<ThemeNotifier>(
+      builder: (context, themeNotifier, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Uganda Explore',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeNotifier.isDarkMode
+              ? ThemeMode.dark
+              : ThemeMode.light,
+          onGenerateRoute: (settings) {
+            if (settings.name == '/place_details') {
+              final siteName = settings.arguments as String;
+              return MaterialPageRoute(
+                builder: (context) => PlaceDetailsScreen(siteName: siteName),
+              );
+            }
+            return null;
+          },
+          routes: {
+            '/signin': (context) => const SignInScreen(),
+            '/onboarding_screen1': (context) => const OnboardingScreen1(),
+            '/onboarding_screen2': (context) => const OnboardingScreen2(),
+            '/onboarding_screen3': (context) => const OnboardingScreen3(),
+            '/forgot_password': (context) => const ForgotPasswordScreen(),
+            '/otp': (context) => const OtpScreen(email: '', otp: ''),
+            '/home': (context) => const HomeScreen(),
+            '/profile': (context) => const ProfileScreen(),
+            '/edit_profile': (context) => const EditProfileScreen(),
+            '/settings': (context) => const SettingsScreen(),
+            '/app_theme': (context) => const AppThemeScreen(),
+            '/privacy': (context) => const TermsPrivacyScreen(),
+            '/admin_dashboard': (context) => const AdminDashboard(),
+            '/termsandprivacy': (context) => const TermsPrivacyScreen(),
+          },
+          home: const SignInScreen(),
+        );
       },
-      routes: {
-        '/signin': (context) => const SignInScreen(),
-        '/onboarding_screen1': (context) => const OnboardingScreen1(),
-        '/onboarding_screen2': (context) => const OnboardingScreen2(),
-        '/onboarding_screen3': (context) => const OnboardingScreen3(),
-        '/forgot_password': (context) => const ForgotPasswordScreen(),
-        '/otp': (context) => const OtpScreen(email: '', otp: ''),
-        '/home': (context) => const HomeScreen(),
-        '/profile': (context) => const ProfileScreen(),
-        '/edit_profile': (context) => const EditProfileScreen(),
-        '/settings': (context) => const SettingsScreen(),
-        '/app_theme': (context) => const AppThemeScreen(),
-        '/privacy': (context) => const TermsPrivacyScreen(),
-        '/admin_dashboard': (context) => const AdminDashboard(),
-        '/termsandprivacy': (context) => const TermsPrivacyScreen(),
-      },
-      home: PageNotFoundScreen(),
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -10,7 +10,9 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  final CollectionReference sites = FirebaseFirestore.instance.collection('tourismsites');
+  final CollectionReference sites = FirebaseFirestore.instance.collection(
+    'tourismsites',
+  );
 
   void _showEditFieldDialog(String docId, String field, dynamic value) async {
     final controller = TextEditingController(text: value?.toString() ?? '');
@@ -19,7 +21,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white.withOpacity(0.85),
         title: Text('Edit $field'),
-        content: TextField(controller: controller, maxLines: field == 'description' ? 4 : 1),
+        content: TextField(
+          controller: controller,
+          maxLines: field == 'description' ? 4 : 1,
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, null),
@@ -52,8 +57,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: fieldController, decoration: const InputDecoration(labelText: 'Field Name')),
-            TextField(controller: valueController, decoration: const InputDecoration(labelText: 'Value')),
+            TextField(
+              controller: fieldController,
+              decoration: const InputDecoration(labelText: 'Field Name'),
+            ),
+            TextField(
+              controller: valueController,
+              decoration: const InputDecoration(labelText: 'Value'),
+            ),
           ],
         ),
         actions: [
@@ -91,6 +102,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     final latitudeController = TextEditingController();
     final longitudeController = TextEditingController();
     final panoramaController = TextEditingController();
+    final audioController = TextEditingController();
 
     final result = await showDialog<bool>(
       context: context,
@@ -100,16 +112,54 @@ class _AdminDashboardState extends State<AdminDashboard> {
         content: SingleChildScrollView(
           child: Column(
             children: [
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
-              TextField(controller: categoryController, decoration: const InputDecoration(labelText: 'Category')),
-              TextField(controller: locationController, decoration: const InputDecoration(labelText: 'Location')),
-              TextField(controller: descriptionController, decoration: const InputDecoration(labelText: 'Description')),
-              TextField(controller: openingController, decoration: const InputDecoration(labelText: 'Opening Hours')),
-              TextField(controller: closingController, decoration: const InputDecoration(labelText: 'Closing Hours')),
-              TextField(controller: entryFeeController, decoration: const InputDecoration(labelText: 'Entry Fee')),
-              TextField(controller: latitudeController, decoration: const InputDecoration(labelText: 'Latitude')),
-              TextField(controller: longitudeController, decoration: const InputDecoration(labelText: 'Longitude')),
-              TextField(controller: panoramaController, decoration: const InputDecoration(labelText: 'Panorama Image URL')),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: categoryController,
+                decoration: const InputDecoration(labelText: 'Category'),
+              ),
+              TextField(
+                controller: locationController,
+                decoration: const InputDecoration(labelText: 'Location'),
+              ),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(labelText: 'Description'),
+              ),
+              TextField(
+                controller: openingController,
+                decoration: const InputDecoration(labelText: 'Opening Hours'),
+              ),
+              TextField(
+                controller: closingController,
+                decoration: const InputDecoration(labelText: 'Closing Hours'),
+              ),
+              TextField(
+                controller: entryFeeController,
+                decoration: const InputDecoration(labelText: 'Entry Fee'),
+              ),
+              TextField(
+                controller: latitudeController,
+                decoration: const InputDecoration(labelText: 'Latitude'),
+              ),
+              TextField(
+                controller: longitudeController,
+                decoration: const InputDecoration(labelText: 'Longitude'),
+              ),
+              TextField(
+                controller: panoramaController,
+                decoration: const InputDecoration(
+                  labelText: 'Panorama Image URL',
+                ),
+              ),
+              TextField(
+                controller: audioController,
+                decoration: const InputDecoration(
+                  labelText: 'Audio Links (comma separated)',
+                ),
+              ),
             ],
           ),
         ),
@@ -143,6 +193,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
         'panoramaImageUrl': panoramaController.text,
         'images': [],
         'videos': [],
+        'audios': audioController.text.isNotEmpty
+            ? audioController.text.split(',').map((e) => e.trim()).toList()
+            : [],
       });
     }
   }
@@ -158,12 +211,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   Widget build(BuildContext context) {
     final glassColor = Colors.white.withOpacity(0.18);
-    final glassBorder = Border.all(color: Colors.white.withOpacity(0.25), width: 1.5);
+    final glassBorder = Border.all(
+      color: Colors.white.withOpacity(0.25),
+      width: 1.5,
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFF101624),
       appBar: AppBar(
-        title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text(
+          'Admin Dashboard',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: Colors.white.withOpacity(0.10),
         elevation: 0,
         actions: [
@@ -171,6 +230,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             icon: const Icon(Icons.add_box_rounded, color: Color(0xFF3B82F6)),
             tooltip: 'Add New Site',
             onPressed: _showAddDocumentDialog,
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout, color: Colors.white),
+            tooltip: 'Logout',
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/signin');
+            },
           ),
         ],
       ),
@@ -238,25 +304,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete, color: Color(0xFFEF4444)),
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Color(0xFFEF4444),
+                                    ),
                                     tooltip: 'Delete Document',
                                     onPressed: () => _deleteDocument(docId),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.add, color: Color(0xFF3B82F6)),
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: Color(0xFF3B82F6),
+                                    ),
                                     tooltip: 'Add Field',
                                     onPressed: () => _showAddFieldDialog(docId),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              if (data['images'] != null && data['images'] is List && data['images'].isNotEmpty)
+                              if (data['images'] != null &&
+                                  data['images'] is List &&
+                                  data['images'].isNotEmpty)
                                 SizedBox(
                                   height: 120,
                                   child: ListView.separated(
                                     scrollDirection: Axis.horizontal,
                                     itemCount: data['images'].length,
-                                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                    separatorBuilder: (_, __) =>
+                                        const SizedBox(width: 8),
                                     itemBuilder: (context, idx) => ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: Image.network(
@@ -268,63 +343,93 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                           width: 120,
                                           height: 120,
                                           color: Colors.grey[300],
-                                          child: const Icon(Icons.broken_image, color: Colors.grey),
+                                          child: const Icon(
+                                            Icons.broken_image,
+                                            color: Colors.grey,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               const SizedBox(height: 10),
-                              ...data.entries.where((e) => e.key != 'images').map((entry) {
-                                return Card(
-                                  color: Colors.white.withOpacity(0.12),
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
-                                  child: ListTile(
-                                    title: Text(
-                                      entry.key,
-                                      style: const TextStyle(
-                                        color: Color(0xFF3B82F6),
-                                        fontWeight: FontWeight.bold,
+                              ...data.entries
+                                  .where((e) => e.key != 'images')
+                                  .map((entry) {
+                                    return Card(
+                                      color: Colors.white.withOpacity(0.12),
+                                      margin: const EdgeInsets.symmetric(
+                                        vertical: 4,
                                       ),
-                                    ),
-                                    subtitle: entry.value is List
-                                        ? Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              ...List.generate(
-                                                (entry.value as List).length,
-                                                (idx) => Padding(
-                                                  padding: const EdgeInsets.only(bottom: 2.0),
-                                                  child: Text(
-                                                    '${entry.value[idx]}',
-                                                    style: const TextStyle(color: Colors.white),
+                                      child: ListTile(
+                                        title: Text(
+                                          entry.key,
+                                          style: const TextStyle(
+                                            color: Color(0xFF3B82F6),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: entry.value is List
+                                            ? Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  ...List.generate(
+                                                    (entry.value as List)
+                                                        .length,
+                                                    (idx) => Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                            bottom: 2.0,
+                                                          ),
+                                                      child: Text(
+                                                        '${entry.value[idx]}',
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
+                                                ],
+                                              )
+                                            : Text(
+                                                '${entry.value}',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
                                                 ),
                                               ),
-                                            ],
-                                          )
-                                        : Text(
-                                            '${entry.value}',
-                                            style: const TextStyle(color: Colors.white),
-                                          ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.edit, color: Color(0xFF1E3A8A)),
-                                          tooltip: 'Edit Field',
-                                          onPressed: () => _showEditFieldDialog(docId, entry.key, entry.value),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.edit,
+                                                color: Color(0xFF1E3A8A),
+                                              ),
+                                              tooltip: 'Edit Field',
+                                              onPressed: () =>
+                                                  _showEditFieldDialog(
+                                                    docId,
+                                                    entry.key,
+                                                    entry.value,
+                                                  ),
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.delete_outline,
+                                                color: Color(0xFFEF4444),
+                                              ),
+                                              tooltip: 'Delete Field',
+                                              onPressed: () => _deleteField(
+                                                docId,
+                                                entry.key,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
-                                          tooltip: 'Delete Field',
-                                          onPressed: () => _deleteField(docId, entry.key),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
+                                      ),
+                                    );
+                                  }),
                             ],
                           ),
                         ),

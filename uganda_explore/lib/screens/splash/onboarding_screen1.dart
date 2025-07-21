@@ -1,12 +1,17 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
+
 
 class OnboardingScreen1 extends StatelessWidget {
   const OnboardingScreen1({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeNotifier>(context).isDarkMode;
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background image
@@ -23,7 +28,9 @@ class OnboardingScreen1 extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                'assets/logo/whiteugandaexplore.png',
+                isDarkMode
+                    ? 'assets/logo/whiteugandaexplore.png'
+                    : 'assets/logo/blackugandaexplore.png',
                 width: 260,
                 height: 100,
                 fit: BoxFit.contain,
@@ -71,7 +78,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             height: 15,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1E3A8A), // Navy Blue
+                              color: Color(0xFF3B82F6), // Navy Blue
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -87,26 +94,26 @@ class OnboardingScreen1 extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       // Main text
-                      const Text(
+                      Text(
                         "Discover the hidden gems,\ncultural heritage\nand stunning nature of\nUganda",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontWeight: FontWeight.bold,
                           fontSize: 25,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
                       const SizedBox(height: 24),
                       // Subtitle
-                      const Text(
+                      Text(
                         "Explore Uganda like never before",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -154,7 +161,7 @@ class OnboardingScreen1 extends StatelessWidget {
                                       fontFamily: 'Outfit',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22,
-                                      color: Color(0xFFE5E7EB), // Light Gray
+                                      color: isDarkMode ? Colors.white : Colors.black,
                                     ),
                                   ),
                                 ),
