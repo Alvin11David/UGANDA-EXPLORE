@@ -1425,7 +1425,6 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(bottom: 80.0),
         child: FloatingActionButton(
           backgroundColor: const Color(0xFF3B82F6),
-          child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
           tooltip: 'Virtual Guide',
           onPressed: () {
             showModalBottomSheet(
@@ -1523,6 +1522,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
+          child: const Icon(Icons.smart_toy_outlined, color: Colors.white),
         ),
       ),
     );
