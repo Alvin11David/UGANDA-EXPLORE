@@ -2,6 +2,33 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+// Helper to get Firestore type as string
+String getFirestoreType(dynamic value) {
+  if (value == null) return 'null';
+  if (value is String) return 'string';
+  if (value is num) return 'number';
+  if (value is bool) return 'boolean';
+  if (value is Map) return 'map';
+  if (value is List) return 'array';
+  if (value is Timestamp) return 'timestamp';
+  if (value is GeoPoint) return 'geopoint';
+  // Add more types as needed
+  return 'unknown';
+}
+
+// Dropdown options for types
+const List<String> firestoreTypes = [
+  'string',
+  'number',
+  'boolean',
+  'map',
+  'array',
+  'null',
+  'timestamp',
+  'geopoint',
+  'reference',
+];
+
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
 
@@ -16,14 +43,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   void _showEditFieldDialog(String docId, String field, dynamic value) async {
     final controller = TextEditingController(text: value?.toString() ?? '');
-    final result = await showDialog<String>(
+    String selectedType = getFirestoreType(value);
+
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white.withOpacity(0.85),
         title: Text('Edit $field'),
-        content: TextField(
-          controller: controller,
-          maxLines: field == 'description' ? 4 : 1,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: controller,
+              maxLines: field == 'description' ? 4 : 1,
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: selectedType,
+              decoration: const InputDecoration(labelText: 'Type'),
+              items: firestoreTypes
+                  .map(
+                    (type) => DropdownMenuItem(value: type, child: Text(type)),
+                  )
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) selectedType = val;
+              },
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -31,7 +78,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(context, controller.text),
+            onPressed: () => Navigator.pop(context, {
+              'value': controller.text,
+              'type': selectedType,
+            }),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
               foregroundColor: Colors.white,
@@ -42,14 +92,32 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
     );
     if (result != null) {
-      await sites.doc(docId).update({field: result});
+      dynamic finalValue = result['value'];
+      switch (result['type']) {
+        case 'number':
+          finalValue = double.tryParse(finalValue) ?? 0;
+          break;
+        case 'boolean':
+          finalValue = finalValue.toLowerCase() == 'true';
+          break;
+        case 'null':
+          finalValue = null;
+          break;
+        case 'array':
+          finalValue = finalValue.split(',').map((e) => e.trim()).toList();
+          break;
+        // Add more conversions as needed
+      }
+      await sites.doc(docId).update({field: finalValue});
     }
   }
 
   void _showAddFieldDialog(String docId) async {
     final fieldController = TextEditingController();
     final valueController = TextEditingController();
-    final result = await showDialog<Map<String, String>>(
+    String selectedType = 'string';
+
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Colors.white.withOpacity(0.85),
@@ -65,6 +133,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
               controller: valueController,
               decoration: const InputDecoration(labelText: 'Value'),
             ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: selectedType,
+              decoration: const InputDecoration(labelText: 'Type'),
+              items: firestoreTypes
+                  .map(
+                    (type) => DropdownMenuItem(value: type, child: Text(type)),
+                  )
+                  .toList(),
+              onChanged: (val) {
+                if (val != null) selectedType = val;
+              },
+            ),
           ],
         ),
         actions: [
@@ -76,6 +157,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             onPressed: () => Navigator.pop(context, {
               'field': fieldController.text,
               'value': valueController.text,
+              'type': selectedType,
             }),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1E3A8A),
@@ -87,7 +169,23 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
     );
     if (result != null && result['field']!.isNotEmpty) {
-      await sites.doc(docId).update({result['field']!: result['value']});
+      dynamic finalValue = result['value'];
+      switch (result['type']) {
+        case 'number':
+          finalValue = double.tryParse(finalValue) ?? 0;
+          break;
+        case 'boolean':
+          finalValue = finalValue.toLowerCase() == 'true';
+          break;
+        case 'null':
+          finalValue = null;
+          break;
+        case 'array':
+          finalValue = finalValue.split(',').map((e) => e.trim()).toList();
+          break;
+        // Add more conversions as needed
+      }
+      await sites.doc(docId).update({result['field']: finalValue});
     }
   }
 
@@ -356,18 +454,47 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               ...data.entries
                                   .where((e) => e.key != 'images')
                                   .map((entry) {
+                                    final fieldType = getFirestoreType(
+                                      entry.value,
+                                    );
                                     return Card(
                                       color: Colors.white.withOpacity(0.12),
                                       margin: const EdgeInsets.symmetric(
                                         vertical: 4,
                                       ),
                                       child: ListTile(
-                                        title: Text(
-                                          entry.key,
-                                          style: const TextStyle(
-                                            color: Color(0xFF3B82F6),
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        title: Row(
+                                          children: [
+                                            Text(
+                                              entry.key,
+                                              style: const TextStyle(
+                                                color: Color(0xFF3B82F6),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 2,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(
+                                                  0.1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                fieldType,
+                                                style: const TextStyle(
+                                                  color: Colors.white70,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         subtitle: entry.value is List
                                             ? Column(
