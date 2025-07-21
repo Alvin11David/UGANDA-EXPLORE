@@ -694,7 +694,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           right: 0,
                           child: Center(
                             child: Image.asset(
-                              'assets/logo/blackugandaexplore.png',
+                              'assets/logo/whiteugandaexplore.png',
                               height: 60,
                               fit: BoxFit.contain,
                             ),

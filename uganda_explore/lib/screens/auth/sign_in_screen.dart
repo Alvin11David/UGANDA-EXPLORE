@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uganda_explore/screens/auth/signup_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -32,6 +34,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeNotifier>(context).isDarkMode;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -54,7 +57,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   height: 100,
                   decoration: const BoxDecoration(shape: BoxShape.circle),
                   child: Image.asset(
-                    'assets/logo/whitelogo.png',
+                    isDarkMode
+                        ? 'assets/logo/whitelogo.png'
+                        : 'assets/logo/blacklogo.png',
                     width: 100,
                     height: 100,
                     fit: BoxFit.contain,
@@ -62,14 +67,14 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 "Let's get you\n signed in!",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: 'Outfit',
                   fontSize: 37,
                   fontWeight: FontWeight.w900,
-                  color: Colors.white,
+                  color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
               const SizedBox(height: 70),
@@ -86,10 +91,10 @@ class _SignInScreenState extends State<SignInScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 10),
-                      const Text(
+                      Text(
                         "Sign In",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: isDarkMode ? Colors.white : Colors.black,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Inter',
@@ -97,10 +102,10 @@ class _SignInScreenState extends State<SignInScreen> {
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 5),
-                      const Text(
+                      Text(
                         "Please enter the details to continue.",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: isDarkMode ? Colors.white : Colors.black,
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                           fontFamily: 'Poppins',
@@ -175,7 +180,7 @@ class EmailField extends StatelessWidget {
           decoration: InputDecoration(
             labelText: 'Email',
             labelStyle: const TextStyle(
-              color: Color(0xFF374151), // Dark Gray
+              color: Color.fromARGB(255, 0, 0, 0), // Dark Gray
               fontFamily: 'Poppins',
               fontWeight: FontWeight.w500,
               fontSize: 16,
