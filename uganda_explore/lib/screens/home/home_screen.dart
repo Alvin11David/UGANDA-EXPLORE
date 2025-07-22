@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uganda_explore/screens/home/chat_screen_dart.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
 import 'package:uganda_explore/screens/map/near_by_attractions_screen.dart.dart';
@@ -13,7 +14,10 @@ import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? userFullName;
+
+  const HomeScreen({super.key, this.userFullName});
+  
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -159,6 +163,7 @@ class ImageCard extends StatelessWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String? _userFullName;
   final ScrollController _scrollController = ScrollController();
   bool _showNavBar = true;
   String _district = 'Kampala';
@@ -171,6 +176,27 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
   final LayerLink _searchBarLink = LayerLink();
 
+  
+
+  Future<void> _loadUserFullName() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _userFullName = prefs.getString('userFullName');
+    });
+  }
+
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) {
+      return 'Good morning';
+    } else if (hour < 17) {
+      return 'Good afternoon';
+    } else {
+      return 'Good evening';
+    }
+  }
+  
   void _onItemTapped(int index) {
     if (index == 0) {
       setState(() {
@@ -209,19 +235,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_showNavBar) setState(() => _showNavBar = false);
-      } else if (_scrollController.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (!_showNavBar) setState(() => _showNavBar = true);
-      }
-    });
-    _getCurrentDistrict();
-  }
+void initState() {
+  super.initState();
+  _loadUserFullName();
+  _scrollController.addListener(() {
+    if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
+      if (_showNavBar) setState(() => _showNavBar = false);
+    } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
+      if (!_showNavBar) setState(() => _showNavBar = true);
+    }
+  });
+  _getCurrentDistrict();
+}
 
   Future<void> _getCurrentDistrict() async {
     try {
@@ -818,6 +843,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                       ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        _getGreeting() + ', ${widget.userFullName ?? "Explorer"}',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 20),

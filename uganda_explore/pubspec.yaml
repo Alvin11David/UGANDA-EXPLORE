@@ -44,6 +44,8 @@ dependencies:
   # image picker
   image_picker: 
 
+  shared_preferences:
+
   # Google maps and places
   google_maps_flutter:
 
