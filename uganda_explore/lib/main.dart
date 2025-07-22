@@ -47,10 +47,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
-        ChangeNotifierProvider(
-          create: (_) => ThemeNotifier(),
-        ),
       ],
       child: const MyApp(),
     ),
@@ -92,7 +90,7 @@ class MyApp extends StatelessWidget {
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
       },
-      home: SplashScreen(),
+      home: HomeScreen(),
     );
   }
 }
