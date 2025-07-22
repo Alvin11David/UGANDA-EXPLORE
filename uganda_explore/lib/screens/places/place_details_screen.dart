@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/virtual_ar/ar_scan_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
@@ -701,10 +703,25 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   top: 290,
   left: MediaQuery.of(context).size.width / 2 + 85,
   child: GestureDetector(
-    onTap: () {
+    onTap: () async {
       setState(() {
         _isStarSelected = !_isStarSelected;
       });
+      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+
+      // Fetch site details from Firestore
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: widget.siteName)
+          .get();
+      if (query.docs.isNotEmpty) {
+        final siteData = query.docs.first.data();
+        if (_isStarSelected) {
+          favoritesProvider.addFavorite(siteData);
+        } else {
+          favoritesProvider.removeFavorite(widget.siteName);
+        }
+      }
     },
     child: ClipOval(
       child: BackdropFilter(

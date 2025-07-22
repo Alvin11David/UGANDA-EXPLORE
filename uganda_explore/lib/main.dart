@@ -6,6 +6,7 @@ import 'package:uganda_explore/apptheme/apptheme.dart';
 import 'package:uganda_explore/config/theme_notifier.dart';
 import 'package:uganda_explore/firebase_options.dart';
 
+
 // Auth Screens
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
@@ -15,6 +16,7 @@ import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
 import 'package:uganda_explore/screens/profile/termsandprivacy_screen.dart';
+import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/splash/splash_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -43,8 +45,13 @@ void main() async {
   }
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(
+          create: (_) => ThemeNotifier(),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
