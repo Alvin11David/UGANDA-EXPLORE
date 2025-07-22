@@ -41,7 +41,7 @@ class _SignInScreenState extends State<SignInScreen> {
           gradient: RadialGradient(
             center: Alignment.center,
             radius: 1.0,
-            colors: [Color(0xFF0C0F0A), Color(0xFF235347)],
+            colors: [Color(0xFF0C0F0A), Color(0xFF3B82F6)],
             stops: [0.03, 0.63],
           ),
         ),
@@ -200,11 +200,11 @@ class EmailField extends StatelessWidget {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 1),
+              borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(color: Color(0xFF1EF813), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 2),
             ),
             contentPadding: const EdgeInsets.symmetric(
               vertical: 16,
@@ -218,7 +218,7 @@ class EmailField extends StatelessWidget {
             fontWeight: FontWeight.w400,
             fontSize: 15,
           ),
-          cursorColor: Color(0xFF1EF813),
+          cursorColor: Color(0xFF3B82F6),
         ),
       ),
     );
