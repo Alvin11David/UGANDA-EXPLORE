@@ -1,12 +1,17 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
+
 
 class OnboardingScreen1 extends StatelessWidget {
   const OnboardingScreen1({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Provider.of<ThemeNotifier>(context).isDarkMode;
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Background image
@@ -23,7 +28,9 @@ class OnboardingScreen1 extends StatelessWidget {
             right: 0,
             child: Center(
               child: Image.asset(
-                'assets/logo/whiteugandaexplore.png',
+                isDarkMode
+                    ? 'assets/logo/whiteugandaexplore.png'
+                    : 'assets/logo/blackugandaexplore.png',
                 width: 260,
                 height: 100,
                 fit: BoxFit.contain,
@@ -44,10 +51,7 @@ class OnboardingScreen1 extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(40),
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1.1,
-                    ),
+                    border: Border.all(color: Colors.white, width: 1.1),
                   ),
                   child: Column(
                     children: [
@@ -62,7 +66,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: Color(0xFF1FF813),
+                                color: Color(0xFF3B82F6), // Blue
                                 width: 3,
                               ),
                               color: Colors.transparent,
@@ -74,7 +78,7 @@ class OnboardingScreen1 extends StatelessWidget {
                             height: 15,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF3B82F6), // Navy Blue
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -83,33 +87,33 @@ class OnboardingScreen1 extends StatelessWidget {
                             height: 15,
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF3B82F6), // Blue
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
                       // Main text
-                      const Text(
+                      Text(
                         "Discover the hidden gems,\ncultural heritage\nand stunning nature of\nUganda",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontWeight: FontWeight.bold,
                           fontSize: 25,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
                       const SizedBox(height: 24),
                       // Subtitle
-                      const Text(
+                      Text(
                         "Explore Uganda like never before",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontFamily: 'Outfit',
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
-                          color: Colors.white,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -124,19 +128,21 @@ class OnboardingScreen1 extends StatelessWidget {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                               colors: [
-                                Color(0xFF000000),
-                                Color(0xFF1FF813),
+                                Color(0xFF1E3A8A), // Navy Blue
+                                Color(0xFF3B82F6), // Blue
                               ],
                               stops: [0.0, 0.47],
                             ),
                             border: Border.all(
-                              color: Color(0xFF1FF813),
+                              color: Color(0xFF3B82F6), // Blue
                               width: 1,
                             ),
                           ),
                           child: TextButton(
                             onPressed: () {
-                              Navigator.of(context).pushReplacementNamed('/onboarding_screen2');
+                              Navigator.of(
+                                context,
+                              ).pushReplacementNamed('/onboarding_screen2');
                             },
                             style: TextButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -155,17 +161,21 @@ class OnboardingScreen1 extends StatelessWidget {
                                       fontFamily: 'Outfit',
                                       fontWeight: FontWeight.bold,
                                       fontSize: 22,
-                                      color: Colors.black,
+                                      color: isDarkMode ? Colors.white : Colors.black,
                                     ),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, right: 5),
+                                  padding: const EdgeInsets.only(
+                                    top: 5,
+                                    bottom: 5,
+                                    right: 5,
+                                  ),
                                   child: Container(
                                     width: 52,
                                     height: 52,
                                     decoration: const BoxDecoration(
-                                      color: Colors.black,
+                                      color: Color(0xFF3B82F6), // Blue
                                       shape: BoxShape.circle,
                                     ),
                                     child: const Icon(

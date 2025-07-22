@@ -1,20 +1,23 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/Admin/Admin_Dashboard.dart';
 import 'package:uganda_explore/apptheme/apptheme.dart';
+import 'package:uganda_explore/config/theme_notifier.dart';
 import 'package:uganda_explore/firebase_options.dart';
-import 'package:uganda_explore/screens/auth/change_password_screen.dart';
 
 // Auth Screens
 import 'package:uganda_explore/screens/auth/forgot_password_screen.dart';
 import 'package:uganda_explore/screens/auth/otp_screen.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 import 'package:uganda_explore/screens/auth/signup_screen.dart';
-import 'package:uganda_explore/screens/home/results_screen.dart';
-import 'package:uganda_explore/screens/home/search_screen.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
 import 'package:uganda_explore/screens/profile/termsandprivacy_screen.dart';
+import 'package:uganda_explore/screens/splash/splash_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
 // Splash Screens
 import 'package:uganda_explore/screens/splash/onboarding_screen1.dart';
 import 'package:uganda_explore/screens/splash/onboarding_screen2.dart';
@@ -23,12 +26,28 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
 import 'package:uganda_explore/screens/profile/profile_screen.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+
+  // Initialize WebView Platform - This is crucial for Street View to work
+  try {
+    // This ensures the WebView platform is properly initialized
+    WebViewPlatform.instance ??= WebViewPlatform.instance;
+    print('WebView platform initialized successfully');
+  } catch (e) {
+    print('Error initializing WebView platform: $e');
+  }
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
