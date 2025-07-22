@@ -717,7 +717,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       if (query.docs.isNotEmpty) {
         final siteData = query.docs.first.data();
         if (_isStarSelected) {
-          favoritesProvider.addFavorite(siteData);
+          favoritesProvider.addFavorite(widget.siteName);
         } else {
           favoritesProvider.removeFavorite(widget.siteName);
         }
