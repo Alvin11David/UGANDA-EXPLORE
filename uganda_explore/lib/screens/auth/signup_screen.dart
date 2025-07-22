@@ -64,14 +64,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (_emailController.text.trim().toLowerCase() == 'admin@gmail.com') {
         Navigator.pushReplacementNamed(context, '/admin_dashboard');
       } else {
-        // Show onboarding screens 1, 2, and 3 in sequence
         Navigator.pushReplacementNamed(context, '/onboarding_screen1');
-        Future.delayed(const Duration(milliseconds: 500), () {
-          Navigator.pushNamed(context, '/onboarding_screen2');
-        });
-        Future.delayed(const Duration(milliseconds: 1000), () {
-          Navigator.pushNamed(context, '/onboarding_screen3');
-        });
       }
     } on FirebaseAuthException catch (e) {
       setState(() {

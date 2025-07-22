@@ -698,30 +698,37 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 290,
-            left: MediaQuery.of(context).size.width / 2 + 85,
-            child: ClipOval(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.star_border,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  ),
-                ),
-              ),
+  top: 290,
+  left: MediaQuery.of(context).size.width / 2 + 85,
+  child: GestureDetector(
+    onTap: () {
+      setState(() {
+        _isStarSelected = !_isStarSelected;
+      });
+    },
+    child: ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.3),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1.5),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.star_border,
+              color: _isStarSelected ? Colors.yellow : Colors.white,
+              size: 60,
             ),
           ),
+        ),
+      ),
+    ),
+  ),
+),
           Positioned(
             left: 4,
             right: 4,
