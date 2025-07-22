@@ -19,6 +19,7 @@ class PlaceDetailsScreen extends StatefulWidget {
 }
 
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
+  bool _isStarSelected = false;
   final PageController _pageController = PageController();
   int _currentPage = 0;
   List<String> _images = [];
