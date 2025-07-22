@@ -23,7 +23,7 @@ class PlaceDetailsScreen extends StatefulWidget {
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   bool _isStarSelected = false;
   final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final int _currentPage = 0;
   List<String> _images = [];
   bool _autoScrollStarted = false;
 
@@ -1233,7 +1233,7 @@ class _NavIcon extends StatelessWidget {
 
 class BackgroundAudioPlayer extends StatefulWidget {
   final List<String> urls;
-  const BackgroundAudioPlayer({required this.urls, Key? key}) : super(key: key);
+  const BackgroundAudioPlayer({required this.urls, super.key});
 
   @override
   State<BackgroundAudioPlayer> createState() => _BackgroundAudioPlayerState();
