@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/virtual_ar/ar_scan_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
@@ -19,6 +21,7 @@ class PlaceDetailsScreen extends StatefulWidget {
 }
 
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
+  bool _isStarSelected = false;
   final PageController _pageController = PageController();
   int _currentPage = 0;
   List<String> _images = [];
@@ -697,30 +700,52 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 290,
-            left: MediaQuery.of(context).size.width / 2 + 85,
-            child: ClipOval(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.star_border,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  ),
-                ),
-              ),
+  top: 290,
+  left: MediaQuery.of(context).size.width / 2 + 85,
+  child: GestureDetector(
+    onTap: () async {
+      setState(() {
+        _isStarSelected = !_isStarSelected;
+      });
+      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+
+      // Fetch site details from Firestore
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: widget.siteName)
+          .get();
+      if (query.docs.isNotEmpty) {
+        final siteData = query.docs.first.data();
+        if (_isStarSelected) {
+          favoritesProvider.addFavorite(widget.siteName);
+        } else {
+          favoritesProvider.removeFavorite(widget.siteName);
+        }
+      }
+    },
+    child: ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.3),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1.5),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.star_border,
+              color: _isStarSelected ? Colors.yellow : Colors.white,
+              size: 60,
             ),
           ),
+        ),
+      ),
+    ),
+  ),
+),
           Positioned(
             left: 4,
             right: 4,

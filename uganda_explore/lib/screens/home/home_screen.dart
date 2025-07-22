@@ -3,13 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:uganda_explore/screens/home/chat_screen_dart.dart';
 import 'package:uganda_explore/screens/home/results_screen.dart';
+import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -54,32 +57,22 @@ class ImageCard extends StatelessWidget {
                 child: const Icon(Icons.broken_image, color: Colors.grey),
               ),
             ),
-            // Virtual Tour Button (Street View icon) if supported
             if (site['streetViewLat'] != null && site['streetViewLng'] != null)
               Positioned(
                 top: 10,
                 right: 10,
                 child: GestureDetector(
                   onTap: () {
-                    print('Virtual tour icon tapped!');
-                    print('site["name"]: ${site['name']}');
-                    print('site["streetViewLat"]: ${site['streetViewLat']}');
-                    print('site["streetViewLng"]: ${site['streetViewLng']}');
-                    try {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => StreetViewPage(
-                            latitude: site['streetViewLat'],
-                            longitude: site['streetViewLng'],
-                            siteName: site['name'] ?? '',
-                          ),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StreetViewPage(
+                          latitude: site['streetViewLat'],
+                          longitude: site['streetViewLng'],
+                          siteName: site['name'] ?? '',
                         ),
-                      );
-                    } catch (e, stack) {
-                      print('Navigation error: $e');
-                      print(stack);
-                    }
+                      ),
+                    );
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -167,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
   OverlayEntry? _suggestionsOverlay;
   List<Map<String, dynamic>> _suggestions = [];
   bool _isLoadingSuggestions = false;
-  String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
+  String _selectedCategory = '';
   final LayerLink _searchBarLink = LayerLink();
 
   void _onItemTapped(int index) {
@@ -478,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            );
+              );
             },
           );
       },
@@ -657,6 +650,8 @@ class _HomeScreenState extends State<HomeScreen> {
       isFilterFocused.value = filterFocusNode.hasFocus;
     });
 
+    final favoriteSites = Provider.of<FavoritesProvider>(context).favorites;
+
     return Scaffold(
       backgroundColor: const Color(0xFF101624),
 
@@ -667,450 +662,10 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _scrollController,
               child: Column(
                 children: [
-                  SizedBox(
-                    height: 155,
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(30),
-                          ),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.10),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.25),
-                                  width: 1,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 35,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Image.asset(
-                              'assets/logo/whiteugandaexplore.png',
-                              height: 60,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          top: 95,
-                          left: 4,
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.location_on,
-                                    color: Color(0xFF3B82F6),
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Location',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        _district,
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 16,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 4),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          top: 95,
-                          right: 4,
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.2),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: const Center(
-                                  child: Icon(
-                                    Icons.sunny,
-                                    color: Color(0xFFF59E0B),
-                                    size: 28,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Weather',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  const Text(
-                                    '20° C',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: CompositedTransformTarget(
-                          link: _searchBarLink,
-                          child: SizedBox(
-                            width: 240,
-                            child: ValueListenableBuilder<bool>(
-                              valueListenable: isSearchFocused,
-                              builder: (context, focused, child) {
-                                return Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.15),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                    border: Border.all(
-                                      color: focused
-                                          ? const Color(0xFF1FF813)
-                                          : Colors.transparent,
-                                      width: 1,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const SizedBox(width: 16),
-                                      const Icon(
-                                        Icons.search,
-                                        color: Colors.black,
-                                        size: 24,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(
-                                        child: Focus(
-                                          focusNode: _searchFocusNode,
-                                          child: TextField(
-                                            controller: _searchController,
-                                            decoration: const InputDecoration(
-                                              hintText: 'Search Your Place',
-                                              border: InputBorder.none,
-                                              isDense: true,
-                                              contentPadding:
-                                                  EdgeInsets.symmetric(
-                                                    vertical: 14,
-                                                  ),
-                                            ),
-                                            style: const TextStyle(
-                                              fontFamily: 'Poppins',
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            onChanged: (value) {
-                                              _fetchSuggestionsDropdown(
-                                                value,
-                                                context,
-                                              );
-                                            },
-                                            onTap: () {
-                                              if (_searchController
-                                                  .text
-                                                  .isNotEmpty) {
-                                                _fetchSuggestionsDropdown(
-                                                  _searchController.text,
-                                                  context,
-                                                );
-                                              }
-                                            },
-                                            onEditingComplete: () {
-                                              _removeSuggestionsOverlay();
-                                            },
-                                            onSubmitted: (value) async {
-                                              _removeSuggestionsOverlay();
-                                              final keyword = value.trim();
-                                              if (keyword.isNotEmpty) {
-                                                final query =
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection(
-                                                          'tourismsites',
-                                                        )
-                                                        .where(
-                                                          'name',
-                                                          isEqualTo: keyword,
-                                                        )
-                                                        .limit(1)
-                                                        .get();
+                  // ...existing widgets...
 
-                                                if (query.docs.isNotEmpty) {
-                                                  final siteData = query
-                                                      .docs
-                                                      .first
-                                                      .data();
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          PlaceDetailsScreen(
-                                                            siteName:
-                                                                siteData['name'],
-                                                          ),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                        'No site found with that name.',
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              }
-                                            },
-                                            textInputAction:
-                                                TextInputAction.search,
-                                          ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(
-                                          Icons.arrow_forward,
-                                          color: Colors.black,
-                                        ),
-                                        onPressed: () async {
-                                          _removeSuggestionsOverlay();
-                                          final keyword = _searchController.text
-                                              .trim();
-                                          if (keyword.isNotEmpty) {
-                                            final query =
-                                                await FirebaseFirestore.instance
-                                                    .collection('tourismsites')
-                                                    .where(
-                                                      'name',
-                                                      isEqualTo: keyword,
-                                                    )
-                                                    .limit(1)
-                                                    .get();
+                  // Popular Place Category, Category Buttons, etc.
 
-                                            if (query.docs.isNotEmpty) {
-                                              final siteData = query.docs.first
-                                                  .data();
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      PlaceDetailsScreen(
-                                                        siteName:
-                                                            siteData['name'],
-                                                      ),
-                                                ),
-                                              );
-                                            } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    'No site found with that name.',
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 0),
-                      GestureDetector(
-                        onTap: () {
-                          print('filter clicked');
-                          _showFilterSheet(context);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 0),
-                          child: ValueListenableBuilder<bool>(
-                            valueListenable: isFilterFocused,
-                            builder: (context, focused, child) {
-                              return ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: BackdropFilter(
-                                  filter: ImageFilter.blur(
-                                    sigmaX: 30,
-                                    sigmaY: 30,
-                                  ),
-                                  child: Container(
-                                    height: 50,
-                                    width: 60,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.18),
-                                      borderRadius: BorderRadius.circular(30),
-                                      border: Border.all(
-                                        color: focused
-                                            ? const Color(0xFF3B82F6)
-                                            : Colors.white.withOpacity(0.25),
-                                        width: 1.5,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.15),
-                                          blurRadius: 12,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Focus(
-                                      focusNode: filterFocusNode,
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.filter_alt,
-                                          color: Color(0xFF3B82F6),
-                                          size: 26,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25),
-                  Padding(
-                    padding: EdgeInsets.only(left: 18),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: const Text(
-                        'Popular Place Category',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.start,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: _CategoryButton(
-                            label: "National Parks",
-                            selected: _selectedCategory == "National Park",
-                            onTap: () => setState(
-                              () => _selectedCategory = "National Park",
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        _CategoryButton(
-                          label: "Waterbodies",
-                          selected: _selectedCategory == "Lakes",
-                          onTap: () =>
-                              setState(() => _selectedCategory = "Lakes"),
-                        ),
-                        const SizedBox(width: 12),
-                        _CategoryButton(
-                          label: "Mountains",
-                          selected: _selectedCategory == "Mountain",
-                          onTap: () =>
-                              setState(() => _selectedCategory = "Mountain"),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 25),
                   if (_selectedCategory.isNotEmpty)
                     StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _fetchSites(_selectedCategory),
@@ -1368,6 +923,192 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
+                            const SizedBox(height: 30),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 18, bottom: 8),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'FAVORITES',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                            ),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  for (final siteName in favoriteSites)
+                                    FutureBuilder<DocumentSnapshot>(
+                                      future: FirebaseFirestore.instance
+                                          .collection('tourismsites')
+                                          .where('name', isEqualTo: siteName)
+                                          .limit(1)
+                                          .get()
+                                          .then((snapshot) {
+                                            if (snapshot.docs.isNotEmpty) {
+                                              return snapshot.docs.first;
+                                            } else {
+                                              throw Exception('No document found');
+                                            }
+                                          }),
+                                      builder: (context, snapshot) {
+                                        if (!snapshot.hasData || snapshot.data == null) {
+                                          return SizedBox.shrink();
+                                        }
+                                        final siteData = snapshot.data!.data() as Map<String, dynamic>;
+                                        return Padding(
+                                          padding: const EdgeInsets.only(left: 4),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => PlaceDetailsScreen(
+                                                    siteName: siteName,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 250,
+                                              decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.circular(30),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.5),
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 8),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(30),
+                                                child: Stack(
+                                                  children: [
+                                                    Image.network(
+                                                      siteData['images'][0],
+                                                      height: 250,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    // 360° icon button in the top right corner if Street View is available
+                                                    if (siteData['streetViewLat'] != null && siteData['streetViewLng'] != null)
+                                                      Positioned(
+                                                        top: 10,
+                                                        right: 10,
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (_) => StreetViewPage(
+                                                                  latitude: siteData['streetViewLat'],
+                                                                  longitude: siteData['streetViewLng'],
+                                                                  siteName: siteData['name'] ?? '',
+                                                                ),
+                                                              ),
+                                                            );
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.black.withOpacity(0.55),
+                                                              shape: BoxShape.circle,
+                                                            ),
+                                                            padding: const EdgeInsets.all(8),
+                                                            child: const Icon(
+                                                              Icons.threesixty,
+                                                              color: Color(0xFF1FF813),
+                                                              size: 26,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    Positioned(
+                                                      left: 0,
+                                                      right: 0,
+                                                      bottom: 0,
+                                                      child: ClipRRect(
+                                                        borderRadius: const BorderRadius.only(
+                                                          bottomLeft: Radius.circular(30),
+                                                          bottomRight: Radius.circular(30),
+                                                        ),
+                                                        child: BackdropFilter(
+                                                          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                                          child: Container(
+                                                            height: 80,
+                                                            width: 219,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white.withOpacity(0.18),
+                                                              border: Border.all(color: Colors.white, width: 1),
+                                                              borderRadius: const BorderRadius.only(
+                                                                bottomLeft: Radius.circular(30),
+                                                                bottomRight: Radius.circular(30),
+                                                              ),
+                                                            ),
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.only(left: 3, top: 10, right: 8),
+                                                              child: Column(
+                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                children: [
+                                                                  Text(
+                                                                    siteData['name'] ?? '',
+                                                                    style: const TextStyle(
+                                                                      fontFamily: 'Poppins',
+                                                                      fontWeight: FontWeight.bold,
+                                                                      fontSize: 13,
+                                                                      color: Colors.white,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(height: 8),
+                                                                  Row(
+                                                                    children: [
+                                                                      const Padding(
+                                                                        padding: EdgeInsets.only(left: 4),
+                                                                        child: Icon(
+                                                                          Icons.location_on,
+                                                                          color: Color(0xFF3B82F6),
+                                                                          size: 20,
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(width: 6),
+                                                                      Expanded(
+                                                                        child: Text(
+                                                                          siteData['location'] ?? '',
+                                                                          style: const TextStyle(
+                                                                            fontFamily: 'Poppins',
+                                                                            fontWeight: FontWeight.w500,
+                                                                            fontSize: 13,
+                                                                            color: Colors.white,
+                                                                          ),
+                                                                          overflow: TextOverflow.ellipsis,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                ],
+                              ),
+                            ),
                           ],
                         );
                       },
@@ -1376,6 +1117,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          // ...existing bottom navigation and floating action button...
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ClipRRect(
@@ -1385,7 +1127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   height: 64,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E3A8A), // Navy blue
+                    color: const Color(0xFF1E3A8A),
                     borderRadius: BorderRadius.circular(40),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.25),
