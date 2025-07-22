@@ -170,6 +170,24 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
   final LayerLink _searchBarLink = LayerLink();
 
+  // Dummy favorite sites list for demonstration. Replace with your actual data source.
+  List<Map<String, dynamic>> _favoriteSites = [
+    {
+      'name': 'Bwindi Impenetrable Forest',
+      'images': [
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
+      ],
+      'location': 'Southwestern Uganda',
+    },
+    {
+      'name': 'Lake Victoria',
+      'images': [
+        'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80'
+      ],
+      'location': 'Central Uganda',
+    },
+  ];
+
   void _onItemTapped(int index) {
     if (index == 0) {
       setState(() {
@@ -477,8 +495,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-              ),
-            );
+              );
             },
           );
       },
@@ -1365,6 +1382,150 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         ),
                                       ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 18, bottom: 8),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  'FAVORITES',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                              ),
+                            ),
+
+                            // Show favorite sites (replace _favoriteSites with your actual list)
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  for (final site in _favoriteSites)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 4),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => PlaceDetailsScreen(
+                                                siteName: site['name'] ?? '',
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          height: 250,
+                                          width: 220,
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.5),
+                                                blurRadius: 5,
+                                                offset: const Offset(0, 8),
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(30),
+                                            child: Stack(
+                                              children: [
+                                                Image.network(
+                                                  site['images'][0],
+                                                  height: 250,
+                                                  width: 220,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (c, e, s) => Container(
+                                                    height: 250,
+                                                    width: 220,
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(Icons.broken_image, color: Colors.grey),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  left: 0,
+                                                  right: 0,
+                                                  bottom: 0,
+                                                  child: ClipRRect(
+                                                    borderRadius: const BorderRadius.only(
+                                                      bottomLeft: Radius.circular(30),
+                                                      bottomRight: Radius.circular(30),
+                                                    ),
+                                                    child: BackdropFilter(
+                                                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                                      child: Container(
+                                                        height: 80,
+                                                        width: 219,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white.withOpacity(0.18),
+                                                          border: Border.all(color: Colors.white, width: 1),
+                                                          borderRadius: const BorderRadius.only(
+                                                            bottomLeft: Radius.circular(30),
+                                                            bottomRight: Radius.circular(30),
+                                                          ),
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.only(left: 3, top: 10, right: 8),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                site['name'] ?? '',
+                                                                style: const TextStyle(
+                                                                  fontFamily: 'Poppins',
+                                                                  fontWeight: FontWeight.bold,
+                                                                  fontSize: 13,
+                                                                  color: Colors.white,
+                                                                ),
+                                                              ),
+                                                              const SizedBox(height: 8),
+                                                              Row(
+                                                                children: [
+                                                                  const Padding(
+                                                                    padding: EdgeInsets.only(left: 4),
+                                                                    child: Icon(
+                                                                      Icons.location_on,
+                                                                      color: Color(0xFF3B82F6),
+                                                                      size: 20,
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(width: 6),
+                                                                  Expanded(
+                                                                    child: Text(
+                                                                      site['location'] ?? '',
+                                                                      style: const TextStyle(
+                                                                        fontFamily: 'Poppins',
+                                                                        fontWeight: FontWeight.w500,
+                                                                        fontSize: 13,
+                                                                        color: Colors.white,
+                                                                      ),
+                                                                      overflow: TextOverflow.ellipsis,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
