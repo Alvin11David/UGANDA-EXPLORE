@@ -192,7 +192,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             label: 'App Theme',
                             onTap: () => Navigator.pushNamed(
                               context,
-                              '/termsandprivacy',
+                              '/app_theme',
                             ),
                           ),
                           const SizedBox(height: 12),
