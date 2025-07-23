@@ -208,13 +208,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.share,
                             label: 'Share App',
-                            onTap: () => print("Share App tapped"),
+                             onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
                             icon: Icons.logout,
                             label: 'Logout',
-                            onTap: () => print("Logout tapped"),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                         ],
                       ),
