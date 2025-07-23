@@ -980,179 +980,163 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-                        FutureBuilder<String?>(
-                          future: fetchSiteDescription(widget.siteName),
+(_isLoadingSiteData || _siteData == null || _siteData!['description'] == null)
+  ? const SizedBox.shrink()
+  : Text(
+      _siteData!['description'],
+      style: const TextStyle(
+        color: Colors.black,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
+                        FutureBuilder<List<String>>(
+                          future: fetchSiteAudios(widget.siteName),
+                          builder: (context, audioSnapshot) {
+                            if (audioSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            }
+                            final audios = audioSnapshot.data ?? [];
+                            if (audios.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return BackgroundAudioPlayer(urls: audios);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 0,
+                          ),
+                          child: Container(
+                            height: 1,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: Text(
+                            "Quick Information",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FutureBuilder<Map<String, String>>(
+                          future: fetchQuickInfo(widget.siteName),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const SizedBox.shrink();
                             }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return const SizedBox.shrink();
+                            if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text(
+                                "No quick information available.",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                ),
+                              );
                             }
+                            final info = snapshot.data!;
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  snapshot.data!,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<List<String>>(
-                                  future: fetchSiteAudios(widget.siteName),
-                                  builder: (context, audioSnapshot) {
-                                    if (audioSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    final audios = audioSnapshot.data ?? [];
-                                    if (audios.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return BackgroundAudioPlayer(urls: audios);
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                  ),
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    "Quick Information",
-                                    style: TextStyle(
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.attach_money,
                                       color: Colors.black,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20,
+                                      size: 20,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Entry Fee: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['entryfee'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<Map<String, String>>(
-                                  future: fetchQuickInfo(widget.siteName),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    if (!snapshot.hasData ||
-                                        snapshot.data!.isEmpty) {
-                                      return const Text(
-                                        "No quick information available.",
-                                        style: TextStyle(
-                                          color: Colors.black54,
-                                          fontFamily: 'Poppins',
-                                          fontSize: 14,
-                                        ),
-                                      );
-                                    }
-                                    final info = snapshot.data!;
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.attach_money,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Entry Fee: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['entryfee'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.access_time,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Opening: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['openingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.lock_clock,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Closing: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['closingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.access_time,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Opening: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['openingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_clock,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Closing: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['closingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             );
