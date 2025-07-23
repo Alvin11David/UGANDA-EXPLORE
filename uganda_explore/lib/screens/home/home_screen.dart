@@ -12,6 +12,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   final String? userFullName;
@@ -175,8 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingSuggestions = false;
   String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
   final LayerLink _searchBarLink = LayerLink();
-
-  
+  String _temperature = '--';
+  List<Map<String, dynamic>> _favouriteSites = [];
 
   Future<void> _loadUserFullName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -185,6 +187,31 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _getCurrentWeather() async {
+    try {
+      // Example using OpenWeatherMap API (replace with your API key)
+      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      final lat = position.latitude;
+      final lon = position.longitude;
+      final apiKey = 'c9cc826f10cc2a88c7267d2066cadd70';
+      final url = Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey',
+      );
+      final response = await Future.delayed(const Duration(milliseconds: 500), () async {
+        return await http.get(url);
+      }) as http.Response;
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _temperature = '${data['main']['temp'].round()}° C';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _temperature = '20° C';
+      });
+    }
+  }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -246,6 +273,8 @@ void initState() {
     }
   });
   _getCurrentDistrict();
+  _getCurrentWeather();
+  _loadFavouriteSites();
 }
 
   Future<void> _getCurrentDistrict() async {
@@ -668,6 +697,16 @@ void initState() {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
+  Future<void> _loadFavouriteSites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favNames = prefs.getStringList('favouriteSites') ?? [];
+    final query = await FirebaseFirestore.instance.collection('tourismsites').get();
+    final allSites = query.docs.map((doc) => doc.data()).toList();
+    setState(() {
+      _favouriteSites = allSites.where((site) => favNames.contains(site['name'])).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final FocusNode searchFocusNode = FocusNode();
@@ -828,9 +867,9 @@ void initState() {
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Text(
-                                    '20° C',
-                                    style: TextStyle(
+                                  Text(
+                                    _temperature,
+                                    style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
@@ -1413,6 +1452,156 @@ void initState() {
                         );
                       },
                     ),
+                  const SizedBox(height: 30),
+                  if (_favouriteSites.isNotEmpty) ...[
+                    const Padding(
+                      padding: EdgeInsets.only(left: 18, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Your Favourite Places',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _favouriteSites.map((site) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => PlaceDetailsScreen(siteName: site['name']),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 250,
+                                width: 220,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.5),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Stack(
+                                    children: [
+                                      site['images'] != null &&
+                                              site['images'] is List &&
+                                              (site['images'] as List).isNotEmpty
+                                          ? Image.network(
+                                              site['images'][0],
+                                              height: 250,
+                                              width: 220,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (c, e, s) => Container(
+                                                height: 250,
+                                                width: 220,
+                                                color: Colors.grey[300],
+                                                child: const Icon(Icons.broken_image, color: Colors.grey),
+                                              ),
+                                            )
+                                          : Container(
+                                              height: 250,
+                                              width: 220,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.broken_image, color: Colors.grey),
+                                            ),
+                                      Positioned(
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            bottomLeft: Radius.circular(30),
+                                            bottomRight: Radius.circular(30),
+                                          ),
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                            child: Container(
+                                              height: 80,
+                                              width: 219,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.18),
+                                                border: Border.all(color: Colors.white, width: 1),
+                                                borderRadius: const BorderRadius.only(
+                                                  bottomLeft: Radius.circular(30),
+                                                  bottomRight: Radius.circular(30),
+                                                ),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 3, top: 10, right: 8),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      site['name'] ?? '',
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 13,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        const Padding(
+                                                          padding: EdgeInsets.only(left: 4),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Color(0xFF3B82F6),
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 6),
+                                                        Expanded(
+                                                          child: Text(
+                                                            site['location'] ?? '',
+                                                            style: const TextStyle(
+                                                              fontFamily: 'Poppins',
+                                                              fontWeight: FontWeight.w500,
+                                                              fontSize: 13,
+                                                              color: Colors.white,
+                                                            ),
+                                                            overflow: TextOverflow.ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                  // ...rest of your widgets...
                 ],
               ),
             ),
