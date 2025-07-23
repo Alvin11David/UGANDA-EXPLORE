@@ -219,7 +219,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             label: 'Logout',
                             onTap: () => Navigator.pushNamed(
                               context,
-                              '/termsandprivacy',
+                              '/logout',
                             ),
                           ),
                         ],
