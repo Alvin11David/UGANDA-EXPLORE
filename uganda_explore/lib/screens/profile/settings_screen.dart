@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -66,7 +67,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else if (index == 1) {
       // Stay on settings
     } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/map'); // This navigates to the map screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
+        ),
+      );
     }
   }
 
