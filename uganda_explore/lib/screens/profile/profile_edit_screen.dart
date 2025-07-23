@@ -1,18 +1,11 @@
-import 'dart:ui'; // For blur effects
+import 'dart:ui';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
-import 'dart:io'; // For file operations (profile image)
-
-import 'package:flutter/material.dart'; // Flutter UI framework
-
-import 'package:image_picker/image_picker.dart'; // For picking images
-
-import 'package:firebase_auth/firebase_auth.dart'; // Firebase authentication
-
-import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase Firestore
-
-import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart'; // Map view screen
-
-// Main Edit Profile Screen StatefulWidget
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -20,26 +13,17 @@ class EditProfileScreen extends StatefulWidget {
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-// State class for EditProfileScreen
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  int _selectedIndex = 0; // For bottom navigation bar selection
-
-  File? _profileImage; // Stores the selected profile image
-
+  int _selectedIndex = 0;
+  File? _profileImage;
   final String email = "user@email.com"; // Replace with actual user email
 
-  // Controllers for the profile fields
   final TextEditingController fullNamesController = TextEditingController();
-
   final TextEditingController emailController = TextEditingController();
-
   final TextEditingController phoneContactController = TextEditingController();
-
   final TextEditingController locationController = TextEditingController();
-
   final TextEditingController bioController = TextEditingController();
 
-  // Handles bottom navigation bar taps
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -59,7 +43,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  // Handles profile image selection
   Future<void> _onChangePicture() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -72,17 +55,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Color mainGreen = const Color(0xFF3B82F6); // Main accent color
+    final Color mainGreen = const Color(0xFF3B82F6);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE5E3D4), // Background color
+      backgroundColor: const Color(0xFFE5E3D4),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Column(
               children: [
-                // Back button at the top left
+                // Back button
                 Align(
                   alignment: Alignment.topLeft,
                   child: Container(
@@ -98,7 +81,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 10),
 
-                // Profile avatar with border and camera icon
+                // Profile avatar with green border and camera icon
                 Center(
                   child: Stack(
                     children: [
@@ -137,7 +120,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               : null,
                         ),
                       ),
-                      // Camera icon for changing profile picture
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -164,7 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                 const SizedBox(height: 20),
 
-                // Title for the screen
+                // Title
                 const Text(
                   "Edit Profile",
                   style: TextStyle(
@@ -175,7 +157,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 3),
-                // Subtitle
                 const Text(
                   "Fill in the fields below",
                   style: TextStyle(
@@ -186,7 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Glass container for fields and update button
+                // Glass Container for Fields and Update Button
                 ClipRRect(
                   borderRadius: BorderRadius.circular(40),
                   child: BackdropFilter(
@@ -208,35 +189,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Column(
                         children: [
                           const SizedBox(height: 20),
-                          // Full Names field
                           _buildFloatingField(
                             Icons.person,
                             "Full Names",
                             controller: fullNamesController,
                             iconColor: mainGreen,
                           ),
-                          // Email field
                           _buildFloatingField(
                             Icons.email,
                             "Email",
                             controller: emailController,
                             iconColor: mainGreen,
                           ),
-                          // Phone Contact field
                           _buildFloatingField(
                             Icons.phone,
                             "Phone Contact",
                             controller: phoneContactController,
                             iconColor: mainGreen,
                           ),
-                          // Location field
                           _buildFloatingField(
                             Icons.location_on,
                             "Location",
                             controller: locationController,
                             iconColor: mainGreen,
                           ),
-                          // Bio field (multiline)
                           _buildFloatingField(
                             Icons.edit,
                             "Bio",
@@ -246,7 +222,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // Update button
+                          // Update Button
                           GestureDetector(
                             onTap: () async {
                               final user = FirebaseAuth.instance.currentUser;
@@ -312,7 +288,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
-      // Bottom navigation bar
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
         child: ClipRRect(
@@ -332,7 +307,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  // Home nav icon
                   _NavIcon(
                     icon: Icons.home,
                     label: 'Home',
@@ -340,7 +314,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onTap: () => _onItemTapped(0),
                     color: mainGreen,
                   ),
-                  // Settings nav icon
                   _NavIcon(
                     icon: Icons.settings,
                     label: 'Settings',
@@ -348,7 +321,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     onTap: () => _onItemTapped(1),
                     color: mainGreen,
                   ),
-                  // Map nav icon
                   _NavIcon(
                     icon: Icons.map,
                     label: 'Map',
@@ -365,7 +337,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  // Builds a styled TextFormField for profile fields
   Widget _buildFloatingField(
     IconData icon,
     String label, {
@@ -412,7 +383,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
-// Navigation icon widget for bottom navigation bar
 class _NavIcon extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -459,3 +429,4 @@ class _NavIcon extends StatelessWidget {
     );
   }
 }
+
