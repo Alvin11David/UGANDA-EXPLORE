@@ -365,7 +365,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           shape: BoxShape.circle,
                           border: isActive
                               ? Border.all(
-                                  color: const Color(0xFF1FF813),
+                                  color: const Color(0xFF3B82F6),
                                   width: 3,
                                 )
                               : null,

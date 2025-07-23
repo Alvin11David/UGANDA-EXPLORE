@@ -81,7 +81,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final aiNow = DateTime.now();
     setState(() {
       currentChat.add({
-        'role': 'ai',
+        'role': 'assistant',
         'text': aiResponse,
         'timestamp': aiNow,
         'seen': true,
