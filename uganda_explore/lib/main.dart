@@ -18,6 +18,7 @@ import 'package:uganda_explore/screens/profile/settings_screen.dart';
 import 'package:uganda_explore/screens/profile/termsandprivacy_screen.dart';
 import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/splash/splash_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 // Splash Screens
@@ -90,6 +91,7 @@ class MyApp extends StatelessWidget {
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
         '/logout': (context) => const SignUpScreen(),
+        '/map': (context) => const MapViewScreen(siteName: '')
       },
       home: HomeScreen(),
     );
