@@ -64,8 +64,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
+      // Stay on settings
     } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/map');
+      Navigator.pushReplacementNamed(context, '/map'); // This navigates to the map screen
     }
   }
 
