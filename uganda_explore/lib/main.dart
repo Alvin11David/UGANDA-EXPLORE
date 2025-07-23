@@ -92,6 +92,7 @@ class MyApp extends StatelessWidget {
         '/logout': (context) => const SignUpScreen(),
         '/map': (context) => const MapViewScreen(siteName: ''),
         '/admin_dashboard': (context) => const AdminDashboard(),
+        '/termsandprivacy': (context) => const TermsPrivacyScreen(),
       },
       home: SignInScreen(),
     );

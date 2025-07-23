@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-// Helper to get Firestore type as string
+
 String getFirestoreType(dynamic value) {
   if (value == null) return 'null';
   if (value is String) return 'string';
@@ -12,11 +12,11 @@ String getFirestoreType(dynamic value) {
   if (value is List) return 'array';
   if (value is Timestamp) return 'timestamp';
   if (value is GeoPoint) return 'geopoint';
-  // Add more types as needed
+
   return 'unknown';
 }
 
-// Dropdown options for types
+
 const List<String> firestoreTypes = [
   'string',
   'number',
@@ -464,7 +464,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     title: Row(
                                       children: [
                                         Expanded(
-                                          // <-- Fix overflow by wrapping Text in Expanded
                                           child: Text(
                                             entry.key,
                                             style: const TextStyle(
@@ -472,7 +471,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                             overflow: TextOverflow
-                                                .ellipsis, // Prevent long text overflow
+                                                .ellipsis, 
                                           ),
                                         ),
                                         const SizedBox(width: 8),
