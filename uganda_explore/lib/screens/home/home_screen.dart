@@ -472,7 +472,7 @@ void initState() {
                                   gradient: const LinearGradient(
                                     colors: [
                                       Color(0xFF000000),
-                                      Color(0xFF1FF813),
+                                      Color(0xFF3B82F6),
                                     ],
                                     stops: [0.0, 0.47],
                                     begin: Alignment.centerLeft,

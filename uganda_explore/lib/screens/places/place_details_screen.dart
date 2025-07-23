@@ -21,6 +21,8 @@ class PlaceDetailsScreen extends StatefulWidget {
 }
 
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
+  Map<String, dynamic>? _siteData;
+  bool _isLoadingSiteData = true;
   bool _isStarSelected = false;
   final PageController _pageController = PageController();
   final int _currentPage = 0;
@@ -40,6 +42,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchSiteData();
     fetchSiteImages(widget.siteName).then((imgs) {
       if (mounted) {
         setState(() {
@@ -51,6 +54,24 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       }
     });
     _scrollController.addListener(_handleScroll);
+  }
+
+  Future<void> _fetchSiteData() async {
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isEqualTo: widget.siteName)
+        .get();
+    if (query.docs.isNotEmpty) {
+      setState(() {
+        _siteData = query.docs.first.data();
+        _isLoadingSiteData = false;
+      });
+    } else {
+      setState(() {
+        _siteData = null;
+        _isLoadingSiteData = false;
+      });
+    }
   }
 
   void _handleScroll() {
@@ -365,7 +386,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           shape: BoxShape.circle,
                           border: isActive
                               ? Border.all(
-                                  color: const Color(0xFF1FF813),
+                                  color: const Color(0xFF3B82F6),
                                   width: 3,
                                 )
                               : null,
@@ -718,6 +739,24 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         final siteData = query.docs.first.data();
         if (_isStarSelected) {
           favoritesProvider.addFavorite(widget.siteName);
+
+          // Show drop down notification for 3 seconds
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Added to favorites',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.blue, // You can style as you wish
+              margin: const EdgeInsets.only(top: 60, left: 16, right: 16),
+            ),
+          );
         } else {
           favoritesProvider.removeFavorite(widget.siteName);
         }
@@ -941,179 +980,163 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-                        FutureBuilder<String?>(
-                          future: fetchSiteDescription(widget.siteName),
+(_isLoadingSiteData || _siteData == null || _siteData!['description'] == null)
+  ? const SizedBox.shrink()
+  : Text(
+      _siteData!['description'],
+      style: const TextStyle(
+        color: Colors.black,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
+                        FutureBuilder<List<String>>(
+                          future: fetchSiteAudios(widget.siteName),
+                          builder: (context, audioSnapshot) {
+                            if (audioSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            }
+                            final audios = audioSnapshot.data ?? [];
+                            if (audios.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return BackgroundAudioPlayer(urls: audios);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 0,
+                          ),
+                          child: Container(
+                            height: 1,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: Text(
+                            "Quick Information",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FutureBuilder<Map<String, String>>(
+                          future: fetchQuickInfo(widget.siteName),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const SizedBox.shrink();
                             }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return const SizedBox.shrink();
+                            if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text(
+                                "No quick information available.",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                ),
+                              );
                             }
+                            final info = snapshot.data!;
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  snapshot.data!,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<List<String>>(
-                                  future: fetchSiteAudios(widget.siteName),
-                                  builder: (context, audioSnapshot) {
-                                    if (audioSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    final audios = audioSnapshot.data ?? [];
-                                    if (audios.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return BackgroundAudioPlayer(urls: audios);
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                  ),
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    "Quick Information",
-                                    style: TextStyle(
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.attach_money,
                                       color: Colors.black,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20,
+                                      size: 20,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Entry Fee: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['entryfee'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<Map<String, String>>(
-                                  future: fetchQuickInfo(widget.siteName),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    if (!snapshot.hasData ||
-                                        snapshot.data!.isEmpty) {
-                                      return const Text(
-                                        "No quick information available.",
-                                        style: TextStyle(
-                                          color: Colors.black54,
-                                          fontFamily: 'Poppins',
-                                          fontSize: 14,
-                                        ),
-                                      );
-                                    }
-                                    final info = snapshot.data!;
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.attach_money,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Entry Fee: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['entryfee'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.access_time,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Opening: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['openingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.lock_clock,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Closing: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['closingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.access_time,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Opening: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['openingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_clock,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Closing: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['closingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             );
