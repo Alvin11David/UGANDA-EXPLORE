@@ -190,7 +190,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.brightness_6,
                             label: 'App Theme',
-                            onTap: () => print("App Theme tapped"),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
