@@ -21,6 +21,8 @@ class PlaceDetailsScreen extends StatefulWidget {
 }
 
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
+  Map<String, dynamic>? _siteData;
+  bool _isLoadingSiteData = true;
   bool _isStarSelected = false;
   final PageController _pageController = PageController();
   final int _currentPage = 0;
@@ -40,6 +42,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchSiteData();
     fetchSiteImages(widget.siteName).then((imgs) {
       if (mounted) {
         setState(() {
@@ -51,6 +54,24 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       }
     });
     _scrollController.addListener(_handleScroll);
+  }
+
+  Future<void> _fetchSiteData() async {
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isEqualTo: widget.siteName)
+        .get();
+    if (query.docs.isNotEmpty) {
+      setState(() {
+        _siteData = query.docs.first.data();
+        _isLoadingSiteData = false;
+      });
+    } else {
+      setState(() {
+        _siteData = null;
+        _isLoadingSiteData = false;
+      });
+    }
   }
 
   void _handleScroll() {
@@ -718,6 +739,24 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
         final siteData = query.docs.first.data();
         if (_isStarSelected) {
           favoritesProvider.addFavorite(widget.siteName);
+
+          // Show drop down notification for 3 seconds
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Added to favorites',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.blue, // You can style as you wish
+              margin: const EdgeInsets.only(top: 60, left: 16, right: 16),
+            ),
+          );
         } else {
           favoritesProvider.removeFavorite(widget.siteName);
         }
