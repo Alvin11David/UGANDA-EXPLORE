@@ -33,8 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final response = await http.post(
       Uri.parse('https://openrouter.ai/api/v1/chat/completions'),
       headers: {
-        'Authorization':
-            'Bearer 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',
+        'Authorization': 'Bearer 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',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
@@ -81,7 +80,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final aiNow = DateTime.now();
     setState(() {
       currentChat.add({
-        'role': 'ai',
+        'role': 'assistant',
         'text': aiResponse,
         'timestamp': aiNow,
         'seen': true,

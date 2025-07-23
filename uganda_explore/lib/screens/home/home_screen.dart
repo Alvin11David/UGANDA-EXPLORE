@@ -19,7 +19,6 @@ class HomeScreen extends StatefulWidget {
   final String? userFullName;
 
   const HomeScreen({super.key, this.userFullName});
-  
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -179,6 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final LayerLink _searchBarLink = LayerLink();
   String _temperature = '--';
   List<Map<String, dynamic>> _favouriteSites = [];
+  double? _weatherTemp;
 
   Future<void> _loadUserFullName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -187,28 +187,42 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  IconData _getWeatherIcon(double? temp) {
+    if (temp == null) return Icons.sunny;
+    if (temp >= 25) {
+      return Icons.sunny; // Hot
+    } else if (temp >= 15) {
+      return Icons.cloud; // Mild
+    } else {
+      return Icons.grain; // Cold/Rainy
+    }
+  }
+
+  @override
   Future<void> _getCurrentWeather() async {
     try {
-      // Example using OpenWeatherMap API (replace with your API key)
-      final position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
       final lat = position.latitude;
       final lon = position.longitude;
       final apiKey = 'c9cc826f10cc2a88c7267d2066cadd70';
       final url = Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey',
       );
-      final response = await Future.delayed(const Duration(milliseconds: 500), () async {
-        return await http.get(url);
-      });
+      final response = await http.get(url);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        final temp = (data['main']['temp'] as num?)?.toDouble();
         setState(() {
-          _temperature = '${data['main']['temp'].round()}° C';
+          _temperature = '${temp?.round() ?? '--'}° C';
+          _weatherTemp = temp;
         });
       }
     } catch (e) {
       setState(() {
         _temperature = '20° C';
+        _weatherTemp = 20.0;
       });
     }
   }
@@ -223,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Good evening';
     }
   }
-  
+
   void _onItemTapped(int index) {
     if (index == 0) {
       setState(() {
@@ -262,20 +276,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-void initState() {
-  super.initState();
-  _loadUserFullName();
-  _scrollController.addListener(() {
-    if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-      if (_showNavBar) setState(() => _showNavBar = false);
-    } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
-      if (!_showNavBar) setState(() => _showNavBar = true);
-    }
-  });
-  _getCurrentDistrict();
-  _getCurrentWeather();
-  _loadFavouriteSites();
-}
+  void initState() {
+    super.initState();
+    _loadUserFullName();
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_showNavBar) setState(() => _showNavBar = false);
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!_showNavBar) setState(() => _showNavBar = true);
+      }
+    });
+    _getCurrentDistrict();
+    _getCurrentWeather();
+    _loadFavouriteSites();
+  }
 
   Future<void> _getCurrentDistrict() async {
     try {
@@ -501,7 +517,7 @@ void initState() {
                                   gradient: const LinearGradient(
                                     colors: [
                                       Color(0xFF000000),
-                                      Color(0xFF1FF813),
+                                      Color(0xFF3B82F6),
                                     ],
                                     stops: [0.0, 0.47],
                                     begin: Alignment.centerLeft,
@@ -700,10 +716,14 @@ void initState() {
   Future<void> _loadFavouriteSites() async {
     final prefs = await SharedPreferences.getInstance();
     final favNames = prefs.getStringList('favouriteSites') ?? [];
-    final query = await FirebaseFirestore.instance.collection('tourismsites').get();
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
     final allSites = query.docs.map((doc) => doc.data()).toList();
     setState(() {
-      _favouriteSites = allSites.where((site) => favNames.contains(site['name'])).toList();
+      _favouriteSites = allSites
+          .where((site) => favNames.contains(site['name']))
+          .toList();
     });
   }
 
@@ -845,9 +865,9 @@ void initState() {
                                     ),
                                   ],
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
-                                    Icons.sunny,
+                                    _getWeatherIcon(_weatherTemp),
                                     color: Color(0xFFF59E0B),
                                     size: 28,
                                   ),
@@ -1287,7 +1307,20 @@ void initState() {
                                                       right: 10,
                                                       child: GestureDetector(
                                                         onTap: () {
-                                                          // TODO: Implement StreetViewScreen navigation
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (_) => StreetViewPage(
+                                                                latitude:
+                                                                    site['streetViewLat'],
+                                                                longitude:
+                                                                    site['streetViewLng'],
+                                                                siteName:
+                                                                    site['name'] ??
+                                                                    '',
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
                                                         child: Container(
                                                           decoration:
@@ -1480,7 +1513,9 @@ void initState() {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => PlaceDetailsScreen(siteName: site['name']),
+                                    builder: (_) => PlaceDetailsScreen(
+                                      siteName: site['name'],
+                                    ),
                                   ),
                                 );
                               },
@@ -1503,24 +1538,32 @@ void initState() {
                                     children: [
                                       site['images'] != null &&
                                               site['images'] is List &&
-                                              (site['images'] as List).isNotEmpty
+                                              (site['images'] as List)
+                                                  .isNotEmpty
                                           ? Image.network(
                                               site['images'][0],
                                               height: 250,
                                               width: 220,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (c, e, s) => Container(
-                                                height: 250,
-                                                width: 220,
-                                                color: Colors.grey[300],
-                                                child: const Icon(Icons.broken_image, color: Colors.grey),
-                                              ),
+                                              errorBuilder: (c, e, s) =>
+                                                  Container(
+                                                    height: 250,
+                                                    width: 220,
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
                                             )
                                           : Container(
                                               height: 250,
                                               width: 220,
                                               color: Colors.grey[300],
-                                              child: const Icon(Icons.broken_image, color: Colors.grey),
+                                              child: const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
+                                              ),
                                             ),
                                       Positioned(
                                         left: 0,
@@ -1532,28 +1575,45 @@ void initState() {
                                             bottomRight: Radius.circular(30),
                                           ),
                                           child: BackdropFilter(
-                                            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                                            filter: ImageFilter.blur(
+                                              sigmaX: 30,
+                                              sigmaY: 30,
+                                            ),
                                             child: Container(
                                               height: 80,
                                               width: 219,
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.18),
-                                                border: Border.all(color: Colors.white, width: 1),
-                                                borderRadius: const BorderRadius.only(
-                                                  bottomLeft: Radius.circular(30),
-                                                  bottomRight: Radius.circular(30),
+                                                color: Colors.white.withOpacity(
+                                                  0.18,
                                                 ),
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(30),
+                                                      bottomRight:
+                                                          Radius.circular(30),
+                                                    ),
                                               ),
                                               child: Padding(
-                                                padding: const EdgeInsets.only(left: 3, top: 10, right: 8),
+                                                padding: const EdgeInsets.only(
+                                                  left: 3,
+                                                  top: 10,
+                                                  right: 8,
+                                                ),
                                                 child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       site['name'] ?? '',
                                                       style: const TextStyle(
                                                         fontFamily: 'Poppins',
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 13,
                                                         color: Colors.white,
                                                       ),
@@ -1562,24 +1622,39 @@ void initState() {
                                                     Row(
                                                       children: [
                                                         const Padding(
-                                                          padding: EdgeInsets.only(left: 4),
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 4,
+                                                              ),
                                                           child: Icon(
                                                             Icons.location_on,
-                                                            color: Color(0xFF3B82F6),
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
                                                             size: 20,
                                                           ),
                                                         ),
-                                                        const SizedBox(width: 6),
+                                                        const SizedBox(
+                                                          width: 6,
+                                                        ),
                                                         Expanded(
                                                           child: Text(
-                                                            site['location'] ?? '',
-                                                            style: const TextStyle(
-                                                              fontFamily: 'Poppins',
-                                                              fontWeight: FontWeight.w500,
-                                                              fontSize: 13,
-                                                              color: Colors.white,
-                                                            ),
-                                                            overflow: TextOverflow.ellipsis,
+                                                            site['location'] ??
+                                                                '',
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 13,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                           ),
                                                         ),
                                                       ],
@@ -1752,7 +1827,7 @@ void initState() {
                                   builder: (_) =>
                                       const NearbyAttractionsScreen(),
                                 ),
-                              ); 
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,

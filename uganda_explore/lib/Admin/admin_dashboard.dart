@@ -451,112 +451,111 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                   ),
                                 ),
                               const SizedBox(height: 10),
-                              ...data.entries
-                                  .where((e) => e.key != 'images')
-                                  .map((entry) {
-                                    final fieldType = getFirestoreType(
-                                      entry.value,
-                                    );
-                                    return Card(
-                                      color: Colors.white.withOpacity(0.12),
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 4,
-                                      ),
-                                      child: ListTile(
-                                        title: Row(
-                                          children: [
-                                            Text(
-                                              entry.key,
-                                              style: const TextStyle(
-                                                color: Color(0xFF3B82F6),
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                              ...data.entries.where((e) => e.key != 'images').map((
+                                entry,
+                              ) {
+                                final fieldType = getFirestoreType(entry.value);
+                                return Card(
+                                  color: Colors.white.withOpacity(0.12),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
+                                  child: ListTile(
+                                    title: Row(
+                                      children: [
+                                        Expanded(
+                                          // <-- Fix overflow by wrapping Text in Expanded
+                                          child: Text(
+                                            entry.key,
+                                            style: const TextStyle(
+                                              color: Color(0xFF3B82F6),
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                            const SizedBox(width: 8),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(
-                                                  0.1,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Text(
-                                                fieldType,
-                                                style: const TextStyle(
-                                                  color: Colors.white70,
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
+                                            overflow: TextOverflow
+                                                .ellipsis, // Prevent long text overflow
+                                          ),
                                         ),
-                                        subtitle: entry.value is List
-                                            ? Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  ...List.generate(
-                                                    (entry.value as List)
-                                                        .length,
-                                                    (idx) => Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                            bottom: 2.0,
-                                                          ),
-                                                      child: Text(
-                                                        '${entry.value[idx]}',
-                                                        style: const TextStyle(
-                                                          color: Colors.white,
-                                                        ),
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(
+                                              0.1,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            fieldType,
+                                            style: const TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: entry.value is List
+                                        ? Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              ...List.generate(
+                                                (entry.value as List).length,
+                                                (idx) => Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                        bottom: 2.0,
                                                       ),
+                                                  child: Text(
+                                                    '${entry.value[idx]}',
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
                                                     ),
                                                   ),
-                                                ],
-                                              )
-                                            : Text(
-                                                '${entry.value}',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
                                                 ),
                                               ),
-                                        trailing: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.edit,
-                                                color: Color(0xFF1E3A8A),
-                                              ),
-                                              tooltip: 'Edit Field',
-                                              onPressed: () =>
-                                                  _showEditFieldDialog(
-                                                    docId,
-                                                    entry.key,
-                                                    entry.value,
-                                                  ),
+                                            ],
+                                          )
+                                        : Text(
+                                            '${entry.value}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
                                             ),
-                                            IconButton(
-                                              icon: const Icon(
-                                                Icons.delete_outline,
-                                                color: Color(0xFFEF4444),
-                                              ),
-                                              tooltip: 'Delete Field',
-                                              onPressed: () => _deleteField(
-                                                docId,
-                                                entry.key,
-                                              ),
-                                            ),
-                                          ],
+                                          ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.edit,
+                                            color: Color(0xFF1E3A8A),
+                                          ),
+                                          tooltip: 'Edit Field',
+                                          onPressed: () => _showEditFieldDialog(
+                                            docId,
+                                            entry.key,
+                                            entry.value,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }),
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.delete_outline,
+                                            color: Color(0xFFEF4444),
+                                          ),
+                                          tooltip: 'Delete Field',
+                                          onPressed: () =>
+                                              _deleteField(docId, entry.key),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
                             ],
                           ),
                         ),
