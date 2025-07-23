@@ -23,7 +23,7 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
-import 'package:uganda_explore/screens/profile/profile_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -80,7 +80,6 @@ class MyApp extends StatelessWidget {
             '/forgot_password': (context) => const ForgotPasswordScreen(),
             '/otp': (context) => const OtpScreen(email: '', otp: ''),
             '/home': (context) => const HomeScreen(),
-            '/profile': (context) => const ProfileScreen(),
             '/edit_profile': (context) => const EditProfileScreen(),
             '/settings': (context) => const SettingsScreen(),
             '/app_theme': (context) => const AppThemeScreen(),

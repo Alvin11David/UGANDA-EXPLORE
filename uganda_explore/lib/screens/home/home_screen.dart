@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
       final response = await Future.delayed(const Duration(milliseconds: 500), () async {
         return await http.get(url);
-      }) as http.Response;
+      });
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -890,7 +890,7 @@ void initState() {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        _getGreeting() + ', ${widget.userFullName ?? "Explorer"}',
+                        '${_getGreeting()}, ${widget.userFullName ?? "Explorer"}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
@@ -1474,7 +1474,7 @@ void initState() {
                       child: Row(
                         children: _favouriteSites.map((site) {
                           return Padding(
-                            padding: const EdgeInsets.only(left: 4),
+                            padding: const EdgeInsets.only(right: 90),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
