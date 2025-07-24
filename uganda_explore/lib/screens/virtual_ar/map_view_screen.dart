@@ -302,50 +302,41 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
   }
 
   Future<void> fetchAndSetRoute() async {
-    if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
-    
+  if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
+  print('Fetching route: userLatLng=$userLatLng, siteLatLng=$siteLatLng');
+  setState(() { isLoadingRoute = true; });
+  const apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg'; 
+  try {
+    final polyline = await fetchRoutePolyline(userLatLng!, siteLatLng!, apiKey);
     setState(() {
-      isLoadingRoute = true;
+      routePolyline = polyline;
+      isLoadingRoute = false;
     });
-    
-    const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
-    
-    try {
-      final polyline = await fetchRoutePolyline(
-        userLatLng!,
-        siteLatLng!,
-        apiKey,
-      );
-      setState(() {
-        routePolyline = polyline;
-        isLoadingRoute = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = 'Failed to fetch route: $e';
-        isLoadingRoute = false;
-      });
+  } catch (e) {
+    print('Directions API Error: $e');
+    setState(() {
+      error = 'Failed to fetch route: $e';
+      isLoadingRoute = false;
+    });
+  }
+}
+
+Future<List<LatLng>> fetchRoutePolyline(LatLng origin, LatLng destination, String apiKey) async {
+  final url = 'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=$apiKey';
+  print('Directions API Request: $url');
+  final response = await http.get(Uri.parse(url));
+  print('Directions API Response: Status=${response.statusCode}, Body=${response.body}');
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+      final points = data['routes'][0]['overview_polyline']['points'];
+      return decodePolyline(points);
+    } else {
+      throw Exception('API Error: ${data['status']} - ${data['error_message'] ?? 'No error message'}');
     }
   }
-
-  Future<List<LatLng>> fetchRoutePolyline(
-    LatLng origin,
-    LatLng destination,
-    String apiKey,
-  ) async {
-    final url =
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=$apiKey';
-
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['routes'] != null && data['routes'].isNotEmpty) {
-        final points = data['routes'][0]['overview_polyline']['points'];
-        return decodePolyline(points);
-      }
-    }
-    throw Exception('Failed to fetch route');
-  }
+  throw Exception('HTTP Error: Status=${response.statusCode}, Body=${response.body}');
+}
 
   List<LatLng> decodePolyline(String encoded) {
     List<LatLng> poly = [];
@@ -384,7 +375,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       isLoadingDurations = true;
     });
     
-    const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+    const apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
     final modes = ['walking', 'driving', 'bicycling'];
     final results = <String, Map<String, String>>{};
 
