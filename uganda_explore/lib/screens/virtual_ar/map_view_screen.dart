@@ -311,29 +311,37 @@ class _MapViewScreenState extends State<MapViewScreen>
       isLoadingRoute = true;
       error = null;
     });
+
     try {
-      final directions = await _directionsRepository.getDirections(
-        origin: userLatLng!,
-        destination: siteLatLng!,
-        mode: 'driving',
-      );
-      if (directions != null && directions.polylinePoints.isNotEmpty) {
-        setState(() {
-          routePolyline = directions.polylinePoints;
-          isLoadingRoute = false;
-          // Optionally: show directions.totalDistance, directions.totalDuration
-        });
-      } else {
-        // Fallback: try walking or bicycling, or show error
-        setState(() {
-          error = 'No route found for this mode.';
-          isLoadingRoute = false;
-          routePolyline = [];
-        });
+      // 1. Interpolate points every 10km
+      final points = interpolatePointsEvery10km(userLatLng!, siteLatLng!, 10.0);
+
+      // 2. Fetch directions for each segment and join polylines
+      List<LatLng> allPolylinePoints = [];
+      for (int i = 0; i < points.length - 1; i++) {
+        final directions = await _directionsRepository.getDirections(
+          origin: points[i],
+          destination: points[i + 1],
+          mode: 'driving',
+        );
+        if (directions != null && directions.polylinePoints.isNotEmpty) {
+          // Avoid duplicate points at segment joins
+          if (allPolylinePoints.isNotEmpty &&
+              allPolylinePoints.last == directions.polylinePoints.first) {
+            allPolylinePoints.addAll(directions.polylinePoints.skip(1));
+          } else {
+            allPolylinePoints.addAll(directions.polylinePoints);
+          }
+        }
       }
+
+      setState(() {
+        routePolyline = allPolylinePoints;
+        isLoadingRoute = false;
+      });
     } catch (e) {
       setState(() {
-        error = 'Failed to fetch route: $e';
+        error = 'Failed to fetch segmented route: $e';
         isLoadingRoute = false;
         routePolyline = [];
       });
@@ -1072,4 +1080,38 @@ class _MapViewScreenState extends State<MapViewScreen>
       ),
     );
   }
+}
+
+List<LatLng> interpolatePointsEvery10km(LatLng start, LatLng end, double intervalKm) {
+  double distance = _haversineDistance(start, end);
+  int numPoints = (distance / intervalKm).floor();
+  List<LatLng> points = [start];
+
+  for (int i = 1; i < numPoints; i++) {
+    double fraction = i * intervalKm / distance;
+    points.add(_interpolateLatLng(start, end, fraction));
+  }
+  points.add(end);
+  return points;
+}
+
+double _haversineDistance(LatLng p1, LatLng p2) {
+  const R = 6371; // Earth radius in km
+  double dLat = _deg2rad(p2.latitude - p1.latitude);
+  double dLng = _deg2rad(p2.longitude - p1.longitude);
+  double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+      math.cos(_deg2rad(p1.latitude)) *
+          math.cos(_deg2rad(p2.latitude)) *
+          math.sin(dLng / 2) *
+          math.sin(dLng / 2);
+  double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  return R * c;
+}
+
+double _deg2rad(double deg) => deg * (math.pi / 180);
+
+LatLng _interpolateLatLng(LatLng start, LatLng end, double fraction) {
+  double lat = start.latitude + (end.latitude - start.latitude) * fraction;
+  double lng = start.longitude + (end.longitude - start.longitude) * fraction;
+  return LatLng(lat, lng);
 }
