@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
+import 'package:uganda_explore/screens/virtual_ar/directions_repository.dart';
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
@@ -62,9 +63,13 @@ class _MapViewScreenState extends State<MapViewScreen>
   // Custom marker for user with direction
   BitmapDescriptor? customUserMarker;
 
+  // Add DirectionsRepository instance
+  late final DirectionsRepository _directionsRepository;
+
   @override
   void initState() {
     super.initState();
+    _directionsRepository = DirectionsRepository(_apiKey);
     _initializeAnimations();
     fetchCoordinates();
     fetchUserDistrict();
@@ -302,31 +307,35 @@ class _MapViewScreenState extends State<MapViewScreen>
 
   Future<void> fetchAndSetRoute() async {
     if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
-
-    print('Fetching route: userLatLng=$userLatLng, siteLatLng=$siteLatLng');
-
     setState(() {
       isLoadingRoute = true;
-      error = null; // Clear previous errors
+      error = null;
     });
-
     try {
-      final polyline = await fetchRoutePolyline(
-        userLatLng!,
-        siteLatLng!,
-        _apiKey,
+      final directions = await _directionsRepository.getDirections(
+        origin: userLatLng!,
+        destination: siteLatLng!,
+        mode: 'driving',
       );
-      setState(() {
-        routePolyline = polyline;
-        isLoadingRoute = false;
-      });
-      print('Route fetched successfully with ${polyline.length} points');
+      if (directions != null && directions.polylinePoints.isNotEmpty) {
+        setState(() {
+          routePolyline = directions.polylinePoints;
+          isLoadingRoute = false;
+          // Optionally: show directions.totalDistance, directions.totalDuration
+        });
+      } else {
+        // Fallback: try walking or bicycling, or show error
+        setState(() {
+          error = 'No route found for this mode.';
+          isLoadingRoute = false;
+          routePolyline = [];
+        });
+      }
     } catch (e) {
-      print('Directions API Error: $e');
       setState(() {
         error = 'Failed to fetch route: $e';
         isLoadingRoute = false;
-        routePolyline = []; // Clear existing route on error
+        routePolyline = [];
       });
     }
   }
@@ -334,13 +343,16 @@ class _MapViewScreenState extends State<MapViewScreen>
   Future<List<LatLng>> fetchRoutePolyline(
     LatLng origin,
     LatLng destination,
-    String apiKey,
+    String apiKey, {
+    String mode = 'driving',
+  }
   ) async {
     final url =
         'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${origin.latitude},${origin.longitude}&'
         'destination=${destination.latitude},${destination.longitude}&'
-        'mode=driving&'
+        'mode=$mode&'
+        'overview=full&'
         'key=$apiKey';
 
     print('Directions API Request: $url');
