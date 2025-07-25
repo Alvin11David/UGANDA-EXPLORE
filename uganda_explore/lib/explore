@@ -23,6 +23,8 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<FirestoreService>(
           create:(_) =>
+FirestoreService(),
+        )
 
     return MaterialApp(
       title: 'Tourism Image Carousel',
