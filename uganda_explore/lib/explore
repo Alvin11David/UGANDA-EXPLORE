@@ -6,7 +6,10 @@ import'firebase_options.dart';
 import'services/firestore_service.dart';
 
 void main() async {
-WidgetsFlutterBinding.ensureInitialized()
+WidgetsFlutterBinding.ensureInitialized();
+
+await Firebase.InitializeApp(
+  options:
   runApp(const MyApp());
 }
 
