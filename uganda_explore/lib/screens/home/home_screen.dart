@@ -550,8 +550,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             );
-          },
-        );
+            },
+          );
       },
     );
   }
@@ -1000,44 +1000,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                             },
                                             onSubmitted: (value) async {
                                               _removeSuggestionsOverlay();
-                                              final keyword = value.trim();
+                                              final keyword = value.trim().toLowerCase();
                                               if (keyword.isNotEmpty) {
-                                                final query =
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection(
-                                                          'tourismsites',
-                                                        )
-                                                        .where(
-                                                          'name',
-                                                          isEqualTo: keyword,
-                                                        )
-                                                        .limit(1)
-                                                        .get();
+                                                final query = await FirebaseFirestore.instance
+                                                    .collection('tourismsites')
+                                                    .where('name_lowercase', isGreaterThanOrEqualTo: keyword)
+                                                    .where('name_lowercase', isLessThanOrEqualTo: '$keyword\uf8ff')
+                                                    .limit(1)
+                                                    .get();
 
                                                 if (query.docs.isNotEmpty) {
-                                                  final siteData = query
-                                                      .docs
-                                                      .first
-                                                      .data();
+                                                  final siteData = query.docs.first.data();
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          PlaceDetailsScreen(
-                                                            siteName:
-                                                                siteData['name'],
-                                                          ),
+                                                      builder: (_) => PlaceDetailsScreen(
+                                                        siteName: siteData['name'],
+                                                      ),
                                                     ),
                                                   );
                                                 } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
+                                                  ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                      content: Text(
-                                                        'No site found with that name.',
-                                                      ),
+                                                      content: Text('No site found with that name.'),
                                                     ),
                                                   );
                                                 }
@@ -1055,40 +1040,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         onPressed: () async {
                                           _removeSuggestionsOverlay();
-                                          final keyword = _searchController.text
-                                              .trim();
+                                          final keyword = _searchController.text.trim().toLowerCase();
                                           if (keyword.isNotEmpty) {
-                                            final query =
-                                                await FirebaseFirestore.instance
-                                                    .collection('tourismsites')
-                                                    .where(
-                                                      'name',
-                                                      isEqualTo: keyword,
-                                                    )
-                                                    .limit(1)
-                                                    .get();
+                                            final query = await FirebaseFirestore.instance
+                                                .collection('tourismsites')
+                                                .where('name_lowercase', isGreaterThanOrEqualTo: keyword)
+                                                .where('name_lowercase', isLessThanOrEqualTo: '$keyword\uf8ff')
+                                                .limit(1)
+                                                .get();
 
                                             if (query.docs.isNotEmpty) {
-                                              final siteData = query.docs.first
-                                                  .data();
+                                              final siteData = query.docs.first.data();
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      PlaceDetailsScreen(
-                                                        siteName:
-                                                            siteData['name'],
-                                                      ),
+                                                  builder: (_) => PlaceDetailsScreen(
+                                                    siteName: siteData['name'],
+                                                  ),
                                                 ),
                                               );
                                             } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
+                                              ScaffoldMessenger.of(context).showSnackBar(
                                                 SnackBar(
-                                                  content: Text(
-                                                    'No site found with that name.',
-                                                  ),
+                                                  content: Text('No site found with that name.'),
                                                 ),
                                               );
                                             }
