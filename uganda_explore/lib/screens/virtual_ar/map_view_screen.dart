@@ -112,17 +112,11 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       _smoothCameraFollow();
     }
     if (siteLatLng != null && !isLoadingRoute) {
-      _debouncedRouteUpdate();
+      _debouncedRouteUpdate(); // Use the new debounced update method
     }
   }
 
   Timer? _routeUpdateTimer;
-  void _debouncedRouteUpdate() {
-    _routeUpdateTimer?.cancel();
-    _routeUpdateTimer = Timer(const Duration(seconds: 3), () {
-      fetchAndSetRoute();
-    });
-  }
 
   void _smoothCameraFollow() {
     if (userLatLng != null && mapController != null) {
@@ -305,219 +299,41 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     }
   }
 
-  Future<List<LatLng>> fetchOptimalRouteWithWaypoints(
-    LatLng origin,
-    LatLng destination,
-    String apiKey, {
-    int maxWaypoints = 23,
-  }) async {
-    try {
-      final distance = calculateDistance(origin, destination);
-      if (distance <= 100) {
-        return await _fetchDirectRoute(origin, destination, apiKey);
-      }
-      final waypoints = _calculateStrategicWaypoints(
-        origin,
-        destination,
-        maxWaypoints,
-      );
-      final waypointsString = waypoints
-          .map((point) => '${point.latitude},${point.longitude}')
-          .join('|');
-      final url =
-          'https://maps.googleapis.com/maps/api/directions/json?'
-          'origin=${origin.latitude},${origin.longitude}&'
-          'destination=${destination.latitude},${destination.longitude}&'
-          'waypoints=optimize:true|$waypointsString&'
-          'mode=driving&'
-          'overview=full&'
-          'key=$apiKey';
-      final response = await http
-          .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-          final points = data['routes'][0]['overview_polyline']['points'];
-          final decodedPoints = decodePolyline(points);
-          return decodedPoints;
-        } else {
-          throw Exception(
-            'Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
-          );
-        }
-      } else {
-        throw Exception('HTTP ${response.statusCode}: ${response.body}');
-      }
-    } catch (e) {
-      return await _fetchDirectRoute(origin, destination, apiKey);
-    }
-  }
-
-  List<LatLng> _calculateStrategicWaypoints(
-    LatLng origin,
-    LatLng destination,
-    int maxWaypoints,
-  ) {
-    final distance = calculateDistance(origin, destination);
-    int waypointCount;
-    if (distance <= 200) {
-      waypointCount = math.min(3, maxWaypoints);
-    } else if (distance <= 500)
-      waypointCount = math.min(8, maxWaypoints);
-    else if (distance <= 1000)
-      waypointCount = math.min(15, maxWaypoints);
-    else
-      waypointCount = maxWaypoints;
-    List<LatLng> waypoints = [];
-    for (int i = 1; i <= waypointCount; i++) {
-      final fraction = i / (waypointCount + 1.0);
-      final waypoint = _interpolateGreatCircle(origin, destination, fraction);
-      waypoints.add(waypoint);
-    }
-    return waypoints;
-  }
-
-  LatLng _interpolateGreatCircle(LatLng start, LatLng end, double fraction) {
-    final lat1 = start.latitude * math.pi / 180;
-    final lon1 = start.longitude * math.pi / 180;
-    final lat2 = end.latitude * math.pi / 180;
-    final lon2 = end.longitude * math.pi / 180;
-    final d =
-        2 *
-        math.asin(
-          math.sqrt(
-            math.pow(math.sin((lat1 - lat2) / 2), 2) +
-                math.cos(lat1) *
-                    math.cos(lat2) *
-                    math.pow(math.sin((lon1 - lon2) / 2), 2),
-          ),
-        );
-    if (d.isNaN || d == 0) {
-      return LatLng(
-        start.latitude + (end.latitude - start.latitude) * fraction,
-        start.longitude + (end.longitude - start.longitude) * fraction,
-      );
-    }
-    final a = math.sin((1 - fraction) * d) / math.sin(d);
-    final b = math.sin(fraction * d) / math.sin(d);
-    final x =
-        a * math.cos(lat1) * math.cos(lon1) +
-        b * math.cos(lat2) * math.cos(lon2);
-    final y =
-        a * math.cos(lat1) * math.sin(lon1) +
-        b * math.cos(lat2) * math.sin(lon2);
-    final z = a * math.sin(lat1) + b * math.sin(lat2);
-    final lat = math.atan2(z, math.sqrt(x * x + y * y));
-    final lon = math.atan2(y, x);
-    return LatLng(lat * 180 / math.pi, lon * 180 / math.pi);
-  }
-
-  Future<List<LatLng>> fetchBestAlternativeRoute(
-    LatLng origin,
-    LatLng destination,
-    String apiKey,
-  ) async {
-    final url =
-        'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${origin.latitude},${origin.longitude}&'
-        'destination=${destination.latitude},${destination.longitude}&'
-        'alternatives=true&'
-        'mode=driving&'
-        'overview=full&'
-        'key=$apiKey';
-    final response = await http
-        .get(Uri.parse(url))
-        .timeout(const Duration(seconds: 10));
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-        final routes = data['routes'] as List;
-        var selectedRoute = routes[0];
-        final points = selectedRoute['overview_polyline']['points'];
-        return decodePolyline(points);
-      }
-    }
-    throw Exception('Alternative routing failed: HTTP ${response.statusCode}');
-  }
-
-  Future<List<LatLng>> fetchSmartChunkedRoute(
-    LatLng origin,
-    LatLng destination,
-    String apiKey,
-  ) async {
-    final distance = calculateDistance(origin, destination);
-    if (distance <= 300) {
-      return await fetchOptimalRouteWithWaypoints(origin, destination, apiKey);
-    }
-    final chunks = _createIntelligentChunks(origin, destination, distance);
-    List<LatLng> fullRoute = [];
-    for (int i = 0; i < chunks.length - 1; i++) {
-      try {
-        final chunkRoute = await fetchOptimalRouteWithWaypoints(
-          chunks[i],
-          chunks[i + 1],
-          apiKey,
-        );
-        if (fullRoute.isNotEmpty && chunkRoute.isNotEmpty) {
-          if (fullRoute.last.latitude == chunkRoute.first.latitude &&
-              fullRoute.last.longitude == chunkRoute.first.longitude) {
-            fullRoute.addAll(chunkRoute.skip(1));
-          } else {
-            fullRoute.addAll(chunkRoute);
-          }
-        } else {
-          fullRoute.addAll(chunkRoute);
-        }
-        if (i < chunks.length - 2) {
-          await Future.delayed(const Duration(milliseconds: 300));
-        }
-      } catch (e) {
-        // Continue with other chunks
-      }
-    }
-    return fullRoute;
-  }
-
-  List<LatLng> _createIntelligentChunks(
-    LatLng origin,
-    LatLng destination,
-    double distance,
-  ) {
-    int chunkCount;
-    if (distance <= 500) {
-      chunkCount = 2;
-    } else if (distance <= 1000)
-      chunkCount = 3;
-    else if (distance <= 2000)
-      chunkCount = 4;
-    else
-      chunkCount = 5;
-    List<LatLng> chunks = [origin];
-    for (int i = 1; i < chunkCount; i++) {
-      final fraction = i / chunkCount.toDouble();
-      chunks.add(_interpolateGreatCircle(origin, destination, fraction));
-    }
-    chunks.add(destination);
-    return chunks;
-  }
+  // Add improved routing methods below
 
   Future<List<LatLng>> fetchRouteWithFallback(
     LatLng origin,
     LatLng destination,
     String apiKey,
   ) async {
-    final distance = calculateDistance(origin, destination);
-    try {
-      return await fetchOptimalRouteWithWaypoints(origin, destination, apiKey);
-    } catch (e) {}
-    try {
-      return await fetchBestAlternativeRoute(origin, destination, apiKey);
-    } catch (e) {}
+    // Try simple direct route first - this usually works best for staying on roads
     try {
       return await _fetchDirectRoute(origin, destination, apiKey);
-    } catch (e) {}
-    return await fetchSmartChunkedRoute(origin, destination, apiKey);
+    } catch (e) {
+      print('Direct route failed: $e');
+    }
+
+    // If direct fails, try alternatives but avoid waypoints for shorter distances
+    final distance = calculateDistance(origin, destination);
+    
+    if (distance <= 200) {
+      // For shorter distances, avoid waypoints completely
+      try {
+        return await fetchBestAlternativeRoute(origin, destination, apiKey);
+      } catch (e) {
+        print('Alternative route failed: $e');
+      }
+    } else {
+      // For longer distances, use minimal waypoints
+      try {
+        return await fetchOptimalRouteWithMinimalWaypoints(origin, destination, apiKey);
+      } catch (e) {
+        print('Optimal route with waypoints failed: $e');
+      }
+    }
+
+    // Last resort - return straight line (better than broken polylines)
+    return [origin, destination];
   }
 
   Future<List<LatLng>> _fetchDirectRoute(
@@ -525,29 +341,175 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     LatLng destination,
     String apiKey,
   ) async {
-    final url =
-        'https://maps.googleapis.com/maps/api/directions/json?'
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${origin.latitude},${origin.longitude}&'
         'destination=${destination.latitude},${destination.longitude}&'
         'mode=driving&'
+        'avoid=tolls&'  // Avoid tolls to get more direct routes
+        'optimize_waypoints=false&'  // Don\'t let Google reorder
         'overview=full&'
         'key=$apiKey';
-    final response = await http
-        .get(Uri.parse(url))
-        .timeout(const Duration(seconds: 10));
+
+    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+    
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
+      
       if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
         final points = data['routes'][0]['overview_polyline']['points'];
-        return decodePolyline(points);
+        final decodedPoints = decodePolyline(points);
+        
+        // Validate the route doesn't have crazy jumps
+        if (_validateRoute(decodedPoints)) {
+          return decodedPoints;
+        } else {
+          throw Exception('Route validation failed - too many off-road segments');
+        }
       } else {
-        throw Exception(
-          'Direct route API error: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
-        );
+        throw Exception('API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
       }
     } else {
-      throw Exception('Direct route HTTP error: ${response.statusCode}');
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
     }
+  }
+
+  Future<List<LatLng>> fetchOptimalRouteWithMinimalWaypoints(
+  LatLng origin,
+  LatLng destination,
+  String apiKey,
+) async {
+  final distance = calculateDistance(origin, destination);
+  List<LatLng> waypoints = [];
+
+  // DOUBLED waypoints: 2 for >100km, 4 for >200km, etc. (max 10, but Google allows max 25)
+  int waypointCount = 0;
+  if (distance > 100) {
+    waypointCount = (((distance - 1) ~/ 100) * 2).clamp(2, 10); // Doubled and capped at 10
+  }
+  
+  // Alternative: Even more aggressive doubling with different distance thresholds
+  // if (distance > 50) {
+  //   waypointCount = (((distance - 1) ~/ 50) * 2).clamp(2, 15); // Waypoints every 50km, doubled
+  // }
+  
+  for (int i = 1; i <= waypointCount; i++) {
+    final fraction = i / (waypointCount + 1);
+    final lat = origin.latitude + (destination.latitude - origin.latitude) * fraction;
+    final lng = origin.longitude + (destination.longitude - origin.longitude) * fraction;
+    waypoints.add(LatLng(lat, lng));
+  }
+
+  String waypointsString = '';
+  if (waypoints.isNotEmpty) {
+    waypointsString = '&waypoints=' + 
+        waypoints.map((point) => '${point.latitude},${point.longitude}').join('|');
+  }
+  
+  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+      'origin=${origin.latitude},${origin.longitude}&'
+      'destination=${destination.latitude},${destination.longitude}&'
+      'mode=driving&'
+      'avoid=tolls&'
+      'optimize_waypoints=false&'
+      '$waypointsString&'
+      'overview=full&'
+      'key=$apiKey';
+
+  final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20)); // Increased timeout
+  
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    
+    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+      final points = data['routes'][0]['overview_polyline']['points'];
+      final decodedPoints = decodePolyline(points);
+      
+      if (_validateRoute(decodedPoints)) {
+        return decodedPoints;
+      } else {
+        // Fallback to direct route if validation fails
+        return await _fetchDirectRoute(origin, destination, apiKey);
+      }
+    } else {
+      throw Exception('Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
+    }
+  } else {
+    throw Exception('HTTP ${response.statusCode}');
+  }
+}
+
+  // Validate that the route doesn't have crazy jumps or off-road segments
+  bool _validateRoute(List<LatLng> route) {
+    if (route.length < 2) return false;
+    
+    for (int i = 1; i < route.length; i++) {
+      final distance = calculateDistance(route[i-1], route[i]);
+      
+      // If any single segment is more than 50km, it's probably a bad route
+      if (distance > 50) {
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  Future<List<LatLng>> fetchBestAlternativeRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
+  ) async {
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'alternatives=true&'
+        'mode=driving&'
+        'avoid=tolls&'
+        'overview=full&'
+        'key=$apiKey';
+
+    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+    
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+        final routes = data['routes'] as List;
+        
+        // Find the route with the most reasonable distance
+        var bestRoute;
+        double bestScore = double.infinity;
+        
+        for (var route in routes) {
+          final points = route['overview_polyline']['points'];
+          final decodedPoints = decodePolyline(points);
+          
+          if (_validateRoute(decodedPoints)) {
+            // Score based on number of points (more points = more detailed = better)
+            final score = decodedPoints.length.toDouble();
+            if (score < bestScore) {
+              bestScore = score;
+              bestRoute = route;
+            }
+          }
+        }
+        
+        if (bestRoute != null) {
+          final points = bestRoute['overview_polyline']['points'];
+          return decodePolyline(points);
+        }
+      }
+    }
+    
+    throw Exception('No valid alternative routes found');
+  }
+
+  // Also update your route update method to be less aggressive
+  void _debouncedRouteUpdate() {
+    _routeUpdateTimer?.cancel();
+    _routeUpdateTimer = Timer(const Duration(seconds: 20), () { 
+      fetchAndSetRoute();
+    });
   }
 
   double calculateDistance(LatLng point1, LatLng point2) {
