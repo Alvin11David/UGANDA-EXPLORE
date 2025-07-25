@@ -30,10 +30,8 @@ FirestoreService(),
       child:MaterialApp(
          debugShowCheckedModeBanner:
 false,
-
-    
-      title: 'Tourism Image Carousel',
-      theme: ThemeData(
+       title: 'Tourism Image Carousel',
+       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Inter', 
