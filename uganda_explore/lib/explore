@@ -51,6 +51,10 @@ Colors.black,
     );
     textTheme:const TextTheme(
       headlineSmall: TextStyle(
+        fontSize: 20
+        fontWeight:
+FontWeight.bold,
+              color:Colors.black87,
   }
 }
 
