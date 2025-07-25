@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider<FirestoreService>(
 
     return MaterialApp(
       title: 'Tourism Image Carousel',
