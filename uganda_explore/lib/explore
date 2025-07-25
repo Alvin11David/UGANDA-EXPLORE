@@ -26,6 +26,9 @@ class MyApp extends StatelessWidget {
 FirestoreService(),
         )
 
+      ],
+      child:MaterialApp(
+
     return MaterialApp(
       title: 'Tourism Image Carousel',
       theme: ThemeData(
