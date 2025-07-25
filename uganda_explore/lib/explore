@@ -30,7 +30,7 @@ FirestoreService(),
       child:MaterialApp(
          debugShowCheckedModeBanner:
 
-    return MaterialApp(
+    
       title: 'Tourism Image Carousel',
       theme: ThemeData(
         primarySwatch: Colors.blue,
