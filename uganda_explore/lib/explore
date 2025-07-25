@@ -10,6 +10,7 @@ WidgetsFlutterBinding.ensureInitialized();
 
 await Firebase.InitializeApp(
   options:
+DefaultFirebaseOptions.currentPlatform,);
   runApp(const MyApp());
 }
 
