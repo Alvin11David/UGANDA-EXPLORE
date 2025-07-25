@@ -7,6 +7,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
@@ -23,7 +25,7 @@ class MapViewScreen extends StatefulWidget {
 }
 
 class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateMixin {
-  static const String _apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
+  final String _apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
   LatLng? siteLatLng;
   LatLng? userLatLng;
