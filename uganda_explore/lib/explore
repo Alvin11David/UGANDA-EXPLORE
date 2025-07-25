@@ -36,8 +36,9 @@ false,
         scaffoldBackgroundColor:
 Colors.white,
           visualDensity:
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Inter', 
+VisualDensity.adaptivePlatformDensity,
+          appBarTheme: const AppBarTheme(
+            backgroundColor:
       ),
       home: const ImageCarouselScreen(),
     );
