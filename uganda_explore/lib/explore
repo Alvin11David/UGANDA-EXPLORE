@@ -33,6 +33,7 @@ false,
        title: 'Tourism Image Carousel',
        theme: ThemeData(
         primarySwatch: Colors.blue,
+        scaffoldBackgroundColor:
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Inter', 
       ),
