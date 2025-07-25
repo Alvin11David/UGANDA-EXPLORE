@@ -45,6 +45,8 @@ Colors.black,
             elevation: 1,
             centerTitle: true,
       ),
+      textTheme:const TextTheme(
+        headlineSmall:TextStyle(
       home: const ImageCarouselScreen(),
     );
   }
