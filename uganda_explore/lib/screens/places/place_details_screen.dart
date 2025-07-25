@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
   final String siteName;
@@ -38,6 +38,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   bool _showNavBar = true;
   double _lastOffset = 0.0;
   final ScrollController _scrollController = ScrollController();
+
+  bool _isFavourite = false;
 
   @override
   void initState() {
@@ -82,6 +84,29 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       setState(() => _showNavBar = true);
     }
     _lastOffset = offset;
+  }
+
+  Future<void> _loadFavouriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favs = prefs.getStringList('favouriteSites') ?? [];
+    setState(() {
+      _isFavourite = favs.contains(widget.siteName);
+    });
+  }
+
+  Future<void> _toggleFavourite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favs = prefs.getStringList('favouriteSites') ?? [];
+    setState(() {
+      if (_isFavourite) {
+        favs.remove(widget.siteName);
+        _isFavourite = false;
+      } else {
+        favs.add(widget.siteName);
+        _isFavourite = true;
+      }
+    });
+    await prefs.setStringList('favouriteSites', favs);
   }
 
   @override
@@ -799,8 +824,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 child: Container(
                   height: 400,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 255, 255)
-                        .withOpacity(0.3),
+                    color: const Color.fromARGB(
+                      255,
+                      255,
+                      255,
+                      255,
+                    ).withOpacity(0.3),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
@@ -916,10 +945,11 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         alignment: Alignment.center,
                                         children: [
                                           ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            child: controller
-                                                    .value.isInitialized
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child:
+                                                controller.value.isInitialized
                                                 ? SizedBox(
                                                     width: 100,
                                                     height: 80,
@@ -1301,8 +1331,9 @@ class _BackgroundAudioPlayerState extends State<BackgroundAudioPlayer> {
       children: [
         IconButton(
           icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.black),
+            _isPlaying ? Icons.pause : Icons.play_arrow,
+            color: Colors.black,
+          ),
           onPressed: () {
             if (_isPlaying) {
               _player.pause();
