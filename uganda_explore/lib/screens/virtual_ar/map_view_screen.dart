@@ -1,6 +1,5 @@
-import 'dart:convert';
-import 'dart:ui';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,26 +7,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
-import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
-import 'package:uganda_explore/screens/virtual_ar/directions_repository.dart';
+
 
 class MapViewScreen extends StatefulWidget {
   final String siteName;
   final bool showCurrentLocation;
+
   const MapViewScreen({
-    super.key,
+    Key? key,
     required this.siteName,
     this.showCurrentLocation = false,
-  });
+  }) : super(key: key);
 
   @override
-  State<MapViewScreen> createState() => _MapViewScreenState();
+  _MapViewScreenState createState() => _MapViewScreenState();
 }
 
-class _MapViewScreenState extends State<MapViewScreen>
-    with TickerProviderStateMixin {
-  static const String _apiKey =
-      'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
+class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateMixin {
+  static const String _apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
 
   LatLng? siteLatLng;
   LatLng? userLatLng;
@@ -60,16 +57,9 @@ class _MapViewScreenState extends State<MapViewScreen>
 
   StreamSubscription<Position>? _positionStream;
 
-  // Custom marker for user with direction
-  BitmapDescriptor? customUserMarker;
-
-  // Add DirectionsRepository instance
-  late final DirectionsRepository _directionsRepository;
-
   @override
   void initState() {
     super.initState();
-    _directionsRepository = DirectionsRepository(_apiKey);
     _initializeAnimations();
     fetchCoordinates();
     fetchUserDistrict();
@@ -78,19 +68,16 @@ class _MapViewScreenState extends State<MapViewScreen>
 
   void _initializeAnimations() {
     _bearingController = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-
     _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
     _pulseController.repeat(reverse: true);
   }
 
@@ -99,15 +86,12 @@ class _MapViewScreenState extends State<MapViewScreen>
       accuracy: LocationAccuracy.bestForNavigation,
       distanceFilter: 10,
     );
-
     _positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings).listen(
           (Position position) {
             _updateUserPosition(position);
           },
         );
-
-    // Start motion detection timer
     _motionTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _detectMotion();
     });
@@ -115,27 +99,18 @@ class _MapViewScreenState extends State<MapViewScreen>
 
   void _updateUserPosition(Position position) {
     final newLatLng = LatLng(position.latitude, position.longitude);
-
     setState(() {
       previousUserLatLng = userLatLng;
       userLatLng = newLatLng;
-
-      // Update bearing if we have a previous position
       if (previousUserLatLng != null) {
         userBearing = _calculateBearing(previousUserLatLng!, newLatLng);
       }
-
-      // Update speed
       userSpeed = position.speed * 3.6; // Convert m/s to km/h
-      isMoving = userSpeed > 0.5; // Consider moving if speed > 0.5 km/h
+      isMoving = userSpeed > 0.5;
     });
-
-    // Update camera to follow user smoothly if moving
     if (isMoving && mapController != null) {
       _smoothCameraFollow();
     }
-
-    // Update route if both locations are available
     if (siteLatLng != null && !isLoadingRoute) {
       _debouncedRouteUpdate();
     }
@@ -168,12 +143,10 @@ class _MapViewScreenState extends State<MapViewScreen>
     final lat1 = start.latitude * math.pi / 180;
     final lat2 = end.latitude * math.pi / 180;
     final deltaLng = (end.longitude - start.longitude) * math.pi / 180;
-
     final y = math.sin(deltaLng) * math.cos(lat2);
     final x =
         math.cos(lat1) * math.sin(lat2) -
         math.sin(lat1) * math.cos(lat2) * math.cos(deltaLng);
-
     final bearing = math.atan2(y, x) * 180 / math.pi;
     return (bearing + 360) % 360;
   }
@@ -186,8 +159,6 @@ class _MapViewScreenState extends State<MapViewScreen>
         userLatLng!.latitude,
         userLatLng!.longitude,
       );
-
-      // If user hasn't moved significantly in 2 seconds, they're stationary
       if (distance < 2.0 && isMoving) {
         setState(() {
           isMoving = false;
@@ -206,7 +177,6 @@ class _MapViewScreenState extends State<MapViewScreen>
         });
         return;
       }
-
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -223,7 +193,6 @@ class _MapViewScreenState extends State<MapViewScreen>
         });
         return;
       }
-
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -239,7 +208,6 @@ class _MapViewScreenState extends State<MapViewScreen>
                   "Unknown District")
             : "District not found";
       });
-
       if (userLatLng != null && siteLatLng != null) {
         await fetchAndSetRoute();
         await fetchDurationsAndDistance();
@@ -252,58 +220,65 @@ class _MapViewScreenState extends State<MapViewScreen>
   }
 
   Future<void> fetchCoordinates({String? customDestination}) async {
-    final searchName = customDestination ?? widget.siteName;
-    try {
-      final query = await FirebaseFirestore.instance
-          .collection('tourismsites')
-          .where('name', isEqualTo: searchName.trim())
-          .limit(1)
-          .get();
-
-      if (query.docs.isNotEmpty) {
-        final doc = query.docs.first;
-        final lat = doc['latitude'];
-        final lng = doc['longitude'];
-        double? latitude;
-        double? longitude;
-
-        if (lat is double && lng is double) {
-          latitude = lat;
-          longitude = lng;
-        } else if (lat is int && lng is int) {
-          latitude = lat.toDouble();
-          longitude = lng.toDouble();
-        } else if (lat is String && lng is String) {
-          latitude = double.tryParse(lat);
-          longitude = double.tryParse(lng);
-        }
-
-        if (latitude != null && longitude != null) {
-          setState(() {
-            siteLatLng = LatLng(latitude!, longitude!);
-            error = null;
-          });
-
-          if (userLatLng != null) {
-            await fetchAndSetRoute();
-            await fetchDurationsAndDistance();
-          }
-        } else {
-          setState(() {
-            error = 'Location not found for this site.';
-          });
+  final searchName = customDestination ?? widget.siteName;
+  try {
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isEqualTo: searchName.trim())
+        .limit(1)
+        .get();
+    
+    if (query.docs.isNotEmpty) {
+      final doc = query.docs.first;
+      final lat = doc['latitude'];
+      final lng = doc['longitude'];
+      
+      double? latitude;
+      double? longitude;
+      
+      // Handle different data types from Firestore
+      if (lat is double && lng is double) {
+        latitude = lat;
+        longitude = lng;
+      } else if (lat is int && lng is int) {
+        latitude = lat.toDouble();
+        longitude = lng.toDouble();
+      } else if (lat is String && lng is String) {
+        latitude = double.tryParse(lat);
+        longitude = double.tryParse(lng);
+      }
+      
+      // Check if both values are valid before creating LatLng
+      if (latitude != null && longitude != null) {
+        setState(() {
+          siteLatLng = LatLng(latitude!, longitude!); // Use ! operator since we verified they're not null
+          error = null;
+        });
+        
+        // Fetch route and durations if user location is available
+        if (userLatLng != null) {
+          await fetchAndSetRoute();
+          await fetchDurationsAndDistance();
         }
       } else {
         setState(() {
-          error = 'Site not found.';
+          error = 'Invalid coordinates for this site.';
+          siteLatLng = null;
         });
       }
-    } catch (e) {
+    } else {
       setState(() {
-        error = 'Error finding location: $e';
+        error = 'Site not found in database.';
+        siteLatLng = null;
       });
     }
+  } catch (e) {
+    setState(() {
+      error = 'Error finding location: $e';
+      siteLatLng = null;
+    });
   }
+}
 
   Future<void> fetchAndSetRoute() async {
     if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
@@ -311,90 +286,290 @@ class _MapViewScreenState extends State<MapViewScreen>
       isLoadingRoute = true;
       error = null;
     });
-
     try {
-      // 1. Interpolate points every 10km
-      final points = interpolatePointsEvery10km(userLatLng!, siteLatLng!, 10.0);
-
-      // 2. Fetch directions for each segment and join polylines
-      List<LatLng> allPolylinePoints = [];
-      for (int i = 0; i < points.length - 1; i++) {
-        final directions = await _directionsRepository.getDirections(
-          origin: points[i],
-          destination: points[i + 1],
-          mode: 'driving',
-        );
-        if (directions != null && directions.polylinePoints.isNotEmpty) {
-          // Avoid duplicate points at segment joins
-          if (allPolylinePoints.isNotEmpty &&
-              allPolylinePoints.last == directions.polylinePoints.first) {
-            allPolylinePoints.addAll(directions.polylinePoints.skip(1));
-          } else {
-            allPolylinePoints.addAll(directions.polylinePoints);
-          }
-        }
-      }
-
+      final optimalRoute = await fetchRouteWithFallback(
+        userLatLng!,
+        siteLatLng!,
+        _apiKey,
+      );
       setState(() {
-        routePolyline = allPolylinePoints;
+        routePolyline = optimalRoute;
         isLoadingRoute = false;
       });
     } catch (e) {
       setState(() {
-        error = 'Failed to fetch segmented route: $e';
+        error = 'Failed to fetch optimal route: $e';
         isLoadingRoute = false;
         routePolyline = [];
       });
     }
   }
 
-  Future<List<LatLng>> fetchRoutePolyline(
+  Future<List<LatLng>> fetchOptimalRouteWithWaypoints(
     LatLng origin,
     LatLng destination,
     String apiKey, {
-    String mode = 'driving',
+    int maxWaypoints = 23,
+  }) async {
+    try {
+      final distance = calculateDistance(origin, destination);
+      if (distance <= 100) {
+        return await _fetchDirectRoute(origin, destination, apiKey);
+      }
+      final waypoints = _calculateStrategicWaypoints(
+        origin,
+        destination,
+        maxWaypoints,
+      );
+      final waypointsString = waypoints
+          .map((point) => '${point.latitude},${point.longitude}')
+          .join('|');
+      final url =
+          'https://maps.googleapis.com/maps/api/directions/json?'
+          'origin=${origin.latitude},${origin.longitude}&'
+          'destination=${destination.latitude},${destination.longitude}&'
+          'waypoints=optimize:true|$waypointsString&'
+          'mode=driving&'
+          'overview=full&'
+          'key=$apiKey';
+      final response = await http
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+          final points = data['routes'][0]['overview_polyline']['points'];
+          final decodedPoints = decodePolyline(points);
+          return decodedPoints;
+        } else {
+          throw Exception(
+            'Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
+          );
+        }
+      } else {
+        throw Exception('HTTP ${response.statusCode}: ${response.body}');
+      }
+    } catch (e) {
+      return await _fetchDirectRoute(origin, destination, apiKey);
+    }
   }
+
+  List<LatLng> _calculateStrategicWaypoints(
+    LatLng origin,
+    LatLng destination,
+    int maxWaypoints,
+  ) {
+    final distance = calculateDistance(origin, destination);
+    int waypointCount;
+    if (distance <= 200) {
+      waypointCount = math.min(3, maxWaypoints);
+    } else if (distance <= 500)
+      waypointCount = math.min(8, maxWaypoints);
+    else if (distance <= 1000)
+      waypointCount = math.min(15, maxWaypoints);
+    else
+      waypointCount = maxWaypoints;
+    List<LatLng> waypoints = [];
+    for (int i = 1; i <= waypointCount; i++) {
+      final fraction = i / (waypointCount + 1.0);
+      final waypoint = _interpolateGreatCircle(origin, destination, fraction);
+      waypoints.add(waypoint);
+    }
+    return waypoints;
+  }
+
+  LatLng _interpolateGreatCircle(LatLng start, LatLng end, double fraction) {
+    final lat1 = start.latitude * math.pi / 180;
+    final lon1 = start.longitude * math.pi / 180;
+    final lat2 = end.latitude * math.pi / 180;
+    final lon2 = end.longitude * math.pi / 180;
+    final d =
+        2 *
+        math.asin(
+          math.sqrt(
+            math.pow(math.sin((lat1 - lat2) / 2), 2) +
+                math.cos(lat1) *
+                    math.cos(lat2) *
+                    math.pow(math.sin((lon1 - lon2) / 2), 2),
+          ),
+        );
+    if (d.isNaN || d == 0) {
+      return LatLng(
+        start.latitude + (end.latitude - start.latitude) * fraction,
+        start.longitude + (end.longitude - start.longitude) * fraction,
+      );
+    }
+    final a = math.sin((1 - fraction) * d) / math.sin(d);
+    final b = math.sin(fraction * d) / math.sin(d);
+    final x =
+        a * math.cos(lat1) * math.cos(lon1) +
+        b * math.cos(lat2) * math.cos(lon2);
+    final y =
+        a * math.cos(lat1) * math.sin(lon1) +
+        b * math.cos(lat2) * math.sin(lon2);
+    final z = a * math.sin(lat1) + b * math.sin(lat2);
+    final lat = math.atan2(z, math.sqrt(x * x + y * y));
+    final lon = math.atan2(y, x);
+    return LatLng(lat * 180 / math.pi, lon * 180 / math.pi);
+  }
+
+  Future<List<LatLng>> fetchBestAlternativeRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
   ) async {
     final url =
         'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${origin.latitude},${origin.longitude}&'
         'destination=${destination.latitude},${destination.longitude}&'
-        'mode=$mode&'
+        'alternatives=true&'
+        'mode=driving&'
         'overview=full&'
         'key=$apiKey';
-
-    print('Directions API Request: $url');
-
-    final response = await http.get(Uri.parse(url));
-    print('Directions API Response: Status=${response.statusCode}');
-
+    final response = await http
+        .get(Uri.parse(url))
+        .timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      print('API Response Status: ${data['status']}');
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+        final routes = data['routes'] as List;
+        var selectedRoute = routes[0];
+        final points = selectedRoute['overview_polyline']['points'];
+        return decodePolyline(points);
+      }
+    }
+    throw Exception('Alternative routing failed: HTTP ${response.statusCode}');
+  }
 
-      if (data['status'] == 'OK' &&
-          data['routes'] != null &&
-          data['routes'].isNotEmpty) {
+  Future<List<LatLng>> fetchSmartChunkedRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
+  ) async {
+    final distance = calculateDistance(origin, destination);
+    if (distance <= 300) {
+      return await fetchOptimalRouteWithWaypoints(origin, destination, apiKey);
+    }
+    final chunks = _createIntelligentChunks(origin, destination, distance);
+    List<LatLng> fullRoute = [];
+    for (int i = 0; i < chunks.length - 1; i++) {
+      try {
+        final chunkRoute = await fetchOptimalRouteWithWaypoints(
+          chunks[i],
+          chunks[i + 1],
+          apiKey,
+        );
+        if (fullRoute.isNotEmpty && chunkRoute.isNotEmpty) {
+          if (fullRoute.last.latitude == chunkRoute.first.latitude &&
+              fullRoute.last.longitude == chunkRoute.first.longitude) {
+            fullRoute.addAll(chunkRoute.skip(1));
+          } else {
+            fullRoute.addAll(chunkRoute);
+          }
+        } else {
+          fullRoute.addAll(chunkRoute);
+        }
+        if (i < chunks.length - 2) {
+          await Future.delayed(const Duration(milliseconds: 300));
+        }
+      } catch (e) {
+        // Continue with other chunks
+      }
+    }
+    return fullRoute;
+  }
+
+  List<LatLng> _createIntelligentChunks(
+    LatLng origin,
+    LatLng destination,
+    double distance,
+  ) {
+    int chunkCount;
+    if (distance <= 500) {
+      chunkCount = 2;
+    } else if (distance <= 1000)
+      chunkCount = 3;
+    else if (distance <= 2000)
+      chunkCount = 4;
+    else
+      chunkCount = 5;
+    List<LatLng> chunks = [origin];
+    for (int i = 1; i < chunkCount; i++) {
+      final fraction = i / chunkCount.toDouble();
+      chunks.add(_interpolateGreatCircle(origin, destination, fraction));
+    }
+    chunks.add(destination);
+    return chunks;
+  }
+
+  Future<List<LatLng>> fetchRouteWithFallback(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
+  ) async {
+    final distance = calculateDistance(origin, destination);
+    try {
+      return await fetchOptimalRouteWithWaypoints(origin, destination, apiKey);
+    } catch (e) {}
+    try {
+      return await fetchBestAlternativeRoute(origin, destination, apiKey);
+    } catch (e) {}
+    try {
+      return await _fetchDirectRoute(origin, destination, apiKey);
+    } catch (e) {}
+    return await fetchSmartChunkedRoute(origin, destination, apiKey);
+  }
+
+  Future<List<LatLng>> _fetchDirectRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey,
+  ) async {
+    final url =
+        'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'mode=driving&'
+        'overview=full&'
+        'key=$apiKey';
+    final response = await http
+        .get(Uri.parse(url))
+        .timeout(const Duration(seconds: 10));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
         final points = data['routes'][0]['overview_polyline']['points'];
-        final decodedPoints = decodePolyline(points);
-        print('Decoded ${decodedPoints.length} polyline points');
-        return decodedPoints;
+        return decodePolyline(points);
       } else {
-        final errorMessage = data['error_message'] ?? 'No routes found';
-        print('API Error: ${data['status']} - $errorMessage');
-        throw Exception('API Error: ${data['status']} - $errorMessage');
+        throw Exception(
+          'Direct route API error: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}',
+        );
       }
     } else {
-      print('HTTP Error: ${response.statusCode} - ${response.body}');
-      throw Exception('HTTP Error: ${response.statusCode}');
+      throw Exception('Direct route HTTP error: ${response.statusCode}');
     }
+  }
+
+  double calculateDistance(LatLng point1, LatLng point2) {
+    const double earthRadius = 6371;
+    final lat1Rad = point1.latitude * math.pi / 180;
+    final lat2Rad = point2.latitude * math.pi / 180;
+    final deltaLatRad = (point2.latitude - point1.latitude) * math.pi / 180;
+    final deltaLngRad = (point2.longitude - point1.longitude) * math.pi / 180;
+    final a =
+        math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
+        math.cos(lat1Rad) *
+            math.cos(lat2Rad) *
+            math.sin(deltaLngRad / 2) *
+            math.sin(deltaLngRad / 2);
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return earthRadius * c;
   }
 
   List<LatLng> decodePolyline(String encoded) {
     List<LatLng> poly = [];
     int index = 0, len = encoded.length;
     int lat = 0, lng = 0;
-
     while (index < len) {
       int b, shift = 0, result = 0;
       do {
@@ -404,7 +579,6 @@ class _MapViewScreenState extends State<MapViewScreen>
       } while (b >= 0x20);
       int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lat += dlat;
-
       shift = 0;
       result = 0;
       do {
@@ -414,7 +588,6 @@ class _MapViewScreenState extends State<MapViewScreen>
       } while (b >= 0x20);
       int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
       lng += dlng;
-
       poly.add(LatLng(lat / 1E5, lng / 1E5));
     }
     return poly;
@@ -422,14 +595,11 @@ class _MapViewScreenState extends State<MapViewScreen>
 
   Future<void> fetchDurationsAndDistance() async {
     if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
-
     setState(() {
       isLoadingDurations = true;
     });
-
     final modes = ['walking', 'driving', 'bicycling'];
     final results = <String, Map<String, String>>{};
-
     try {
       for (final mode in modes) {
         final url =
@@ -438,7 +608,6 @@ class _MapViewScreenState extends State<MapViewScreen>
             'destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&'
             'mode=$mode&'
             'key=$_apiKey';
-
         final response = await http.get(Uri.parse(url));
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
@@ -455,7 +624,6 @@ class _MapViewScreenState extends State<MapViewScreen>
           }
         }
       }
-
       setState(() {
         walkingDuration = results['walking']?['duration'] ?? '-';
         drivingDuration = results['driving']?['duration'] ?? '-';
@@ -468,7 +636,6 @@ class _MapViewScreenState extends State<MapViewScreen>
         isLoadingDurations = false;
       });
     } catch (e) {
-      print('Error fetching durations: $e');
       setState(() {
         isLoadingDurations = false;
       });
@@ -498,9 +665,7 @@ class _MapViewScreenState extends State<MapViewScreen>
             color: isMoving ? Colors.green : Colors.orange,
             boxShadow: [
               BoxShadow(
-                color: (isMoving ? Colors.green : Colors.orange).withOpacity(
-                  0.5,
-                ),
+                color: (isMoving ? Colors.green : Colors.orange).withOpacity(0.5),
                 blurRadius: 10 * _pulseAnimation.value,
                 spreadRadius: 2 * _pulseAnimation.value,
               ),
@@ -512,566 +677,183 @@ class _MapViewScreenState extends State<MapViewScreen>
   }
 
   void _fitMarkersOnScreen() {
-    if (mapController == null || userLatLng == null || siteLatLng == null)
+    if (mapController == null || userLatLng == null || siteLatLng == null) {
       return;
-
+    }
     LatLngBounds bounds;
     if (userLatLng!.latitude > siteLatLng!.latitude) {
       bounds = LatLngBounds(southwest: siteLatLng!, northeast: userLatLng!);
     } else {
       bounds = LatLngBounds(southwest: userLatLng!, northeast: siteLatLng!);
     }
-
     mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
+  }
+
+  void _showDestinationDialog() {
+    _destinationController.text = widget.siteName;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Change Destination'),
+          content: TextField(
+            controller: _destinationController,
+            decoration: const InputDecoration(
+              hintText: 'Enter destination name',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                final newDestination = _destinationController.text.trim();
+                if (newDestination.isNotEmpty) {
+                  await fetchCoordinates(customDestination: newDestination);
+                }
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.siteName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_location_alt),
+            onPressed: _showDestinationDialog,
+            tooltip: 'Change Destination',
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          if (siteLatLng != null)
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: siteLatLng!,
-                zoom: 14,
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: siteLatLng ?? const LatLng(0, 0),
+              zoom: 14,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            polylines: routePolyline.isNotEmpty
+                ? {
+                    Polyline(
+                      polylineId: const PolylineId('route'),
+                      color: Colors.blue,
+                      width: 5,
+                      points: routePolyline,
+                    ),
+                  }
+                : {},
+            markers: {
+              if (siteLatLng != null)
+                Marker(
+                  markerId: const MarkerId('site'),
+                  position: siteLatLng!,
+                  infoWindow: InfoWindow(title: widget.siteName),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                ),
+              if (userLatLng != null)
+                Marker(
+                  markerId: const MarkerId('user'),
+                  position: userLatLng!,
+                  infoWindow: const InfoWindow(title: 'You'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+                ),
+            },
+            onMapCreated: (controller) {
+              mapController = controller;
+              if (userLatLng != null && siteLatLng != null) {
+                _fitMarkersOnScreen();
+              }
+            },
+          ),
+          if (isLoadingRoute || isLoadingDurations)
+            const Positioned(
+              top: 20,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
-              markers: {
-                if (siteLatLng != null)
-                  Marker(
-                    markerId: const MarkerId('site'),
-                    position: siteLatLng!,
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueRed,
-                    ),
-                    infoWindow: InfoWindow(
-                      title: widget.siteName,
-                      snippet: 'Destination',
-                    ),
+            ),
+          if (error != null)
+            Positioned(
+              top: 80,
+              left: 20,
+              right: 20,
+              child: Material(
+                color: Colors.red.shade100,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Text(
+                    error!,
+                    style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
                   ),
-                if (userLatLng != null)
-                  Marker(
-                    markerId: const MarkerId('user'),
-                    position: userLatLng!,
-                    icon: BitmapDescriptor.defaultMarkerWithHue(
-                      BitmapDescriptor.hueAzure,
-                    ),
-                    rotation: userBearing,
-                    anchor: const Offset(0.5, 0.5),
-                    infoWindow: const InfoWindow(
-                      title: 'Your Location',
-                      snippet: 'Current position',
-                    ),
-                  ),
-              },
-              polylines: {
-                if (routePolyline.isNotEmpty)
-                  Polyline(
-                    polylineId: const PolylineId('route'),
-                    points: routePolyline,
-                    color: isMoving ? Colors.blue : Colors.green,
-                    width: 5,
-                    patterns: isMoving
-                        ? [PatternItem.dash(20), PatternItem.gap(10)]
-                        : [],
-                    startCap: Cap.roundCap,
-                    endCap: Cap.roundCap,
-                    jointType: JointType.round,
-                  ),
-              },
-              onMapCreated: (controller) {
-                mapController = controller;
-                // Fit both markers on screen if both locations are available
-                if (userLatLng != null && siteLatLng != null) {
-                  _fitMarkersOnScreen();
-                }
-              },
-              myLocationEnabled: false,
-              myLocationButtonEnabled: false,
-              compassEnabled: true,
-              rotateGesturesEnabled: true,
-              tiltGesturesEnabled: true,
-              mapType: MapType.normal,
-              zoomControlsEnabled: false,
-            )
-          else
-            const Center(child: CircularProgressIndicator()),
-
-          // Custom back arrow and rectangle with motion indicator
+                ),
+              ),
+            ),
           Positioned(
-            top: 38,
+            bottom: 0,
             left: 0,
             right: 0,
-            child: Row(
-              children: [
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: ClipOval(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 1),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.chevron_left,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-
-                // Enhanced rectangle with motion indicator
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                    child: Container(
-                      width: 285,
-                      height: 125,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(30),
-                        border: Border.all(color: Colors.white, width: 1.5),
-                      ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 6,
-                              top: 10,
-                              bottom: 10,
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.my_location,
-                                      size: 25,
-                                      color: Colors.blue,
-                                    ),
-                                    Positioned(
-                                      right: -5,
-                                      top: -5,
-                                      child: _buildMotionIndicator(),
-                                    ),
-                                  ],
-                                ),
-                                const Icon(
-                                  Icons.more_vert,
-                                  size: 25,
-                                  color: Colors.black,
-                                ),
-                                const Icon(
-                                  Icons.location_on,
-                                  size: 25,
-                                  color: Colors.black,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                // User's district with speed indicator
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 20,
-                                    bottom: 8,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        userDistrict ?? "Fetching...",
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      if (isMoving && userSpeed > 0)
-                                        Text(
-                                          "${userSpeed.toStringAsFixed(1)} km/h",
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                                // Black line
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                  ),
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                // Tourism site location
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    left: 20,
-                                    top: 8,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: isEditingDestination
-                                            ? TextField(
-                                                controller:
-                                                    _destinationController,
-                                                autofocus: true,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                  fontSize: 16,
-                                                ),
-                                                decoration:
-                                                    const InputDecoration(
-                                                      hintText:
-                                                          "Enter destination...",
-                                                      border: InputBorder.none,
-                                                      isDense: true,
-                                                      contentPadding:
-                                                          EdgeInsets.zero,
-                                                    ),
-                                                onSubmitted: (value) {
-                                                  setState(() {
-                                                    isEditingDestination =
-                                                        false;
-                                                  });
-                                                  if (value.trim().isNotEmpty) {
-                                                    fetchCoordinates(
-                                                      customDestination: value
-                                                          .trim(),
-                                                    );
-                                                  }
-                                                },
-                                              )
-                                            : Text(
-                                                widget.siteName,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                  fontSize: 16,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                      ),
-                                      const SizedBox(width: 1),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            isEditingDestination = true;
-                                            _destinationController.clear();
-                                          });
-                                        },
-                                        child: const Icon(
-                                          Icons.swap_vert,
-                                          size: 28,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Spacer(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Action buttons with loading indicators
-          Positioned(
-            top: 555,
-            left: 5,
-            right: 5,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // VR Tour button
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            VirtualTourScreen(placeName: widget.siteName),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 5,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.threesixty,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Fit markers button
-                GestureDetector(
-                  onTap: _fitMarkersOnScreen,
-                  child: Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 5,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.fit_screen,
-                        color: Colors.black,
-                        size: 25,
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Location button with loading indicator
-                GestureDetector(
-                  onTap: () {
-                    if (userLatLng != null && mapController != null) {
-                      mapController!.animateCamera(
-                        CameraUpdate.newCameraPosition(
-                          CameraPosition(
-                            target: userLatLng!,
-                            zoom: 16,
-                            bearing: isMoving ? userBearing : 0,
-                            tilt: isMoving ? 45 : 0,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  child: Container(
-                    height: 55,
-                    width: 55,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.4),
-                          blurRadius: 5,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
+            child: Card(
+              margin: const EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(
-                          Icons.my_location,
-                          color: Colors.black,
-                          size: 25,
-                        ),
-                        if (isLoadingRoute)
-                          const Positioned(
-                            bottom: 8,
-                            right: 8,
-                            child: SizedBox(
-                              width: 12,
-                              height: 12,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
+                        Text('District: $userDistrict'),
+                        _buildMotionIndicator(),
                       ],
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Enhanced bottom rectangle with real-time data
-          Positioned(
-            left: 4,
-            right: 4,
-            bottom: 0,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(40),
-                topRight: Radius.circular(40),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  height: 170,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(40),
-                      topRight: Radius.circular(40),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          children: [
+                            const Icon(Icons.directions_walk, color: Colors.green),
+                            Text('Walk: ${walkingDuration ?? '-'}'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Icon(Icons.directions_bike, color: Colors.orange),
+                            Text('Bike: ${bicyclingDuration ?? '-'}'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Icon(Icons.directions_car, color: Colors.blue),
+                            Text('Drive: ${drivingDuration ?? '-'}'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            const Icon(Icons.straighten, color: Colors.black),
+                            Text('Distance: ${routeDistance ?? '-'}'),
+                          ],
+                        ),
+                      ],
                     ),
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 18,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Route info row
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.directions_walk,
-                            color: Colors.black,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Walking: ',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isLoadingDurations
-                                ? '...'
-                                : (walkingDuration ?? '-'),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          const SizedBox(width: 18),
-                          const Icon(
-                            Icons.directions_bike,
-                            color: Colors.black,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Biking: ',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isLoadingDurations
-                                ? '...'
-                                : (bicyclingDuration ?? '-'),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.directions_car,
-                            color: Colors.black,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Driving: ',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isLoadingDurations
-                                ? '...'
-                                : (drivingDuration ?? '-'),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                          const SizedBox(width: 18),
-                          const Icon(
-                            Icons.straighten,
-                            color: Colors.black,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Distance: ',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            isLoadingDurations ? '...' : (routeDistance ?? '-'),
-                            style: const TextStyle(color: Colors.black),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      if (error != null)
-                        Text(
-                          error!,
-                          style: const TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      if (isLoadingRoute)
-                        const Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.blue,
-                          ),
-                        ),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -1080,38 +862,4 @@ class _MapViewScreenState extends State<MapViewScreen>
       ),
     );
   }
-}
-
-List<LatLng> interpolatePointsEvery10km(LatLng start, LatLng end, double intervalKm) {
-  double distance = _haversineDistance(start, end);
-  int numPoints = (distance / intervalKm).floor();
-  List<LatLng> points = [start];
-
-  for (int i = 1; i < numPoints; i++) {
-    double fraction = i * intervalKm / distance;
-    points.add(_interpolateLatLng(start, end, fraction));
-  }
-  points.add(end);
-  return points;
-}
-
-double _haversineDistance(LatLng p1, LatLng p2) {
-  const R = 6371; // Earth radius in km
-  double dLat = _deg2rad(p2.latitude - p1.latitude);
-  double dLng = _deg2rad(p2.longitude - p1.longitude);
-  double a = math.sin(dLat / 2) * math.sin(dLat / 2) +
-      math.cos(_deg2rad(p1.latitude)) *
-          math.cos(_deg2rad(p2.latitude)) *
-          math.sin(dLng / 2) *
-          math.sin(dLng / 2);
-  double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-  return R * c;
-}
-
-double _deg2rad(double deg) => deg * (math.pi / 180);
-
-LatLng _interpolateLatLng(LatLng start, LatLng end, double fraction) {
-  double lat = start.latitude + (end.latitude - start.latitude) * fraction;
-  double lng = start.longitude + (end.longitude - start.longitude) * fraction;
-  return LatLng(lat, lng);
 }
