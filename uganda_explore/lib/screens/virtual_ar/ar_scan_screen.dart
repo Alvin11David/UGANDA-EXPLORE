@@ -33,6 +33,9 @@ class _ARScanScreenState extends State<ARScanScreen> {
   double? _accuracy;
   StreamSubscription<Position>? _positionStream;
 
+  List<LatLng> _waypoints = []; // You need to fill this with your route points
+  int _currentWaypointIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +60,13 @@ class _ARScanScreenState extends State<ARScanScreen> {
         _heading = event.heading;
       });
     });
+
+    // Example: fill waypoints (replace with your route logic)
+    _waypoints = [
+      LatLng(37.3318, -122.0312), // start point
+      LatLng(37.3328, -122.0322), // waypoint 1
+      LatLng(widget.destinationLat, widget.destinationLng), // destination
+    ];
   }
 
   Future<void> _initCamera() async {
@@ -75,21 +85,52 @@ class _ARScanScreenState extends State<ARScanScreen> {
   }
 
   void _updateBearingAndDistance() {
-    if (_currentPosition != null) {
+    if (_currentPosition != null && _waypoints.isNotEmpty) {
+      // Find closest waypoint ahead
+      while (_currentWaypointIndex < _waypoints.length - 1) {
+        double dist = Geolocator.distanceBetween(
+          _currentPosition!.latitude,
+          _currentPosition!.longitude,
+          _waypoints[_currentWaypointIndex].lat,
+          _waypoints[_currentWaypointIndex].lng,
+        );
+        if (dist < 20) {
+          // threshold to switch to next waypoint
+          _currentWaypointIndex++;
+        } else {
+          break;
+        }
+      }
+      LatLng target = _waypoints[_currentWaypointIndex];
       _bearingToDestination = Geolocator.bearingBetween(
         _currentPosition!.latitude,
         _currentPosition!.longitude,
-        widget.destinationLat,
-        widget.destinationLng,
+        target.lat,
+        target.lng,
       );
       _distanceToDestination = Geolocator.distanceBetween(
         _currentPosition!.latitude,
         _currentPosition!.longitude,
-        widget.destinationLat,
-        widget.destinationLng,
+        target.lat,
+        target.lng,
       );
-      _totalDistance ??= _distanceToDestination;
+      // Optional: update _totalDistance to sum of all segments
+      _totalDistance ??= _calculateTotalRouteDistance();
     }
+  }
+
+  // Helper to sum route distance
+  double _calculateTotalRouteDistance() {
+    double total = 0.0;
+    for (int i = 0; i < _waypoints.length - 1; i++) {
+      total += Geolocator.distanceBetween(
+        _waypoints[i].lat,
+        _waypoints[i].lng,
+        _waypoints[i + 1].lat,
+        _waypoints[i + 1].lng,
+      );
+    }
+    return total;
   }
 
   String getDirectionInstruction(double angle) {
@@ -424,10 +465,17 @@ class _ARScanScreenState extends State<ARScanScreen> {
           directionPanel,
           animatedArrow,
           metricsPanel,
-          progressBar, 
+          progressBar,
           closeButton,
         ],
       ),
     );
   }
+}
+
+// Helper class for lat/lng
+class LatLng {
+  final double lat;
+  final double lng;
+  LatLng(this.lat, this.lng);
 }

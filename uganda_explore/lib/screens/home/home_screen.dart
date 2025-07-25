@@ -335,11 +335,11 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         List<String> categories = [
-          "National Parks",
+          "National Park",
           "Lakes",
-          "Cultural Sites",
-          "Adventure Activities",
-          "Historical Landmarks",
+          "Waterfall",
+          "Historical Site",
+          "Forest",
         ];
         List<bool> checked = List.filled(categories.length, false);
         String selectedRegion = "Central";
