@@ -29,6 +29,7 @@ FirestoreService(),
       ],
       child:MaterialApp(
          debugShowCheckedModeBanner:
+false,
 
     
       title: 'Tourism Image Carousel',
