@@ -55,6 +55,14 @@ Colors.black,
         fontWeight:
 FontWeight.bold,
               color:Colors.black87,
+           ),
+           bodyMedium:TextStyle(
+             fontSize:16,
+             color:Colors.black54,
+          ),
+         ),
+        ),
+           
   }
 }
 
