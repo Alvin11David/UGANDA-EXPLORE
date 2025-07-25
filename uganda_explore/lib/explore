@@ -34,6 +34,8 @@ false,
        theme: ThemeData(
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor:
+Colors.white,
+          visualDensity:
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Inter', 
       ),
