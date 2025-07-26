@@ -17,7 +17,6 @@ import 'package:uganda_explore/screens/profile/profile_edit_screen.dart';
 import 'package:uganda_explore/screens/profile/settings_screen.dart';
 import 'package:uganda_explore/screens/profile/termsandprivacy_screen.dart';
 import 'package:uganda_explore/screens/providers/favorites_provider.dart';
-import 'package:uganda_explore/screens/splash/splash_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -28,7 +27,7 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
-import 'package:uganda_explore/screens/profile/profile_screen.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -85,15 +84,16 @@ class MyApp extends StatelessWidget {
         '/forgot_password': (context) => const ForgotPasswordScreen(),
         '/otp': (context) => const OtpScreen(email: '', otp: ''),
         '/home': (context) => const HomeScreen(),
-        '/profile': (context) => const ProfileScreen(),
         '/edit_profile': (context) => const EditProfileScreen(),
         '/settings': (context) => const SettingsScreen(),
         '/app_theme': (context) => const AppThemeScreen(),
         '/privacy': (context) => const TermsPrivacyScreen(),
         '/logout': (context) => const SignUpScreen(),
-        '/map': (context) => const MapViewScreen(siteName: '')
+        '/map': (context) => const MapViewScreen(siteName: ''),
+        '/admin_dashboard': (context) => const AdminDashboard(),
+        '/termsandprivacy': (context) => const TermsPrivacyScreen(),
       },
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }

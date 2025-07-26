@@ -12,12 +12,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/place_details_screen.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_list_screen.dart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   final String? userFullName;
 
   const HomeScreen({super.key, this.userFullName});
-  
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -175,8 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoadingSuggestions = false;
   String _selectedCategory = ''; // '', 'National Park', 'Lakes', 'Mountain'
   final LayerLink _searchBarLink = LayerLink();
-
-  
+  String _temperature = '--';
+  List<Map<String, dynamic>> _favouriteSites = [];
+  double? _weatherTemp;
 
   Future<void> _loadUserFullName() async {
     final prefs = await SharedPreferences.getInstance();
@@ -185,6 +187,45 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  IconData _getWeatherIcon(double? temp) {
+    if (temp == null) return Icons.sunny;
+    if (temp >= 25) {
+      return Icons.sunny; // Hot
+    } else if (temp >= 15) {
+      return Icons.cloud; // Mild
+    } else {
+      return Icons.grain; // Cold/Rainy
+    }
+  }
+
+  @override
+  Future<void> _getCurrentWeather() async {
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      final lat = position.latitude;
+      final lon = position.longitude;
+      final apiKey = 'c9cc826f10cc2a88c7267d2066cadd70';
+      final url = Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$apiKey',
+      );
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final temp = (data['main']['temp'] as num?)?.toDouble();
+        setState(() {
+          _temperature = '${temp?.round() ?? '--'}° C';
+          _weatherTemp = temp;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _temperature = '20° C';
+        _weatherTemp = 20.0;
+      });
+    }
+  }
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
@@ -196,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
       return 'Good evening';
     }
   }
-  
+
   void _onItemTapped(int index) {
     if (index == 0) {
       setState(() {
@@ -235,18 +276,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-void initState() {
-  super.initState();
-  _loadUserFullName();
-  _scrollController.addListener(() {
-    if (_scrollController.position.userScrollDirection == ScrollDirection.reverse) {
-      if (_showNavBar) setState(() => _showNavBar = false);
-    } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward) {
-      if (!_showNavBar) setState(() => _showNavBar = true);
-    }
-  });
-  _getCurrentDistrict();
-}
+  void initState() {
+    super.initState();
+    _loadUserFullName();
+    _scrollController.addListener(() {
+      if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_showNavBar) setState(() => _showNavBar = false);
+      } else if (_scrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!_showNavBar) setState(() => _showNavBar = true);
+      }
+    });
+    _getCurrentDistrict();
+    _getCurrentWeather();
+    _loadFavouriteSites();
+  }
 
   Future<void> _getCurrentDistrict() async {
     try {
@@ -290,11 +335,11 @@ void initState() {
       backgroundColor: Colors.transparent,
       builder: (context) {
         List<String> categories = [
-          "National Parks",
+          "National Park",
           "Lakes",
-          "Cultural Sites",
-          "Adventure Activities",
-          "Historical Landmarks",
+          "Waterfall",
+          "Historical Site",
+          "Forest",
         ];
         List<bool> checked = List.filled(categories.length, false);
         String selectedRegion = "Central";
@@ -505,8 +550,8 @@ void initState() {
                 ),
               ),
             );
-          },
-        );
+            },
+          );
       },
     );
   }
@@ -668,6 +713,20 @@ void initState() {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
+  Future<void> _loadFavouriteSites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favNames = prefs.getStringList('favouriteSites') ?? [];
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .get();
+    final allSites = query.docs.map((doc) => doc.data()).toList();
+    setState(() {
+      _favouriteSites = allSites
+          .where((site) => favNames.contains(site['name']))
+          .toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final FocusNode searchFocusNode = FocusNode();
@@ -806,9 +865,9 @@ void initState() {
                                     ),
                                   ],
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Icon(
-                                    Icons.sunny,
+                                    _getWeatherIcon(_weatherTemp),
                                     color: Color(0xFFF59E0B),
                                     size: 28,
                                   ),
@@ -828,9 +887,9 @@ void initState() {
                                     ),
                                   ),
                                   const SizedBox(height: 2),
-                                  const Text(
-                                    '20° C',
-                                    style: TextStyle(
+                                  Text(
+                                    _temperature,
+                                    style: const TextStyle(
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w600,
                                       fontSize: 16,
@@ -851,7 +910,7 @@ void initState() {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        _getGreeting() + ', ${widget.userFullName ?? "Explorer"}',
+                        '${_getGreeting()}, ${widget.userFullName ?? "Explorer"}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 22,
@@ -941,44 +1000,29 @@ void initState() {
                                             },
                                             onSubmitted: (value) async {
                                               _removeSuggestionsOverlay();
-                                              final keyword = value.trim();
+                                              final keyword = value.trim().toLowerCase();
                                               if (keyword.isNotEmpty) {
-                                                final query =
-                                                    await FirebaseFirestore
-                                                        .instance
-                                                        .collection(
-                                                          'tourismsites',
-                                                        )
-                                                        .where(
-                                                          'name',
-                                                          isEqualTo: keyword,
-                                                        )
-                                                        .limit(1)
-                                                        .get();
+                                                final query = await FirebaseFirestore.instance
+                                                    .collection('tourismsites')
+                                                    .where('name_lowercase', isGreaterThanOrEqualTo: keyword)
+                                                    .where('name_lowercase', isLessThanOrEqualTo: '$keyword\uf8ff')
+                                                    .limit(1)
+                                                    .get();
 
                                                 if (query.docs.isNotEmpty) {
-                                                  final siteData = query
-                                                      .docs
-                                                      .first
-                                                      .data();
+                                                  final siteData = query.docs.first.data();
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (_) =>
-                                                          PlaceDetailsScreen(
-                                                            siteName:
-                                                                siteData['name'],
-                                                          ),
+                                                      builder: (_) => PlaceDetailsScreen(
+                                                        siteName: siteData['name'],
+                                                      ),
                                                     ),
                                                   );
                                                 } else {
-                                                  ScaffoldMessenger.of(
-                                                    context,
-                                                  ).showSnackBar(
+                                                  ScaffoldMessenger.of(context).showSnackBar(
                                                     SnackBar(
-                                                      content: Text(
-                                                        'No site found with that name.',
-                                                      ),
+                                                      content: Text('No site found with that name.'),
                                                     ),
                                                   );
                                                 }
@@ -996,40 +1040,29 @@ void initState() {
                                         ),
                                         onPressed: () async {
                                           _removeSuggestionsOverlay();
-                                          final keyword = _searchController.text
-                                              .trim();
+                                          final keyword = _searchController.text.trim().toLowerCase();
                                           if (keyword.isNotEmpty) {
-                                            final query =
-                                                await FirebaseFirestore.instance
-                                                    .collection('tourismsites')
-                                                    .where(
-                                                      'name',
-                                                      isEqualTo: keyword,
-                                                    )
-                                                    .limit(1)
-                                                    .get();
+                                            final query = await FirebaseFirestore.instance
+                                                .collection('tourismsites')
+                                                .where('name_lowercase', isGreaterThanOrEqualTo: keyword)
+                                                .where('name_lowercase', isLessThanOrEqualTo: '$keyword\uf8ff')
+                                                .limit(1)
+                                                .get();
 
                                             if (query.docs.isNotEmpty) {
-                                              final siteData = query.docs.first
-                                                  .data();
+                                              final siteData = query.docs.first.data();
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      PlaceDetailsScreen(
-                                                        siteName:
-                                                            siteData['name'],
-                                                      ),
+                                                  builder: (_) => PlaceDetailsScreen(
+                                                    siteName: siteData['name'],
+                                                  ),
                                                 ),
                                               );
                                             } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
+                                              ScaffoldMessenger.of(context).showSnackBar(
                                                 SnackBar(
-                                                  content: Text(
-                                                    'No site found with that name.',
-                                                  ),
+                                                  content: Text('No site found with that name.'),
                                                 ),
                                               );
                                             }
@@ -1248,7 +1281,20 @@ void initState() {
                                                       right: 10,
                                                       child: GestureDetector(
                                                         onTap: () {
-                                                          // TODO: Implement StreetViewScreen navigation
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (_) => StreetViewPage(
+                                                                latitude:
+                                                                    site['streetViewLat'],
+                                                                longitude:
+                                                                    site['streetViewLng'],
+                                                                siteName:
+                                                                    site['name'] ??
+                                                                    '',
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
                                                         child: Container(
                                                           decoration:
@@ -1413,6 +1459,198 @@ void initState() {
                         );
                       },
                     ),
+                  const SizedBox(height: 30),
+                  if (_favouriteSites.isNotEmpty) ...[
+                    const Padding(
+                      padding: EdgeInsets.only(left: 18, bottom: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Your Favourite Places',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: _favouriteSites.map((site) {
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 90),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => PlaceDetailsScreen(
+                                      siteName: site['name'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 250,
+                                width: 220,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.5),
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 8),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(30),
+                                  child: Stack(
+                                    children: [
+                                      site['images'] != null &&
+                                              site['images'] is List &&
+                                              (site['images'] as List)
+                                                  .isNotEmpty
+                                          ? Image.network(
+                                              site['images'][0],
+                                              height: 250,
+                                              width: 220,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (c, e, s) =>
+                                                  Container(
+                                                    height: 250,
+                                                    width: 220,
+                                                    color: Colors.grey[300],
+                                                    child: const Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                            )
+                                          : Container(
+                                              height: 250,
+                                              width: 220,
+                                              color: Colors.grey[300],
+                                              child: const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                      Positioned(
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        child: ClipRRect(
+                                          borderRadius: const BorderRadius.only(
+                                            bottomLeft: Radius.circular(30),
+                                            bottomRight: Radius.circular(30),
+                                          ),
+                                          child: BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                              sigmaX: 30,
+                                              sigmaY: 30,
+                                            ),
+                                            child: Container(
+                                              height: 80,
+                                              width: 219,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(
+                                                  0.18,
+                                                ),
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
+                                                borderRadius:
+                                                    const BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(30),
+                                                      bottomRight:
+                                                          Radius.circular(30),
+                                                    ),
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                  left: 3,
+                                                  top: 10,
+                                                  right: 8,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      site['name'] ?? '',
+                                                      style: const TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 13,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    Row(
+                                                      children: [
+                                                        const Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                left: 4,
+                                                              ),
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                            color: Color(
+                                                              0xFF3B82F6,
+                                                            ),
+                                                            size: 20,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 6,
+                                                        ),
+                                                        Expanded(
+                                                          child: Text(
+                                                            site['location'] ??
+                                                                '',
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontFamily:
+                                                                      'Poppins',
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  fontSize: 13,
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                  // ...rest of your widgets...
                 ],
               ),
             ),
@@ -1563,7 +1801,7 @@ void initState() {
                                   builder: (_) =>
                                       const NearbyAttractionsScreen(),
                                 ),
-                              ); 
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,

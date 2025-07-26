@@ -23,7 +23,8 @@ class MapViewScreen extends StatefulWidget {
   State<MapViewScreen> createState() => _MapViewScreenState();
 }
 
-class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateMixin {
+class _MapViewScreenState extends State<MapViewScreen>
+    with TickerProviderStateMixin {
   LatLng? siteLatLng;
   LatLng? userLatLng;
   LatLng? previousUserLatLng;
@@ -33,13 +34,13 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
   bool isEditingDestination = false;
   final TextEditingController _destinationController = TextEditingController();
   List<LatLng> routePolyline = [];
-  
+
   // Motion tracking variables
   double userBearing = 0.0;
   double userSpeed = 0.0; // km/h
   bool isMoving = false;
   Timer? _motionTimer;
-  
+
   // Enhanced tracking variables
   String? walkingDuration;
   String? drivingDuration;
@@ -47,14 +48,14 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
   String? routeDistance;
   bool isLoadingRoute = false;
   bool isLoadingDurations = false;
-  
+
   // Animation controllers for smooth updates
   late AnimationController _bearingController;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
-  
+
   StreamSubscription<Position>? _positionStream;
-  
+
   // Custom marker for user with direction
   BitmapDescriptor? customUserMarker;
 
@@ -72,35 +73,32 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
-    
+
     _pulseController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
     );
-    
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.2,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
     _pulseController.repeat(reverse: true);
   }
 
   void _startEnhancedLocationTracking() {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 10, 
+      distanceFilter: 10,
     );
-    
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen((Position position) {
-      _updateUserPosition(position);
-    });
-    
+
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) {
+            _updateUserPosition(position);
+          },
+        );
+
     // Start motion detection timer
     _motionTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
       _detectMotion();
@@ -109,29 +107,21 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
 
   void _updateUserPosition(Position position) {
     final newLatLng = LatLng(position.latitude, position.longitude);
-    
+
     setState(() {
       previousUserLatLng = userLatLng;
       userLatLng = newLatLng;
-      
-      // Update bearing if we have a previous position
+
       if (previousUserLatLng != null) {
         userBearing = _calculateBearing(previousUserLatLng!, newLatLng);
       }
-      
-      // Update speed
-      userSpeed = position.speed * 3.6; // Convert m/s to km/h
-      isMoving = userSpeed > 0.5; // Consider moving if speed > 0.5 km/h
+      userSpeed = position.speed * 3.6;
+      isMoving = userSpeed > 0.5;
     });
-    
-     //Update camera to follow user smoothly if moving
-      if (isMoving && mapController != null) {
-    _smoothCameraFollow();
-   }
-    
-    // Update route if both locations are available
-    if (siteLatLng != null && !isLoadingRoute) {
-      _debouncedRouteUpdate();
+
+    // Always update route when both locations are known
+    if (userLatLng != null && siteLatLng != null) {
+      fetchAndSetRoute();
     }
   }
 
@@ -162,11 +152,12 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     final lat1 = start.latitude * math.pi / 180;
     final lat2 = end.latitude * math.pi / 180;
     final deltaLng = (end.longitude - start.longitude) * math.pi / 180;
-    
+
     final y = math.sin(deltaLng) * math.cos(lat2);
-    final x = math.cos(lat1) * math.sin(lat2) - 
-              math.sin(lat1) * math.cos(lat2) * math.cos(deltaLng);
-    
+    final x =
+        math.cos(lat1) * math.sin(lat2) -
+        math.sin(lat1) * math.cos(lat2) * math.cos(deltaLng);
+
     final bearing = math.atan2(y, x) * 180 / math.pi;
     return (bearing + 360) % 360;
   }
@@ -179,7 +170,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
         userLatLng!.latitude,
         userLatLng!.longitude,
       );
-      
+
       // If user hasn't moved significantly in 2 seconds, they're stationary
       if (distance < 2.0 && isMoving) {
         setState(() {
@@ -192,27 +183,34 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
 
   Future<void> fetchUserDistrict() async {
     try {
+      print("Checking location services...");
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      print("Location services enabled: $serviceEnabled");
       if (!serviceEnabled) {
+        print("Location services are disabled.");
         setState(() {
-          userDistrict = "Location services are disabled.";
+          userDistrict = "Your Location";
         });
         return;
       }
 
       LocationPermission permission = await Geolocator.checkPermission();
+      print("Location permission: $permission");
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+        print("Requested permission, now: $permission");
         if (permission == LocationPermission.denied) {
+          print("Location permission denied.");
           setState(() {
-            userDistrict = "Location permission denied.";
+            userDistrict = "Your Location";
           });
           return;
         }
       }
       if (permission == LocationPermission.deniedForever) {
+        print("Location permission permanently denied.");
         setState(() {
-          userDistrict = "Location permission permanently denied.";
+          userDistrict = "Your Location";
         });
         return;
       }
@@ -220,32 +218,37 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+      print("Got position: ${position.latitude}, ${position.longitude}");
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
+      print("Placemarks: $placemarks");
       setState(() {
         userLatLng = LatLng(position.latitude, position.longitude);
         userDistrict = placemarks.isNotEmpty
             ? (placemarks.first.subAdministrativeArea ??
                   placemarks.first.locality ??
-                  "Unknown District")
-            : "District not found";
+                  "Your Location")
+            : "Your Location";
       });
-      
+
       if (userLatLng != null && siteLatLng != null) {
+        print("Fetching route and durations...");
         await fetchAndSetRoute();
         await fetchDurationsAndDistance();
       }
     } catch (e) {
+      print("Error fetching district: $e");
       setState(() {
-        userDistrict = "Error: $e";
+        userDistrict = "Your Location";
       });
     }
   }
 
   Future<void> fetchCoordinates({String? customDestination}) async {
     final searchName = customDestination ?? widget.siteName;
+    print("Fetching coordinates for: $searchName");
     try {
       final query = await FirebaseFirestore.instance
           .collection('tourismsites')
@@ -253,10 +256,13 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
           .limit(1)
           .get();
 
+      print("Firestore query docs: ${query.docs.length}");
       if (query.docs.isNotEmpty) {
         final doc = query.docs.first;
+        print("Doc data: ${doc.data()}");
         final lat = doc['latitude'];
         final lng = doc['longitude'];
+        print("Lat: $lat, Lng: $lng");
         double? latitude;
         double? longitude;
 
@@ -271,30 +277,32 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
           longitude = double.tryParse(lng);
         }
 
+        print("Parsed latitude: $latitude, longitude: $longitude");
         if (latitude != null && longitude != null) {
           setState(() {
-            siteLatLng = LatLng(
-              latitude!,
-              longitude!,
-            ); // Use ! to assert non-null
+            siteLatLng = LatLng(latitude!, longitude!);
             error = null;
           });
-          
+
           if (userLatLng != null) {
+            print("User location known, fetching route and durations...");
             await fetchAndSetRoute();
             await fetchDurationsAndDistance();
           }
         } else {
+          print("Location not found for this site.");
           setState(() {
             error = 'Location not found for this site.';
           });
         }
       } else {
+        print("Site not found.");
         setState(() {
           error = 'Site not found.';
         });
       }
     } catch (e) {
+      print("Error finding location: $e");
       setState(() {
         error = 'Error finding location: $e';
       });
@@ -302,25 +310,33 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
   }
 
   Future<void> fetchAndSetRoute() async {
-    if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
-    
+    if (userLatLng == null || siteLatLng == null || isLoadingRoute) {
+      print(
+        "Cannot fetch route: userLatLng=$userLatLng, siteLatLng=$siteLatLng, isLoadingRoute=$isLoadingRoute",
+      );
+      return;
+    }
+
     setState(() {
       isLoadingRoute = true;
     });
-    
+
     const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
-    
+
     try {
+      print("Fetching route polyline...");
       final polyline = await fetchRoutePolyline(
         userLatLng!,
         siteLatLng!,
         apiKey,
       );
+      print("Polyline points count: ${polyline.length}");
       setState(() {
         routePolyline = polyline;
         isLoadingRoute = false;
       });
     } catch (e) {
+      print("Failed to fetch route: $e");
       setState(() {
         error = 'Failed to fetch route: $e';
         isLoadingRoute = false;
@@ -336,54 +352,34 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     final url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=driving&key=$apiKey';
 
+    print("Directions API URL: $url");
     final response = await http.get(Uri.parse(url));
+    print("Directions API response status: ${response.statusCode}");
+    print("Directions API response body: ${response.body}");
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       if (data['routes'] != null && data['routes'].isNotEmpty) {
         final points = data['routes'][0]['overview_polyline']['points'];
+        print("Overview polyline: $points");
         return decodePolyline(points);
       }
+      print("No routes found in response.");
     }
     throw Exception('Failed to fetch route');
   }
 
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> poly = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      poly.add(LatLng(lat / 1E5, lng / 1E5));
-    }
-    return poly;
-  }
-
   Future<void> fetchDurationsAndDistance() async {
-    if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
-    
+    if (userLatLng == null || siteLatLng == null || isLoadingDurations) {
+      print(
+        "Cannot fetch durations: userLatLng=$userLatLng, siteLatLng=$siteLatLng, isLoadingDurations=$isLoadingDurations",
+      );
+      return;
+    }
+
     setState(() {
       isLoadingDurations = true;
     });
-    
+
     const apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
     final modes = ['walking', 'driving', 'bicycling'];
     final results = <String, Map<String, String>>{};
@@ -392,7 +388,10 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       for (final mode in modes) {
         final url =
             'https://maps.googleapis.com/maps/api/directions/json?origin=${userLatLng!.latitude},${userLatLng!.longitude}&destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&mode=$mode&key=$apiKey';
+        print("Directions API ($mode) URL: $url");
         final response = await http.get(Uri.parse(url));
+        print("Directions API ($mode) response status: ${response.statusCode}");
+        print("Directions API ($mode) response body: ${response.body}");
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
           if (data['routes'] != null && data['routes'].isNotEmpty) {
@@ -401,7 +400,14 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
               'duration': leg['duration']['text'],
               'distance': leg['distance']['text'],
             };
+            print(
+              "Mode: $mode, Duration: ${leg['duration']['text']}, Distance: ${leg['distance']['text']}",
+            );
+          } else {
+            print("No routes found for mode: $mode");
           }
+        } else {
+          print("Failed to fetch directions for mode: $mode");
         }
       }
 
@@ -409,13 +415,15 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
         walkingDuration = results['walking']?['duration'] ?? '-';
         drivingDuration = results['driving']?['duration'] ?? '-';
         bicyclingDuration = results['bicycling']?['duration'] ?? '-';
-        routeDistance = results['driving']?['distance'] ??
+        routeDistance =
+            results['driving']?['distance'] ??
             results['walking']?['distance'] ??
             results['bicycling']?['distance'] ??
             '-';
         isLoadingDurations = false;
       });
     } catch (e) {
+      print("Error fetching durations: $e");
       setState(() {
         isLoadingDurations = false;
       });
@@ -438,14 +446,16 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       animation: _pulseAnimation,
       builder: (context, child) {
         return Container(
-          width: 20,
+          width: 18,
           height: 20,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: isMoving ? Colors.green : Colors.orange,
             boxShadow: [
               BoxShadow(
-                color: (isMoving ? Colors.green : Colors.orange).withOpacity(0.5),
+                color: (isMoving ? Colors.green : Colors.orange).withOpacity(
+                  0.5,
+                ),
                 blurRadius: 10 * _pulseAnimation.value,
                 spreadRadius: 2 * _pulseAnimation.value,
               ),
@@ -483,7 +493,6 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                     icon: BitmapDescriptor.defaultMarkerWithHue(
                       BitmapDescriptor.hueAzure,
                     ),
-                    rotation: userBearing,
                     anchor: const Offset(0.5, 0.5),
                   ),
               },
@@ -492,9 +501,13 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                   Polyline(
                     polylineId: const PolylineId('route'),
                     points: routePolyline,
-                    color: isMoving ? const Color.fromARGB(255, 41, 78, 41) : const Color(0xFF1FF813),
+                    color: isMoving
+                        ? const Color.fromARGB(255, 41, 78, 41)
+                        : const Color(0xFF1FF813),
                     width: isMoving ? 6 : 4,
-                    patterns: isMoving ? [PatternItem.dash(20), PatternItem.gap(5)] : [],
+                    patterns: isMoving
+                        ? [PatternItem.dash(20), PatternItem.gap(5)]
+                        : [],
                   ),
               },
               onMapCreated: (controller) => mapController = controller,
@@ -506,7 +519,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
             )
           else
             const Center(child: CircularProgressIndicator()),
-          
+
           // Custom back arrow and rectangle with motion indicator
           Positioned(
             top: 38,
@@ -542,7 +555,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                   ),
                 ),
                 const SizedBox(width: 8),
-                
+
                 // Enhanced rectangle with motion indicator
                 ClipRRect(
                   borderRadius: BorderRadius.circular(30),
@@ -606,7 +619,8 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                                     bottom: 8,
                                   ),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         userDistrict ?? "Fetching...",
@@ -649,26 +663,32 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                                       Expanded(
                                         child: isEditingDestination
                                             ? TextField(
-                                                controller: _destinationController,
+                                                controller:
+                                                    _destinationController,
                                                 autofocus: true,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.black,
                                                   fontSize: 16,
                                                 ),
-                                                decoration: const InputDecoration(
-                                                  hintText: "Enter destination...",
-                                                  border: InputBorder.none,
-                                                  isDense: true,
-                                                  contentPadding: EdgeInsets.zero,
-                                                ),
+                                                decoration:
+                                                    const InputDecoration(
+                                                      hintText:
+                                                          "Enter destination...",
+                                                      border: InputBorder.none,
+                                                      isDense: true,
+                                                      contentPadding:
+                                                          EdgeInsets.zero,
+                                                    ),
                                                 onSubmitted: (value) {
                                                   setState(() {
-                                                    isEditingDestination = false;
+                                                    isEditingDestination =
+                                                        false;
                                                   });
                                                   if (value.trim().isNotEmpty) {
                                                     fetchCoordinates(
-                                                      customDestination: value.trim(),
+                                                      customDestination: value
+                                                          .trim(),
                                                     );
                                                   }
                                                 },
@@ -712,7 +732,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
               ],
             ),
           ),
-          
+
           // Action buttons with loading indicators
           Positioned(
             top: 555,
@@ -727,7 +747,8 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => VirtualTourScreen(placeName: widget.siteName),
+                        builder: (context) =>
+                            VirtualTourScreen(placeName: widget.siteName),
                       ),
                     );
                   },
@@ -754,7 +775,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                     ),
                   ),
                 ),
-                
+
                 // Location button with loading indicator
                 GestureDetector(
                   onTap: () {
@@ -813,7 +834,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
               ],
             ),
           ),
-          
+
           // Enhanced bottom rectangle with real-time data
           Positioned(
             left: 4,
@@ -859,15 +880,22 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: isMoving ? Colors.green.withOpacity(0.2) : Colors.orange.withOpacity(0.2),
+                                color: isMoving
+                                    ? Colors.green.withOpacity(0.2)
+                                    : Colors.orange.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 isMoving ? "Moving" : "Stationary",
                                 style: TextStyle(
-                                  color: isMoving ? Colors.green[800] : Colors.orange[800],
+                                  color: isMoving
+                                      ? Colors.green[800]
+                                      : Colors.orange[800],
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -876,7 +904,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                           ],
                         ),
                       ),
-                      
+
                       // Durations and distance row with loading states
                       Positioned(
                         top: 50,
@@ -888,75 +916,80 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                                   SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
                                   ),
                                   SizedBox(width: 10),
                                   Text("Updating routes..."),
                                 ],
                               )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // Walking
-                                  const Icon(
-                                    Icons.directions_walk,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    walkingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                            : SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    // Walking
+                                    const Icon(
+                                      Icons.directions_walk,
+                                      color: Colors.black,
+                                      size: 22,
                                     ),
-                                  ),
-                                                                    const SizedBox(width: 20),
-                                  // Driving
-                                  const Icon(
-                                    Icons.directions_car,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    drivingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      walkingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  // Bicycling
-                                  const Icon(
-                                    Icons.directions_bike,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    bicyclingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 20),
+                                    // Driving
+                                    const Icon(
+                                      Icons.directions_car,
+                                      color: Colors.black,
+                                      size: 22,
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  // Distance
-                                  const Icon(
-                                    Icons.straighten,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    routeDistance ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      drivingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 20),
+                                    // Bicycling
+                                    const Icon(
+                                      Icons.directions_bike,
+                                      color: Colors.black,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      bicyclingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    // Distance
+                                    const Icon(
+                                      Icons.straighten,
+                                      color: Colors.black,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      routeDistance ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                       ),
                       // Error message (if any)
@@ -970,7 +1003,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
                             style: const TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              fontSize: 12,
                             ),
                           ),
                         ),
@@ -984,4 +1017,34 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
       ),
     );
   }
+}
+
+List<LatLng> decodePolyline(String polyline) {
+  List<LatLng> points = [];
+  int index = 0, len = polyline.length;
+  int lat = 0, lng = 0;
+
+  while (index < len) {
+    int b, shift = 0, result = 0;
+    do {
+      b = polyline.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+    do {
+      b = polyline.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+
+    points.add(LatLng(lat / 1e5, lng / 1e5));
+  }
+  return points;
 }

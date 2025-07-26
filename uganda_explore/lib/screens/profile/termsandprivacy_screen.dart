@@ -27,7 +27,7 @@ class TermsPrivacyScreen extends StatelessWidget {
                         vertical: 12,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.9),
+                        color: Colors.white.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
