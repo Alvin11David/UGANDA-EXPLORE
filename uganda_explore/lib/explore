@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
+void main() async {
+WidgetsFlutterBinding.ensureInitialized();
 
-void main() {
+await Firebase.InitializeApp(
+  options:
+DefaultFirebaseOptions.currentPlatform,);
   runApp(const MyApp());
 }
 
@@ -11,16 +16,54 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tourism Image Carousel',
-      theme: ThemeData(
+    return MultiProvider(
+      providers: [
+        Provider<FirestoreService>(
+          create:(_) =>
+FirestoreService(),
+        )
+
+      ],
+      child:MaterialApp(
+         debugShowCheckedModeBanner:
+false,
+       title: 'Tourism Image Carousel',
+       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        fontFamily: 'Inter', 
+        scaffoldBackgroundColor:
+Colors.white,
+          visualDensity:
+VisualDensity.adaptivePlatformDensity,
+          appBarTheme: const AppBarTheme(
+            backgroundColor:
+Colors.white,
+             foregroundColor:
+Colors.black,
+            elevation: 1,
+            centerTitle: true,
       ),
+      textTheme:const TextTheme(
+        headlineSmall:TextStyle(
       home: const ImageCarouselScreen(),
     );
-  }
+    textTheme:const TextTheme(
+      headlineSmall: TextStyle(
+        fontSize: 20
+        fontWeight:
+FontWeight.bold,
+              color:Colors.black87,
+           ),
+           bodyMedium:TextStyle(
+             fontSize:16,
+             color:Colors.black54,
+          ),
+         ),
+        ),
+        home:const
+BwindiDetailsScreen()
+      ),
+     );
+   }
 }
 
 class ImageCarouselScreen extends StatefulWidget {
