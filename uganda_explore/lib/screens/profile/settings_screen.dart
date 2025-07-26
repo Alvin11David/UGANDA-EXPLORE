@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -64,8 +65,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (index == 0) {
       Navigator.pushReplacementNamed(context, '/home');
     } else if (index == 1) {
+      // Stay on settings
     } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/map');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MapViewScreen(
+            siteName: 'Your Current Location',
+            showCurrentLocation: true,
+          ),
+        ),
+      );
     }
   }
 
@@ -190,7 +200,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.brightness_6,
                             label: 'App Theme',
-                            onTap: () => print("App Theme tapped"),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/app_theme',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
@@ -205,13 +218,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           _SettingsOptionButton(
                             icon: Icons.share,
                             label: 'Share App',
-                            onTap: () => print("Share App tapped"),
+                             onTap: () => Navigator.pushNamed(
+                              context,
+                              '/termsandprivacy',
+                            ),
                           ),
                           const SizedBox(height: 12),
                           _SettingsOptionButton(
                             icon: Icons.logout,
                             label: 'Logout',
-                            onTap: () => print("Logout tapped"),
+                            onTap: () => Navigator.pushNamed(
+                              context,
+                              '/logout',
+                            ),
                           ),
                         ],
                       ),

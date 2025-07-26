@@ -429,3 +429,4 @@ class _NavIcon extends StatelessWidget {
     );
   }
 }
+

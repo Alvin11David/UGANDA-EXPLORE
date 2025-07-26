@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:uganda_explore/screens/auth/sign_in_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:uganda_explore/config/theme_notifier.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -55,6 +57,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 .trim(), // from your sign up form
             // ...other fields
           });
+      Future<void> saveUserFullName(String fullName) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('userFullName', fullName);
+}
 
       ScaffoldMessenger.of(
         context,
@@ -140,7 +146,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   color: isDarkMode ? Colors.white : Colors.black,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 70),
               Container(
                 width: 490,
                 padding: const EdgeInsets.only(left: 4, right: 4, bottom: 0),

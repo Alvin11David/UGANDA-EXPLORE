@@ -72,7 +72,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
         final doc = query.docs.first;
         final lat = doc['latitude'];
         final lng = doc['longitude'];
-        
+
         double? latitude;
         double? longitude;
 
@@ -144,13 +144,14 @@ class _StreetViewPageState extends State<StreetViewPage> {
         _userLongitude = position.longitude;
         _userDistrict = placemarks.isNotEmpty
             ? (placemarks.first.subAdministrativeArea ??
-                placemarks.first.locality ??
-                "Unknown District")
+                  placemarks.first.locality ??
+                  "Unknown District")
             : "District not found";
       });
     } catch (e) {
+      print('Location error: $e');
       setState(() {
-        _userDistrict = "Error getting location: $e";
+        _userDistrict = "Error: $e";
       });
     }
   }
@@ -163,7 +164,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
 
     try {
       final streetViewHtml = _generateStreetViewHtml();
-      
+
       _webViewController = WebViewController()
         ..setJavaScriptMode(JavaScriptMode.unrestricted)
         ..setNavigationDelegate(
@@ -400,7 +401,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
             )
           else if (_webViewController != null)
             WebViewWidget(controller: _webViewController!),
-          
+
           // Loading indicator
           if (_isLoading && !_hasError)
             const Center(
@@ -408,7 +409,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
-          
+
           // Custom app bar with blur effect
           Positioned(
             top: 0,
@@ -420,10 +421,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.7),
-                    Colors.transparent,
-                  ],
+                  colors: [Colors.black.withOpacity(0.7), Colors.transparent],
                 ),
               ),
               child: SafeArea(
@@ -489,12 +487,12 @@ class _StreetViewPageState extends State<StreetViewPage> {
               ),
             ),
           ),
-          
+
           // Bottom info panel
           Positioned(
             left: 4,
             right: 4,
-            bottom: 0,            
+            bottom: 0,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(25),
@@ -522,7 +520,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
                           style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 15,
                             fontFamily: 'Poppins',
                           ),
                           overflow: TextOverflow.ellipsis,

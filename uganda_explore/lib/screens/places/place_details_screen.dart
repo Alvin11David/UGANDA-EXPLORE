@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import 'package:uganda_explore/screens/providers/favorites_provider.dart';
 import 'package:uganda_explore/screens/virtual_ar/ar_scan_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/map_view_screen.dart';
 import 'package:uganda_explore/screens/virtual_ar/virtual_tour_screen.dart';
@@ -7,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
   final String siteName;
@@ -19,6 +21,9 @@ class PlaceDetailsScreen extends StatefulWidget {
 }
 
 class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
+  Map<String, dynamic>? _siteData;
+  bool _isLoadingSiteData = true;
+  bool _isStarSelected = false;
   final PageController _pageController = PageController();
   final int _currentPage = 0;
   List<String> _images = [];
@@ -34,9 +39,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   double _lastOffset = 0.0;
   final ScrollController _scrollController = ScrollController();
 
+  bool _isFavourite = false;
+
   @override
   void initState() {
     super.initState();
+    _fetchSiteData();
     fetchSiteImages(widget.siteName).then((imgs) {
       if (mounted) {
         setState(() {
@@ -50,6 +58,24 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     _scrollController.addListener(_handleScroll);
   }
 
+  Future<void> _fetchSiteData() async {
+    final query = await FirebaseFirestore.instance
+        .collection('tourismsites')
+        .where('name', isEqualTo: widget.siteName)
+        .get();
+    if (query.docs.isNotEmpty) {
+      setState(() {
+        _siteData = query.docs.first.data();
+        _isLoadingSiteData = false;
+      });
+    } else {
+      setState(() {
+        _siteData = null;
+        _isLoadingSiteData = false;
+      });
+    }
+  }
+
   void _handleScroll() {
     double offset = _scrollController.offset;
     if (offset > _lastOffset + 10 && _showNavBar) {
@@ -58,6 +84,29 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       setState(() => _showNavBar = true);
     }
     _lastOffset = offset;
+  }
+
+  Future<void> _loadFavouriteStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favs = prefs.getStringList('favouriteSites') ?? [];
+    setState(() {
+      _isFavourite = favs.contains(widget.siteName);
+    });
+  }
+
+  Future<void> _toggleFavourite() async {
+    final prefs = await SharedPreferences.getInstance();
+    final favs = prefs.getStringList('favouriteSites') ?? [];
+    setState(() {
+      if (_isFavourite) {
+        favs.remove(widget.siteName);
+        _isFavourite = false;
+      } else {
+        favs.add(widget.siteName);
+        _isFavourite = true;
+      }
+    });
+    await prefs.setStringList('favouriteSites', favs);
   }
 
   @override
@@ -362,7 +411,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           shape: BoxShape.circle,
                           border: isActive
                               ? Border.all(
-                                  color: const Color(0xFF1FF813),
+                                  color: const Color(0xFF3B82F6),
                                   width: 3,
                                 )
                               : null,
@@ -697,30 +746,70 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-            top: 290,
-            left: MediaQuery.of(context).size.width / 2 + 85,
-            child: ClipOval(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.star_border,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  ),
+  top: 290,
+  left: MediaQuery.of(context).size.width / 2 + 85,
+  child: GestureDetector(
+    onTap: () async {
+      setState(() {
+        _isStarSelected = !_isStarSelected;
+      });
+      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+
+      // Fetch site details from Firestore
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: widget.siteName)
+          .get();
+      if (query.docs.isNotEmpty) {
+        final siteData = query.docs.first.data();
+        if (_isStarSelected) {
+          favoritesProvider.addFavorite(widget.siteName);
+
+          // Show drop down notification for 3 seconds
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Added to favorites',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.blue, // You can style as you wish
+              margin: const EdgeInsets.only(top: 60, left: 16, right: 16),
+            ),
+          );
+        } else {
+          favoritesProvider.removeFavorite(widget.siteName);
+        }
+      }
+    },
+    child: ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+        child: Container(
+          width: 90,
+          height: 90,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.3),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 1.5),
+          ),
+          child: Center(
+            child: Icon(
+              Icons.star_border,
+              color: _isStarSelected ? Colors.yellow : Colors.white,
+              size: 60,
             ),
           ),
+        ),
+      ),
+    ),
+  ),
+),
           Positioned(
             left: 4,
             right: 4,
@@ -735,8 +824,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 child: Container(
                   height: 400,
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 255, 255, 255)
-                        .withOpacity(0.3),
+                    color: const Color.fromARGB(
+                      255,
+                      255,
+                      255,
+                      255,
+                    ).withOpacity(0.3),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(40),
                       topRight: Radius.circular(40),
@@ -852,10 +945,11 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                         alignment: Alignment.center,
                                         children: [
                                           ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                            child: controller
-                                                    .value.isInitialized
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            child:
+                                                controller.value.isInitialized
                                                 ? SizedBox(
                                                     width: 100,
                                                     height: 80,
@@ -916,179 +1010,163 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-                        FutureBuilder<String?>(
-                          future: fetchSiteDescription(widget.siteName),
+(_isLoadingSiteData || _siteData == null || _siteData!['description'] == null)
+  ? const SizedBox.shrink()
+  : Text(
+      _siteData!['description'],
+      style: const TextStyle(
+        color: Colors.black,
+        fontFamily: 'Poppins',
+        fontWeight: FontWeight.normal,
+        fontSize: 16,
+      ),
+    ),
+                        FutureBuilder<List<String>>(
+                          future: fetchSiteAudios(widget.siteName),
+                          builder: (context, audioSnapshot) {
+                            if (audioSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox.shrink();
+                            }
+                            final audios = audioSnapshot.data ?? [];
+                            if (audios.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            return BackgroundAudioPlayer(urls: audios);
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 0,
+                          ),
+                          child: Container(
+                            height: 1,
+                            color: Colors.black,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 4),
+                          child: Text(
+                            "Quick Information",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        FutureBuilder<Map<String, String>>(
+                          future: fetchQuickInfo(widget.siteName),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
                               return const SizedBox.shrink();
                             }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return const SizedBox.shrink();
+                            if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return const Text(
+                                "No quick information available.",
+                                style: TextStyle(
+                                  color: Colors.black54,
+                                  fontFamily: 'Poppins',
+                                  fontSize: 14,
+                                ),
+                              );
                             }
+                            final info = snapshot.data!;
                             return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  snapshot.data!,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins',
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<List<String>>(
-                                  future: fetchSiteAudios(widget.siteName),
-                                  builder: (context, audioSnapshot) {
-                                    if (audioSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    final audios = audioSnapshot.data ?? [];
-                                    if (audios.isEmpty) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return BackgroundAudioPlayer(urls: audios);
-                                  },
-                                ),
-                                const SizedBox(height: 12),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 0,
-                                  ),
-                                  child: Container(
-                                    height: 1,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 4),
-                                  child: Text(
-                                    "Quick Information",
-                                    style: TextStyle(
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.attach_money,
                                       color: Colors.black,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 20,
+                                      size: 20,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Entry Fee: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['entryfee'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 12),
-                                FutureBuilder<Map<String, String>>(
-                                  future: fetchQuickInfo(widget.siteName),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    if (!snapshot.hasData ||
-                                        snapshot.data!.isEmpty) {
-                                      return const Text(
-                                        "No quick information available.",
-                                        style: TextStyle(
-                                          color: Colors.black54,
-                                          fontFamily: 'Poppins',
-                                          fontSize: 14,
-                                        ),
-                                      );
-                                    }
-                                    final info = snapshot.data!;
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.attach_money,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Entry Fee: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['entryfee'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.access_time,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Opening: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['openingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.lock_clock,
-                                              color: Colors.black,
-                                              size: 20,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            const Text(
-                                              "Closing: ",
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            Text(
-                                              info['closingHours'] ?? '',
-                                              style: const TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'Poppins',
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.access_time,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Opening: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['openingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.lock_clock,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      "Closing: ",
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      info['closingHours'] ?? '',
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             );
@@ -1253,8 +1331,9 @@ class _BackgroundAudioPlayerState extends State<BackgroundAudioPlayer> {
       children: [
         IconButton(
           icon: Icon(
-              _isPlaying ? Icons.pause : Icons.play_arrow,
-              color: Colors.black),
+            _isPlaying ? Icons.pause : Icons.play_arrow,
+            color: Colors.black,
+          ),
           onPressed: () {
             if (_isPlaying) {
               _player.pause();
