@@ -924,69 +924,72 @@ class _MapViewScreenState extends State<MapViewScreen>
                                   Text("Updating routes..."),
                                 ],
                               )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // Walking
-                                  const Icon(
-                                    Icons.directions_walk,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    walkingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                            : SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    // Walking
+                                    const Icon(
+                                      Icons.directions_walk,
+                                      color: Colors.black,
+                                      size: 22,
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  // Driving
-                                  const Icon(
-                                    Icons.directions_car,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    drivingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      walkingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  // Bicycling
-                                  const Icon(
-                                    Icons.directions_bike,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    bicyclingDuration ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 20),
+                                    // Driving
+                                    const Icon(
+                                      Icons.directions_car,
+                                      color: Colors.black,
+                                      size: 22,
                                     ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  // Distance
-                                  const Icon(
-                                    Icons.straighten,
-                                    color: Colors.black,
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    routeDistance ?? '-',
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      drivingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 20),
+                                    // Bicycling
+                                    const Icon(
+                                      Icons.directions_bike,
+                                      color: Colors.black,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      bicyclingDuration ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    // Distance
+                                    const Icon(
+                                      Icons.straighten,
+                                      color: Colors.black,
+                                      size: 22,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      routeDistance ?? '-',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                       ),
                       // Error message (if any)

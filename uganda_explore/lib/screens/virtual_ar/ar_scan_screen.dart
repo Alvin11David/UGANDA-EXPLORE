@@ -421,7 +421,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
 
     // Progress bar widget
     Widget progressBar = Positioned(
-      bottom: 10,
+      bottom: 11,
       left: 5,
       right: 24,
       child: Column(
