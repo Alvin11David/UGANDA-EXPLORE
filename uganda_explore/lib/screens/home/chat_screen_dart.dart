@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -9,12 +10,17 @@ class ChatScreen extends StatefulWidget {
   State<ChatScreen> createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   final List<List<Map<String, dynamic>>> chatHistories = [];
   List<Map<String, dynamic>> currentChat = [];
   final TextEditingController controller = TextEditingController();
   bool isLoading = false;
   bool aiTyping = false;
+
+  // Animation controller for glowing effect
+  AnimationController? _glowController;
+  bool showIntro = true;
 
   // Save the current chat to history and start a new chat
   void saveCurrentChat() {
@@ -33,7 +39,8 @@ class _ChatScreenState extends State<ChatScreen> {
     final response = await http.post(
       Uri.parse('https://openrouter.ai/api/v1/chat/completions'),
       headers: {
-        'Authorization': 'Bearer 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',
+        'Authorization':
+            'Bearer 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',
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
@@ -66,6 +73,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
+    setState(() {
+      showIntro = false;
+    });
     final now = DateTime.now();
     setState(() {
       currentChat.add({
@@ -202,6 +212,21 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _glowController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFE5E3D4),
@@ -215,12 +240,12 @@ class _ChatScreenState extends State<ChatScreen> {
                 color: const Color(0xFF3B82F6),
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(4),
               child: const Icon(Icons.smart_toy, color: Colors.white, size: 24),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 3),
             const Text(
-              'Virtual Guide Chat',
+              'Uganda Explore AI',
               style: TextStyle(
                 color: Color(0xFF3B82F6),
                 fontWeight: FontWeight.bold,
@@ -243,15 +268,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 6),
-                const Text(
-                  'Online',
-                  style: TextStyle(
-                    color: Color(0xFF3B82F6),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
               ],
             ),
           ],
@@ -266,191 +282,289 @@ class _ChatScreenState extends State<ChatScreen> {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
+        child: Stack(
           children: [
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: currentChat.length,
-                itemBuilder: (context, idx) {
-                  final msg = currentChat[idx];
-                  final isUser = msg['role'] == 'user';
-                  return Align(
-                    alignment: isUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isUser ? const Color(0xFF3B82F6) : Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(isUser ? 24 : 8),
-                          topRight: Radius.circular(isUser ? 8 : 24),
-                          bottomLeft: const Radius.circular(24),
-                          bottomRight: const Radius.circular(24),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.09),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: isUser
-                              ? const Color(0xFF3B82F6)
-                              : Colors.grey.shade200,
-                          width: 1.2,
-                        ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: isUser
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            msg['text'] ?? '',
-                            style: TextStyle(
-                              color: isUser ? Colors.white : Colors.black87,
-                              fontSize: 16,
-                              fontFamily: 'Poppins',
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                formatTimestamp(msg['timestamp'] as DateTime),
-                                style: TextStyle(
-                                  color: isUser
-                                      ? Colors.white70
-                                      : Colors.black45,
-                                  fontSize: 11,
-                                ),
-                              ),
-                              if (msg['role'] == 'ai' || msg['role'] == 'user')
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 6.0),
-                                  child: Icon(
-                                    msg['seen'] == true
-                                        ? Icons.done_all
-                                        : Icons.done,
-                                    size: 14,
-                                    color: msg['seen'] == true
-                                        ? Colors.green
-                                        : Colors.grey,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            if (aiTyping)
-              Padding(
-                padding: const EdgeInsets.only(left: 18, bottom: 8),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      "AI is typing...",
-                      style: TextStyle(
-                        color: Colors.black54,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            if (isLoading)
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.06),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: controller,
-                        style: const TextStyle(fontSize: 16),
-                        decoration: InputDecoration(
-                          hintText: 'Ask about any tourism site...',
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+            // Main chat UI
+            Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: currentChat.length,
+                    itemBuilder: (context, idx) {
+                      final msg = currentChat[idx];
+                      final isUser = msg['role'] == 'user';
+                      return Align(
+                        alignment: isUser
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
                             vertical: 14,
                           ),
+                          decoration: BoxDecoration(
+                            color: isUser
+                                ? const Color(0xFF3B82F6)
+                                : Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(isUser ? 24 : 8),
+                              topRight: Radius.circular(isUser ? 8 : 24),
+                              bottomLeft: const Radius.circular(24),
+                              bottomRight: const Radius.circular(24),
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.09),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isUser
+                                  ? const Color(0xFF3B82F6)
+                                  : Colors.grey.shade200,
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: isUser
+                                ? CrossAxisAlignment.end
+                                : CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                msg['text'] ?? '',
+                                style: TextStyle(
+                                  color: isUser ? Colors.white : Colors.black87,
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    formatTimestamp(
+                                      msg['timestamp'] as DateTime,
+                                    ),
+                                    style: TextStyle(
+                                      color: isUser
+                                          ? Colors.white70
+                                          : Colors.black45,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                  if (msg['role'] == 'ai' ||
+                                      msg['role'] == 'user')
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 6.0),
+                                      child: Icon(
+                                        msg['seen'] == true
+                                            ? Icons.done_all
+                                            : Icons.done,
+                                        size: 14,
+                                        color: msg['seen'] == true
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                        onSubmitted: (val) {
-                          sendMessage(val);
-                          controller.clear();
-                        },
-                      ),
+                      );
+                    },
+                  ),
+                ),
+                if (aiTyping)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18, bottom: 8),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.green,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          "AI is typing...",
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: () {
-                      sendMessage(controller.text);
-                      controller.clear();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3B82F6),
-                        borderRadius: BorderRadius.circular(18),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.10),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
+                if (isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 18,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.06),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: controller,
+                            style: const TextStyle(fontSize: 16),
+                            decoration: InputDecoration(
+                              hintText: 'Ask about any tourism site...',
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 14,
+                              ),
+                            ),
+                            onSubmitted: (val) {
+                              sendMessage(val);
+                              controller.clear();
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () {
+                          sendMessage(controller.text);
+                          controller.clear();
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B82F6),
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.10),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(14),
+                          child: const Icon(
+                            Icons.send,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      // ...your widgets...
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // Centered intro animation overlay
+            if (showIntro)
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: true, // This allows taps to pass through
+                  child: Container(
+                    color: Colors.transparent,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_glowController != null)
+                            AnimatedBuilder(
+                              animation: _glowController!,
+                              builder: (context, child) {
+                                final glow = 0.5 + 0.5 * _glowController!.value;
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.blue.withOpacity(
+                                          0.5 * glow,
+                                        ),
+                                        blurRadius: 32 * glow,
+                                        spreadRadius: 4 * glow,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Image.asset(
+                                    'assets/logo/blacklogo.png',
+                                    width: 70,
+                                    height: 70,
+                                  ),
+                                );
+                              },
+                            ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            height: 60,
+                            child: AnimatedTextKit(
+                              repeatForever: true,
+                              pause: const Duration(milliseconds: 800),
+                              animatedTexts: [
+                                TypewriterAnimatedText(
+                                  "Welcome to Uganda Explore AI",
+                                  textStyle: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF3B82F6),
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  speed: const Duration(milliseconds: 70),
+                                  cursor: '',
+                                ),
+                                TypewriterAnimatedText(
+                                  "Ask me anything concerning Uganda's Tourism",
+                                  textStyle: const TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black87,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  speed: const Duration(milliseconds: 60),
+                                  cursor: '',
+                                ),
+                              ],
+                              onTap: () {},
+                              displayFullTextOnTap: false,
+                              stopPauseOnTap: false,
+                            ),
                           ),
                         ],
                       ),
-                      padding: const EdgeInsets.all(14),
-                      child: const Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 24,
-                      ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
           ],
         ),
       ),
