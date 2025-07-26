@@ -40,6 +40,9 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   final ScrollController _scrollController = ScrollController();
 
   bool _isFavourite = false;
+  bool showThemeNotification = false;
+  String themeMessage = '';
+  bool get isDarkMode => Theme.of(context).brightness == Brightness.dark;
 
   @override
   void initState() {
@@ -352,6 +355,68 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
       }
     }
     return [];
+  }
+
+  void showTopNotification(BuildContext context, String message) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final overlay = Overlay.of(context);
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.black87 : Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: isDark ? Colors.white24 : Colors.black12,
+                width: 1.5,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 10),
+                  child: Image.asset(
+                    isDark
+                        ? 'assets/logo/blacklogo.png'
+                        : 'assets/logo/whitelogo.png',
+                    width: 32,
+                    height: 32,
+                  ),
+                ),
+                Flexible(
+                  child: Text(
+                    message,
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontFamily: 'Poppins',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(entry);
+    Future.delayed(const Duration(seconds: 3), () => entry.remove());
   }
 
   @override
@@ -746,70 +811,87 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
             ),
           ),
           Positioned(
-  top: 290,
-  left: MediaQuery.of(context).size.width / 2 + 85,
-  child: GestureDetector(
-    onTap: () async {
-      setState(() {
-        _isStarSelected = !_isStarSelected;
-      });
-      final favoritesProvider = Provider.of<FavoritesProvider>(context, listen: false);
+            top: 290,
+            left: MediaQuery.of(context).size.width / 2 + 85,
+            child: GestureDetector(
+              onTap: () async {
+                setState(() {
+                  _isStarSelected = !_isStarSelected;
+                  showThemeNotification = true;
+                  themeMessage = "Added to favourites";
+                });
+                final favoritesProvider = Provider.of<FavoritesProvider>(
+                  context,
+                  listen: false,
+                );
 
-      // Fetch site details from Firestore
-      final query = await FirebaseFirestore.instance
-          .collection('tourismsites')
-          .where('name', isEqualTo: widget.siteName)
-          .get();
-      if (query.docs.isNotEmpty) {
-        final siteData = query.docs.first.data();
-        if (_isStarSelected) {
-          favoritesProvider.addFavorite(widget.siteName);
+                // Fetch site details from Firestore
+                final query = await FirebaseFirestore.instance
+                    .collection('tourismsites')
+                    .where('name', isEqualTo: widget.siteName)
+                    .get();
+                if (query.docs.isNotEmpty) {
+                  final siteData = query.docs.first.data();
+                  if (_isStarSelected) {
+                    favoritesProvider.addFavorite(widget.siteName);
 
-          // Show drop down notification for 3 seconds
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                'Added to favorites',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                    // Show drop down notification for 3 seconds
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'Added to favorites',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                        duration: const Duration(seconds: 3),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor:
+                            Colors.blue, // You can style as you wish
+                        margin: const EdgeInsets.only(
+                          top: 60,
+                          left: 16,
+                          right: 16,
+                        ),
+                      ),
+                    );
+                  } else {
+                    favoritesProvider.removeFavorite(widget.siteName);
+                  }
+                }
+                Future.delayed(const Duration(seconds: 3), () {
+                  if (mounted) {
+                    setState(() {
+                      showThemeNotification = false;
+                    });
+                  }
+                });
+              },
+              child: ClipOval(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+                  child: Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.star_border,
+                        color: _isStarSelected ? Colors.yellow : Colors.white,
+                        size: 60,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-              duration: const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-              backgroundColor: Colors.blue, // You can style as you wish
-              margin: const EdgeInsets.only(top: 60, left: 16, right: 16),
-            ),
-          );
-        } else {
-          favoritesProvider.removeFavorite(widget.siteName);
-        }
-      }
-    },
-    child: ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-        child: Container(
-          width: 90,
-          height: 90,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.3),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 1.5),
-          ),
-          child: Center(
-            child: Icon(
-              Icons.star_border,
-              color: _isStarSelected ? Colors.yellow : Colors.white,
-              size: 60,
             ),
           ),
-        ),
-      ),
-    ),
-  ),
-),
           Positioned(
             left: 4,
             right: 4,
@@ -1010,17 +1092,19 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             ),
                           ),
                         ),
-(_isLoadingSiteData || _siteData == null || _siteData!['description'] == null)
-  ? const SizedBox.shrink()
-  : Text(
-      _siteData!['description'],
-      style: const TextStyle(
-        color: Colors.black,
-        fontFamily: 'Poppins',
-        fontWeight: FontWeight.normal,
-        fontSize: 16,
-      ),
-    ),
+                        (_isLoadingSiteData ||
+                                _siteData == null ||
+                                _siteData!['description'] == null)
+                            ? const SizedBox.shrink()
+                            : Text(
+                                _siteData!['description'],
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 16,
+                                ),
+                              ),
                         FutureBuilder<List<String>>(
                           future: fetchSiteAudios(widget.siteName),
                           builder: (context, audioSnapshot) {
@@ -1037,13 +1121,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         ),
                         const SizedBox(height: 12),
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 0,
-                          ),
-                          child: Container(
-                            height: 1,
-                            color: Colors.black,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 0),
+                          child: Container(height: 1, color: Colors.black),
                         ),
                         const SizedBox(height: 12),
                         const Padding(
@@ -1066,8 +1145,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                                 ConnectionState.waiting) {
                               return const SizedBox.shrink();
                             }
-                            if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
+                            if (!snapshot.hasData || snapshot.data!.isEmpty) {
                               return const Text(
                                 "No quick information available.",
                                 style: TextStyle(
@@ -1079,8 +1157,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                             }
                             final info = snapshot.data!;
                             return Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
@@ -1234,6 +1311,67 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
               ),
             ),
           ),
+          // Notification overlay
+          if (showThemeNotification)
+            Positioned(
+              top: 30,
+              left: 60,
+              right: 60,
+              child: AnimatedOpacity(
+                opacity: showThemeNotification ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  decoration: BoxDecoration(
+                    color: isDarkMode ? Colors.black : Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4, right: 10),
+                        child: Image.asset(
+                          isDarkMode
+                              ? 'assets/logo/whitelogo.png'
+                              : 'assets/logo/blacklogo.png',
+                          height: 32,
+                          width: 32,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          themeMessage,
+                          style: TextStyle(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.close,
+                          color: isDarkMode ? Colors.white : Colors.black,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            showThemeNotification = false;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

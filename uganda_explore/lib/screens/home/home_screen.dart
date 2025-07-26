@@ -1095,55 +1095,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       <String, dynamic>{},
                                                 );
 
-                                            if (match != null) {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) =>
-                                                      PlaceDetailsScreen(
-                                                        siteName: match['name'],
-                                                      ),
-                                                ),
-                                              );
-                                            } else {
-                                              // Try partial match if exact not found
-                                              final partial = query.docs
-                                                  .map((doc) => doc.data())
-                                                  .firstWhere(
-                                                    (site) =>
-                                                        (site['name'] as String)
-                                                            .toLowerCase()
-                                                            .contains(
-                                                              keyword
-                                                                  .toLowerCase(),
-                                                            ),
-                                                    orElse: () =>
-                                                        <String, dynamic>{},
-                                                  );
-                                              if (partial != null) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (_) =>
-                                                        PlaceDetailsScreen(
-                                                          siteName:
-                                                              partial['name'],
-                                                        ),
-                                                  ),
-                                                );
-                                              } else {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'No site found with that name.',
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    PlaceDetailsScreen(
+                                                      siteName: match['name'],
                                                     ),
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                          }
+                                              ),
+                                            );
+                                                                                    }
                                         },
                                       ),
                                     ],
