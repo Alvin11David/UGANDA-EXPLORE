@@ -7,7 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 
 class MapViewScreen extends StatefulWidget {
@@ -25,7 +25,7 @@ class MapViewScreen extends StatefulWidget {
 }
 
 class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateMixin {
-  final String _apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+  final String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
 
   LatLng? siteLatLng;
   LatLng? userLatLng;
@@ -280,329 +280,334 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
 
 
   Future<void> fetchAndSetRoute() async {
-    if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
+  if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
+  setState(() {
+    isLoadingRoute = true;
+    error = null;
+  });
+  try {
+    final optimalRoute = await fetchRouteWithFallback(
+      userLatLng!,
+      siteLatLng!,
+      _apiKey,
+      mode: selectedMode,
+    );
     setState(() {
-      isLoadingRoute = true;
-      error = null;
+      routePolyline = optimalRoute;
+      isLoadingRoute = false;
     });
+  } catch (e) {
+    setState(() {
+      error = 'Failed to fetch optimal route: $e';
+      isLoadingRoute = false;
+      routePolyline = [];
+    });
+  }
+}
+
+Future<List<LatLng>> fetchRouteWithFallback(
+  LatLng origin,
+  LatLng destination,
+  String apiKey, {
+  String mode = 'driving',
+}) async {
+  try {
+    final distance = calculateDistance(origin, destination);
+    return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
+  } catch (e) {
+    print('Direct route failed: $e');
+  }
+
+  final distance = calculateDistance(origin, destination);
+
+  if (distance <= 200) {
     try {
-      final optimalRoute = await fetchRouteWithFallback(
-        userLatLng!,
-        siteLatLng!,
-        _apiKey,
-        mode: selectedMode,
-      );
-      setState(() {
-        routePolyline = optimalRoute;
-        isLoadingRoute = false;
-      });
+      return await fetchBestAlternativeRoute(origin, destination, apiKey, mode: mode);
     } catch (e) {
-      setState(() {
-        error = 'Failed to fetch optimal route: $e';
-        isLoadingRoute = false;
-        routePolyline = [];
-      });
+      print('Alternative route failed: $e');
+    }
+  } else {
+    try {
+      return await fetchOptimalRouteWithMinimalWaypoints(origin, destination, apiKey, mode: mode);
+    } catch (e) {
+      print('Optimal route with waypoints failed: $e');
     }
   }
 
-  Future<List<LatLng>> fetchRouteWithFallback(
-    LatLng origin,
-    LatLng destination,
-    String apiKey, {
-    String mode = 'driving',
-  }) async {
-    try {
-      return await _fetchDirectRoute(origin, destination, apiKey, mode: mode);
-    } catch (e) {
-      print('Direct route failed: $e');
-    }
+  return [origin, destination];
+}
 
-    final distance = calculateDistance(origin, destination);
+Future<List<LatLng>> _fetchDirectRoute(
+  LatLng origin,
+  LatLng destination,
+  String apiKey, {
+  String mode = 'driving',
+  double? distance,
+}) async {
+  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+      'origin=${origin.latitude},${origin.longitude}&'
+      'destination=${destination.latitude},${destination.longitude}&'
+      'mode=$mode&'
+      'avoid=tolls&'
+      'optimize_waypoints=false&'
+      'overview=full&'
+      'key=$apiKey';
 
-    if (distance <= 200) {
-      try {
-        return await fetchBestAlternativeRoute(origin, destination, apiKey, mode: mode);
-      } catch (e) {
-        print('Alternative route failed: $e');
+  final timeout = (distance != null && distance > 300) ? Duration(seconds: 45) : Duration(seconds: 15);
+  final response = await http.get(Uri.parse(url)).timeout(timeout);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+      final steps = data['routes'][0]['legs'][0]['steps'] as List;
+      final decodedPoints = steps.expand((step) {
+        final encoded = step['polyline']['points'];
+        return decodePolyline(encoded);
+      }).toList();
+
+      if (_validateRoute(decodedPoints)) {
+        return decodedPoints;
+      } else {
+        throw Exception('Route validation failed - too many off-road segments');
       }
     } else {
-      try {
-        return await fetchOptimalRouteWithMinimalWaypoints(origin, destination, apiKey, mode: mode);
-      } catch (e) {
-        print('Optimal route with waypoints failed: $e');
-      }
+      throw Exception('API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
     }
+  } else {
+    throw Exception('HTTP ${response.statusCode}: ${response.body}');
+  }
+}
 
-    return [origin, destination];
+Future<List<LatLng>> fetchOptimalRouteWithMinimalWaypoints(
+  LatLng origin,
+  LatLng destination,
+  String apiKey, {
+  String mode = 'driving',
+}) async {
+  final distance = calculateDistance(origin, destination);
+  List<LatLng> waypoints = [];
+
+  int waypointCount = 0;
+  if (distance > 100) {
+    waypointCount = (((distance - 1) ~/ 100) * 2).clamp(2, 10);
   }
 
-  Future<List<LatLng>> _fetchDirectRoute(
-    LatLng origin,
-    LatLng destination,
-    String apiKey, {
-    String mode = 'driving',
-  }) async {
-    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${origin.latitude},${origin.longitude}&'
-        'destination=${destination.latitude},${destination.longitude}&'
-        'mode=$mode&'
-        'avoid=tolls&'
-        'optimize_waypoints=false&'
-        'overview=full&'
-        'key=$apiKey';
+  for (int i = 1; i <= waypointCount; i++) {
+    final fraction = i / (waypointCount + 1);
+    final lat = origin.latitude + (destination.latitude - origin.latitude) * fraction;
+    final lng = origin.longitude + (destination.longitude - origin.longitude) * fraction;
+    waypoints.add(LatLng(lat, lng));
+  }
 
-    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+  String waypointsString = '';
+  if (waypoints.isNotEmpty) {
+    waypointsString = '&waypoints=' +
+        waypoints.map((point) => '${point.latitude},${point.longitude}').join('|');
+  }
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+      'origin=${origin.latitude},${origin.longitude}&'
+      'destination=${destination.latitude},${destination.longitude}&'
+      'mode=$mode&'
+      'avoid=tolls&'
+      'optimize_waypoints=false&'
+      '$waypointsString&'
+      'overview=full&'
+      'key=$apiKey';
 
-      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-        final steps = data['routes'][0]['legs'][0]['steps'] as List;
-        final decodedPoints = steps.expand((step) {
-          final encoded = step['polyline']['points'];
-          return decodePolyline(encoded);
+  final timeout = distance > 300 ? Duration(seconds: 45) : Duration(seconds: 20);
+  final response = await http.get(Uri.parse(url)).timeout(timeout);
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+      final steps = data['routes'][0]['legs'][0]['steps'] as List;
+      final decodedPoints = steps.expand((step) {
+        final encoded = step['polyline']['points'];
+        return decodePolyline(encoded);
+      }).toList();
+
+      if (_validateRoute(decodedPoints)) {
+        return decodedPoints;
+      } else {
+        return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
+      }
+    } else {
+      throw Exception('Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
+    }
+  } else {
+    throw Exception('HTTP ${response.statusCode}');
+  }
+}
+
+bool _validateRoute(List<LatLng> route) {
+  if (route.length < 2) return false;
+
+  for (int i = 1; i < route.length; i++) {
+    final distance = calculateDistance(route[i - 1], route[i]);
+    if (distance > 50) {
+      return false;
+    }
+  }
+  return true;
+}
+
+Future<List<LatLng>> fetchBestAlternativeRoute(
+  LatLng origin,
+  LatLng destination,
+  String apiKey, {
+  String mode = 'driving',
+}) async {
+  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+      'origin=${origin.latitude},${origin.longitude}&'
+      'destination=${destination.latitude},${destination.longitude}&'
+      'alternatives=true&'
+      'mode=$mode&'
+      'avoid=tolls&'
+      'overview=full&'
+      'key=$apiKey';
+
+  final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+
+    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+      final routes = data['routes'] as List;
+
+      var bestRoute;
+      double bestScore = double.infinity;
+
+      for (var route in routes) {
+        final steps = route['legs'][0]['steps'] as List;
+        final allPoints = steps.expand((step) {
+          return decodePolyline(step['polyline']['points']);
         }).toList();
 
-        if (_validateRoute(decodedPoints)) {
-          return decodedPoints;
-        } else {
-          throw Exception('Route validation failed - too many off-road segments');
-        }
-      } else {
-        throw Exception('API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
-      }
-    } else {
-      throw Exception('HTTP ${response.statusCode}: ${response.body}');
-    }
-  }
-
-  Future<List<LatLng>> fetchOptimalRouteWithMinimalWaypoints(
-    LatLng origin,
-    LatLng destination,
-    String apiKey, {
-    String mode = 'driving',
-  }) async {
-    final distance = calculateDistance(origin, destination);
-    List<LatLng> waypoints = [];
-
-    int waypointCount = 0;
-    if (distance > 100) {
-      waypointCount = (((distance - 1) ~/ 100) * 2).clamp(2, 10);
-    }
-
-    for (int i = 1; i <= waypointCount; i++) {
-      final fraction = i / (waypointCount + 1);
-      final lat = origin.latitude + (destination.latitude - origin.latitude) * fraction;
-      final lng = origin.longitude + (destination.longitude - origin.longitude) * fraction;
-      waypoints.add(LatLng(lat, lng));
-    }
-
-    String waypointsString = '';
-    if (waypoints.isNotEmpty) {
-      waypointsString = '&waypoints=' +
-          waypoints.map((point) => '${point.latitude},${point.longitude}').join('|');
-    }
-
-    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${origin.latitude},${origin.longitude}&'
-        'destination=${destination.latitude},${destination.longitude}&'
-        'mode=$mode&'
-        'avoid=tolls&'
-        'optimize_waypoints=false&'
-        '$waypointsString&'
-        'overview=full&'
-        'key=$apiKey';
-
-    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 20));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-        final steps = data['routes'][0]['legs'][0]['steps'] as List;
-        final decodedPoints = steps.expand((step) {
-          final encoded = step['polyline']['points'];
-          return decodePolyline(encoded);
-        }).toList();
-
-        if (_validateRoute(decodedPoints)) {
-          return decodedPoints;
-        } else {
-          return await _fetchDirectRoute(origin, destination, apiKey, mode: mode);
-        }
-      } else {
-        throw Exception('Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
-      }
-    } else {
-      throw Exception('HTTP ${response.statusCode}');
-    }
-  }
-
-  bool _validateRoute(List<LatLng> route) {
-    if (route.length < 2) return false;
-
-    for (int i = 1; i < route.length; i++) {
-      final distance = calculateDistance(route[i - 1], route[i]);
-      if (distance > 50) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  Future<List<LatLng>> fetchBestAlternativeRoute(
-    LatLng origin,
-    LatLng destination,
-    String apiKey, {
-    String mode = 'driving',
-  }) async {
-    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${origin.latitude},${origin.longitude}&'
-        'destination=${destination.latitude},${destination.longitude}&'
-        'alternatives=true&'
-        'mode=$mode&'
-        'avoid=tolls&'
-        'overview=full&'
-        'key=$apiKey';
-
-    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-
-      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-        final routes = data['routes'] as List;
-
-        var bestRoute;
-        double bestScore = double.infinity;
-
-        for (var route in routes) {
-          final steps = route['legs'][0]['steps'] as List;
-          final allPoints = steps.expand((step) {
-            return decodePolyline(step['polyline']['points']);
-          }).toList();
-
-          if (_validateRoute(allPoints)) {
-            final score = allPoints.length.toDouble();
-            if (score < bestScore) {
-              bestScore = score;
-              bestRoute = route;
-            }
-          }
-        }
-
-        if (bestRoute != null) {
-          final steps = bestRoute['legs'][0]['steps'] as List;
-          final allPoints = steps.expand((step) {
-            return decodePolyline(step['polyline']['points']);
-          }).toList();
-          return allPoints;
-        }
-      }
-    }
-
-    throw Exception('No valid alternative routes found');
-  }
-
-  void _debouncedRouteUpdate() {
-    _routeUpdateTimer?.cancel();
-    _routeUpdateTimer = Timer(const Duration(seconds: 20), () {
-      fetchAndSetRoute();
-    });
-  }
-
-  double calculateDistance(LatLng point1, LatLng point2) {
-    const double earthRadius = 6371;
-    final lat1Rad = point1.latitude * math.pi / 180;
-    final lat2Rad = point2.latitude * math.pi / 180;
-    final deltaLatRad = (point2.latitude - point1.latitude) * math.pi / 180;
-    final deltaLngRad = (point2.longitude - point1.longitude) * math.pi / 180;
-    final a =
-        math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
-            math.cos(lat1Rad) *
-                math.cos(lat2Rad) *
-                math.sin(deltaLngRad / 2) *
-                math.sin(deltaLngRad / 2);
-    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  List<LatLng> decodePolyline(String encoded) {
-    List<LatLng> poly = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-      poly.add(LatLng(lat / 1E5, lng / 1E5));
-    }
-    return poly;
-  }
-
-  Future<void> fetchDurationsAndDistance() async {
-    if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
-    setState(() {
-      isLoadingDurations = true;
-    });
-    final modes = ['walking', 'driving', 'bicycling'];
-    final results = <String, Map<String, String>>{};
-    try {
-      for (final mode in modes) {
-        final url =
-            'https://maps.googleapis.com/maps/api/directions/json?'
-            'origin=${userLatLng!.latitude},${userLatLng!.longitude}&'
-            'destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&'
-            'mode=$mode&'
-            'key=$_apiKey';
-        final response = await http.get(Uri.parse(url));
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['status'] == 'OK' &&
-              data['routes'] != null &&
-              data['routes'].isNotEmpty &&
-              data['routes'][0]['legs'] != null &&
-              data['routes'][0]['legs'].isNotEmpty) {
-            final leg = data['routes'][0]['legs'][0];
-            results[mode] = {
-              'duration': leg['duration']['text'] ?? '-',
-              'distance': leg['distance']['text'] ?? '-',
-            };
+        if (_validateRoute(allPoints)) {
+          final score = allPoints.length.toDouble();
+          if (score < bestScore) {
+            bestScore = score;
+            bestRoute = route;
           }
         }
       }
-      setState(() {
-        walkingDuration = results['walking']?['duration'] ?? '-';
-        drivingDuration = results['driving']?['duration'] ?? '-';
-        bicyclingDuration = results['bicycling']?['duration'] ?? '-';
-        routeDistance =
-            results[selectedMode]?['distance'] ??
-            results['driving']?['distance'] ??
-            results['walking']?['distance'] ??
-            results['bicycling']?['distance'] ??
-            '-';
-        isLoadingDurations = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoadingDurations = false;
-      });
+
+      if (bestRoute != null) {
+        final steps = bestRoute['legs'][0]['steps'] as List;
+        final allPoints = steps.expand((step) {
+          return decodePolyline(step['polyline']['points']);
+        }).toList();
+        return allPoints;
+      }
     }
   }
+
+  throw Exception('No valid alternative routes found');
+}
+
+void _debouncedRouteUpdate() {
+  _routeUpdateTimer?.cancel();
+  _routeUpdateTimer = Timer(const Duration(seconds: 20), () {
+    fetchAndSetRoute();
+  });
+}
+
+double calculateDistance(LatLng point1, LatLng point2) {
+  const double earthRadius = 6371;
+  final lat1Rad = point1.latitude * math.pi / 180;
+  final lat2Rad = point2.latitude * math.pi / 180;
+  final deltaLatRad = (point2.latitude - point1.latitude) * math.pi / 180;
+  final deltaLngRad = (point2.longitude - point1.longitude) * math.pi / 180;
+  final a =
+      math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
+          math.cos(lat1Rad) *
+              math.cos(lat2Rad) *
+              math.sin(deltaLngRad / 2) *
+              math.sin(deltaLngRad / 2);
+  final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+  return earthRadius * c;
+}
+
+List<LatLng> decodePolyline(String encoded) {
+  List<LatLng> poly = [];
+  int index = 0, len = encoded.length;
+  int lat = 0, lng = 0;
+  while (index < len) {
+    int b, shift = 0, result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    poly.add(LatLng(lat / 1E5, lng / 1E5));
+  }
+  return poly;
+}
+
+Future<void> fetchDurationsAndDistance() async {
+  if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
+  setState(() {
+    isLoadingDurations = true;
+  });
+  final modes = ['walking', 'driving', 'bicycling'];
+  final results = <String, Map<String, String>>{};
+  try {
+    for (final mode in modes) {
+      final url =
+          'https://maps.googleapis.com/maps/api/directions/json?'
+          'origin=${userLatLng!.latitude},${userLatLng!.longitude}&'
+          'destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&'
+          'mode=$mode&'
+          'key=$_apiKey';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK' &&
+            data['routes'] != null &&
+            data['routes'].isNotEmpty &&
+            data['routes'][0]['legs'] != null &&
+            data['routes'][0]['legs'].isNotEmpty) {
+          final leg = data['routes'][0]['legs'][0];
+          results[mode] = {
+            'duration': leg['duration']['text'] ?? '-',
+            'distance': leg['distance']['text'] ?? '-',
+          };
+        }
+      }
+    }
+    setState(() {
+      walkingDuration = results['walking']?['duration'] ?? '-';
+      drivingDuration = results['driving']?['duration'] ?? '-';
+      bicyclingDuration = results['bicycling']?['duration'] ?? '-';
+      routeDistance =
+          results[selectedMode]?['distance'] ??
+          results['driving']?['distance'] ??
+          results['walking']?['distance'] ??
+          results['bicycling']?['distance'] ??
+          '-';
+      isLoadingDurations = false;
+    });
+  } catch (e) {
+    setState(() {
+      isLoadingDurations = false;
+    });
+  }
+}
+
 
   @override
   void dispose() {
@@ -869,3 +874,680 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//DONE

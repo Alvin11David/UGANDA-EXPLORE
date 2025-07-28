@@ -4,7 +4,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class StreetViewPage extends StatefulWidget {
   final String siteName;
@@ -35,7 +35,7 @@ class _StreetViewPageState extends State<StreetViewPage> {
 
   
   
-  final String _apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+  final String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
 
 
   @override
