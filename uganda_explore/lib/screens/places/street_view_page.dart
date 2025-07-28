@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+
 class StreetViewPage extends StatefulWidget {
   final String siteName;
   final double? latitude;
@@ -32,9 +33,10 @@ class _StreetViewPageState extends State<StreetViewPage> {
   double? _userLatitude;
   double? _userLongitude;
 
-  // TODO: Replace with your actual Google Maps API key
-  // This should be for Google Maps JavaScript API, NOT Street View Publish API
-  static const String _apiKey = 'AIzaSyB7H463r_jOW8U9k-LPtmTmrUOoCLVW3Zg';
+  
+  
+  final String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+
 
   @override
   void initState() {
