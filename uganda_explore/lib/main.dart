@@ -27,13 +27,19 @@ import 'package:uganda_explore/screens/splash/onboarding_screen3.dart';
 
 // Other Screens
 import 'package:uganda_explore/screens/home/home_screen.dart';
+import 'package:uganda_explore/screens/profile/profile_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await dotenv.load(fileName: ".env");
+
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  
 
   // Initialize WebView Platform - This is crucial for Street View to work
   try {

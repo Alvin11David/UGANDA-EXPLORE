@@ -1,0 +1,39 @@
+graph LR
+  subgraph Frontend
+    UD["User Device"] --> FA["Flutter App"]
+  end
+
+  subgraph Backend
+    FA --> FB["Firebase"]
+    FB --> FS["Firestore (NoSQL DB)"]
+    FB --> AUTH["Authentication"]
+    FB --> CF["Cloud Functions"]
+    FB --> ST["Storage (Media Uploads)"]
+    FB --> FCM["Firebase Cloud Messaging (Push Notifications)"]
+    FB --> CR["Crashlytics (Error Reporting)"]
+    FB --> AN["Analytics (Usage Data)"]
+  end
+
+  subgraph Admin
+    AP["Admin Panel"] --> FS
+    AP --> AUTH
+  end
+
+  subgraph CloudFunctionsExternal
+    CF --> MAPS["Maps API (Geolocation)"]
+    CF --> EMAIL["Email Service (Notifications)"]
+    CF --> ANALYTICS["Third-party Analytics"]
+  end
+
+  FCM --> FA
+
+  %% Additional enhancements
+  %% Data sync & offline capability
+  FS -.-> FA["Offline Sync / Cache"]
+
+  %% Security rules layer
+  AUTH --> FS["Firestore Security Rules"]
+  AUTH --> ST["Storage Security Rules"]
+
+  %% Monitoring connection
+  CR --> FB
