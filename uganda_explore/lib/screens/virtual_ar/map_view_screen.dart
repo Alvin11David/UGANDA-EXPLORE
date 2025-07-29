@@ -8,8 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 
-
-
+// MapViewScreen displays a map with navigation and route info
 class MapViewScreen extends StatefulWidget {
   final String siteName;
   final bool showCurrentLocation;
@@ -25,51 +24,52 @@ class MapViewScreen extends StatefulWidget {
 }
 
 class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateMixin {
-  final String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w';
+  final String _apiKey = 'AIzaSyCyqzryof5ULhLPpxqjtMPG22RtpOu7r3w'; // Google Maps API Key
 
-  LatLng? siteLatLng;
-  LatLng? userLatLng;
-  LatLng? previousUserLatLng;
-  GoogleMapController? mapController;
-  String? error;
-  String userDistrict = "Fetching...";
-  bool isEditingDestination = false;
-  final TextEditingController _destinationController = TextEditingController();
-  List<LatLng> routePolyline = [];
+  LatLng? siteLatLng; // Coordinates of the tourism site
+  LatLng? userLatLng; // User's current coordinates
+  LatLng? previousUserLatLng; // Previous user coordinates for bearing calculation
+  GoogleMapController? mapController; // Controller for Google Map
+  String? error; // Error message to display
+  String userDistrict = "Fetching..."; // User's district
+  bool isEditingDestination = false; // Flag for editing destination
+  final TextEditingController _destinationController = TextEditingController(); // Controller for destination input
+  List<LatLng> routePolyline = []; // Polyline points for route
 
   // Motion tracking variables
-  double userBearing = 0.0;
-  double userSpeed = 0.0; // km/h
-  bool isMoving = false;
-  Timer? _motionTimer;
+  double userBearing = 0.0; // User's bearing (direction)
+  double userSpeed = 0.0; // User's speed in km/h
+  bool isMoving = false; // Is user moving
+  Timer? _motionTimer; // Timer for motion detection
 
   // Enhanced tracking variables
-  String? walkingDuration;
-  String? drivingDuration;
-  String? bicyclingDuration;
-  String? routeDistance;
-  bool isLoadingRoute = false;
-  bool isLoadingDurations = false;
+  String? walkingDuration; // Duration for walking
+  String? drivingDuration; // Duration for driving
+  String? bicyclingDuration; // Duration for bicycling
+  String? routeDistance; // Distance of the route
+  bool isLoadingRoute = false; // Is route loading
+  bool isLoadingDurations = false; // Is duration loading
 
   // Animation controllers for smooth updates
   late AnimationController _bearingController;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
-  StreamSubscription<Position>? _positionStream;
+  StreamSubscription<Position>? _positionStream; // Stream for location updates
 
-  // Mode selection
+  // Mode selection (driving, walking, bicycling)
   String selectedMode = 'driving';
 
   @override
   void initState() {
     super.initState();
-    _initializeAnimations();
-    fetchCoordinates();
-    fetchUserDistrict();
-    _startEnhancedLocationTracking();
+    _initializeAnimations(); // Setup animations
+    fetchCoordinates(); // Get site coordinates
+    fetchUserDistrict(); // Get user location/district
+    _startEnhancedLocationTracking(); // Start location tracking
   }
 
+  // Setup animation controllers
   void _initializeAnimations() {
     _bearingController = AnimationController(
       duration: const Duration(milliseconds: 1000),
@@ -85,6 +85,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     _pulseController.repeat(reverse: true);
   }
 
+  // Start location tracking and motion detection
   void _startEnhancedLocationTracking() {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
@@ -101,6 +102,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     });
   }
 
+  // Update user position and bearing
   void _updateUserPosition(Position position) {
     final newLatLng = LatLng(position.latitude, position.longitude);
     setState(() {
@@ -122,6 +124,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
 
   Timer? _routeUpdateTimer;
 
+  // Smoothly follow user on map when moving
   void _smoothCameraFollow() {
     if (userLatLng != null && mapController != null) {
       mapController!.animateCamera(
@@ -137,6 +140,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     }
   }
 
+  // Calculate bearing between two points
   double _calculateBearing(LatLng start, LatLng end) {
     final lat1 = start.latitude * math.pi / 180;
     final lat2 = end.latitude * math.pi / 180;
@@ -149,6 +153,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     return (bearing + 360) % 360;
   }
 
+  // Detect if user is moving or stopped
   void _detectMotion() {
     if (userLatLng != null && previousUserLatLng != null) {
       final distance = Geolocator.distanceBetween(
@@ -166,6 +171,7 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     }
   }
 
+  // Get user's district using geocoding
   Future<void> fetchUserDistrict() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -217,409 +223,419 @@ class _MapViewScreenState extends State<MapViewScreen> with TickerProviderStateM
     }
   }
 
- Future<void> fetchCoordinates({String? customDestination}) async {
-  final searchName = customDestination ?? widget.siteName;
-  try {
-    final query = await FirebaseFirestore.instance
-        .collection('tourismsites')
-        .where('name', isEqualTo: searchName.trim())
-        .limit(1)
-        .get();
-    
-    if (query.docs.isNotEmpty) {
-      final doc = query.docs.first;
-      final lat = doc['latitude'];
-      final lng = doc['longitude'];
-      
-      double? latitude;
-      double? longitude;
-      
-      // Handle different data types from Firestore
-      if (lat is double && lng is double) {
-        latitude = lat;
-        longitude = lng;
-      } else if (lat is int && lng is int) {
-        latitude = lat.toDouble();
-        longitude = lng.toDouble();
-      } else if (lat is String && lng is String) {
-        latitude = double.tryParse(lat);
-        longitude = double.tryParse(lng);
-      }
-      
-      // Check if both values are valid before creating LatLng
-      if (latitude != null && longitude != null) {
-        setState(() {
-          siteLatLng = LatLng(latitude!, longitude!); // Use ! operator since we verified they're not null
-          error = null;
-        });
-        
-        // Fetch route and durations if user location is available
-        if (userLatLng != null) {
-          await fetchAndSetRoute();
-          await fetchDurationsAndDistance();
+  // Fetch coordinates for tourism site from Firestore
+  Future<void> fetchCoordinates({String? customDestination}) async {
+    final searchName = customDestination ?? widget.siteName;
+    try {
+      final query = await FirebaseFirestore.instance
+          .collection('tourismsites')
+          .where('name', isEqualTo: searchName.trim())
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        final doc = query.docs.first;
+        final lat = doc['latitude'];
+        final lng = doc['longitude'];
+
+        double? latitude;
+        double? longitude;
+
+        // Handle different data types from Firestore
+        if (lat is double && lng is double) {
+          latitude = lat;
+          longitude = lng;
+        } else if (lat is int && lng is int) {
+          latitude = lat.toDouble();
+          longitude = lng.toDouble();
+        } else if (lat is String && lng is String) {
+          latitude = double.tryParse(lat);
+          longitude = double.tryParse(lng);
+        }
+
+        // Check if both values are valid before creating LatLng
+        if (latitude != null && longitude != null) {
+          setState(() {
+            siteLatLng = LatLng(latitude!, longitude!); // Use ! operator since we verified they're not null
+            error = null;
+          });
+
+          // Fetch route and durations if user location is available
+          if (userLatLng != null) {
+            await fetchAndSetRoute();
+            await fetchDurationsAndDistance();
+          }
+        } else {
+          setState(() {
+            error = 'Invalid coordinates for this site.';
+            siteLatLng = null;
+          });
         }
       } else {
         setState(() {
-          error = 'Invalid coordinates for this site.';
+          error = 'Site not found in database.';
           siteLatLng = null;
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
-        error = 'Site not found in database.';
+        error = 'Error finding location: $e';
         siteLatLng = null;
       });
     }
-  } catch (e) {
-    setState(() {
-      error = 'Error finding location: $e';
-      siteLatLng = null;
-    });
   }
-}
 
-
+  // Fetch and set route polyline between user and site
   Future<void> fetchAndSetRoute() async {
-  if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
-  setState(() {
-    isLoadingRoute = true;
-    error = null;
-  });
-  try {
-    final optimalRoute = await fetchRouteWithFallback(
-      userLatLng!,
-      siteLatLng!,
-      _apiKey,
-      mode: selectedMode,
-    );
+    if (userLatLng == null || siteLatLng == null || isLoadingRoute) return;
     setState(() {
-      routePolyline = optimalRoute;
-      isLoadingRoute = false;
+      isLoadingRoute = true;
+      error = null;
     });
-  } catch (e) {
-    setState(() {
-      error = 'Failed to fetch optimal route: $e';
-      isLoadingRoute = false;
-      routePolyline = [];
-    });
+    try {
+      final optimalRoute = await fetchRouteWithFallback(
+        userLatLng!,
+        siteLatLng!,
+        _apiKey,
+        mode: selectedMode,
+      );
+      setState(() {
+        routePolyline = optimalRoute;
+        isLoadingRoute = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = 'Failed to fetch optimal route: $e';
+        isLoadingRoute = false;
+        routePolyline = [];
+      });
+    }
   }
-}
 
-Future<List<LatLng>> fetchRouteWithFallback(
-  LatLng origin,
-  LatLng destination,
-  String apiKey, {
-  String mode = 'driving',
-}) async {
-  try {
+  // Try to fetch route, fallback to alternatives if needed
+  Future<List<LatLng>> fetchRouteWithFallback(
+    LatLng origin,
+    LatLng destination,
+    String apiKey, {
+    String mode = 'driving',
+  }) async {
+    try {
+      final distance = calculateDistance(origin, destination);
+      return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
+    } catch (e) {
+      print('Direct route failed: $e');
+    }
+
     final distance = calculateDistance(origin, destination);
-    return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
-  } catch (e) {
-    print('Direct route failed: $e');
-  }
 
-  final distance = calculateDistance(origin, destination);
-
-  if (distance <= 200) {
-    try {
-      return await fetchBestAlternativeRoute(origin, destination, apiKey, mode: mode);
-    } catch (e) {
-      print('Alternative route failed: $e');
-    }
-  } else {
-    try {
-      return await fetchOptimalRouteWithMinimalWaypoints(origin, destination, apiKey, mode: mode);
-    } catch (e) {
-      print('Optimal route with waypoints failed: $e');
-    }
-  }
-
-  return [origin, destination];
-}
-
-Future<List<LatLng>> _fetchDirectRoute(
-  LatLng origin,
-  LatLng destination,
-  String apiKey, {
-  String mode = 'driving',
-  double? distance,
-}) async {
-  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-      'origin=${origin.latitude},${origin.longitude}&'
-      'destination=${destination.latitude},${destination.longitude}&'
-      'mode=$mode&'
-      'avoid=tolls&'
-      'optimize_waypoints=false&'
-      'overview=full&'
-      'key=$apiKey';
-
-  final timeout = (distance != null && distance > 300) ? Duration(seconds: 45) : Duration(seconds: 15);
-  final response = await http.get(Uri.parse(url)).timeout(timeout);
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-
-    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-      final steps = data['routes'][0]['legs'][0]['steps'] as List;
-      final decodedPoints = steps.expand((step) {
-        final encoded = step['polyline']['points'];
-        return decodePolyline(encoded);
-      }).toList();
-
-      if (_validateRoute(decodedPoints)) {
-        return decodedPoints;
-      } else {
-        throw Exception('Route validation failed - too many off-road segments');
+    if (distance <= 200) {
+      try {
+        return await fetchBestAlternativeRoute(origin, destination, apiKey, mode: mode);
+      } catch (e) {
+        print('Alternative route failed: $e');
       }
     } else {
-      throw Exception('API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
-    }
-  } else {
-    throw Exception('HTTP ${response.statusCode}: ${response.body}');
-  }
-}
-
-Future<List<LatLng>> fetchOptimalRouteWithMinimalWaypoints(
-  LatLng origin,
-  LatLng destination,
-  String apiKey, {
-  String mode = 'driving',
-}) async {
-  final distance = calculateDistance(origin, destination);
-  List<LatLng> waypoints = [];
-
-  int waypointCount = 0;
-  if (distance > 100) {
-    waypointCount = (((distance - 1) ~/ 100) * 2).clamp(2, 10);
-  }
-
-  for (int i = 1; i <= waypointCount; i++) {
-    final fraction = i / (waypointCount + 1);
-    final lat = origin.latitude + (destination.latitude - origin.latitude) * fraction;
-    final lng = origin.longitude + (destination.longitude - origin.longitude) * fraction;
-    waypoints.add(LatLng(lat, lng));
-  }
-
-  String waypointsString = '';
-  if (waypoints.isNotEmpty) {
-    waypointsString = '&waypoints=' +
-        waypoints.map((point) => '${point.latitude},${point.longitude}').join('|');
-  }
-
-  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-      'origin=${origin.latitude},${origin.longitude}&'
-      'destination=${destination.latitude},${destination.longitude}&'
-      'mode=$mode&'
-      'avoid=tolls&'
-      'optimize_waypoints=false&'
-      '$waypointsString&'
-      'overview=full&'
-      'key=$apiKey';
-
-  final timeout = distance > 300 ? Duration(seconds: 45) : Duration(seconds: 20);
-  final response = await http.get(Uri.parse(url)).timeout(timeout);
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-
-    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-      final steps = data['routes'][0]['legs'][0]['steps'] as List;
-      final decodedPoints = steps.expand((step) {
-        final encoded = step['polyline']['points'];
-        return decodePolyline(encoded);
-      }).toList();
-
-      if (_validateRoute(decodedPoints)) {
-        return decodedPoints;
-      } else {
-        return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
+      try {
+        return await fetchOptimalRouteWithMinimalWaypoints(origin, destination, apiKey, mode: mode);
+      } catch (e) {
+        print('Optimal route with waypoints failed: $e');
       }
-    } else {
-      throw Exception('Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
     }
-  } else {
-    throw Exception('HTTP ${response.statusCode}');
+
+    return [origin, destination];
   }
-}
 
-bool _validateRoute(List<LatLng> route) {
-  if (route.length < 2) return false;
+  // Fetch direct route from Google Directions API
+  Future<List<LatLng>> _fetchDirectRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey, {
+    String mode = 'driving',
+    double? distance,
+  }) async {
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'mode=$mode&'
+        'avoid=tolls&'
+        'optimize_waypoints=false&'
+        'overview=full&'
+        'key=$apiKey';
 
-  for (int i = 1; i < route.length; i++) {
-    final distance = calculateDistance(route[i - 1], route[i]);
-    if (distance > 50) {
-      return false;
-    }
-  }
-  return true;
-}
+    final timeout = (distance != null && distance > 300) ? Duration(seconds: 45) : Duration(seconds: 15);
+    final response = await http.get(Uri.parse(url)).timeout(timeout);
 
-Future<List<LatLng>> fetchBestAlternativeRoute(
-  LatLng origin,
-  LatLng destination,
-  String apiKey, {
-  String mode = 'driving',
-}) async {
-  final url = 'https://maps.googleapis.com/maps/api/directions/json?'
-      'origin=${origin.latitude},${origin.longitude}&'
-      'destination=${destination.latitude},${destination.longitude}&'
-      'alternatives=true&'
-      'mode=$mode&'
-      'avoid=tolls&'
-      'overview=full&'
-      'key=$apiKey';
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
 
-  final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-
-    if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
-      final routes = data['routes'] as List;
-
-      var bestRoute;
-      double bestScore = double.infinity;
-
-      for (var route in routes) {
-        final steps = route['legs'][0]['steps'] as List;
-        final allPoints = steps.expand((step) {
-          return decodePolyline(step['polyline']['points']);
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+        final steps = data['routes'][0]['legs'][0]['steps'] as List;
+        final decodedPoints = steps.expand((step) {
+          final encoded = step['polyline']['points'];
+          return decodePolyline(encoded);
         }).toList();
 
-        if (_validateRoute(allPoints)) {
-          final score = allPoints.length.toDouble();
-          if (score < bestScore) {
-            bestScore = score;
-            bestRoute = route;
+        if (_validateRoute(decodedPoints)) {
+          return decodedPoints;
+        } else {
+          throw Exception('Route validation failed - too many off-road segments');
+        }
+      } else {
+        throw Exception('API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
+      }
+    } else {
+      throw Exception('HTTP ${response.statusCode}: ${response.body}');
+    }
+  }
+
+  // Fetch optimal route with waypoints for long distances
+  Future<List<LatLng>> fetchOptimalRouteWithMinimalWaypoints(
+    LatLng origin,
+    LatLng destination,
+    String apiKey, {
+    String mode = 'driving',
+  }) async {
+    final distance = calculateDistance(origin, destination);
+    List<LatLng> waypoints = [];
+
+    int waypointCount = 0;
+    if (distance > 100) {
+      waypointCount = (((distance - 1) ~/ 100) * 2).clamp(2, 10);
+    }
+
+    for (int i = 1; i <= waypointCount; i++) {
+      final fraction = i / (waypointCount + 1);
+      final lat = origin.latitude + (destination.latitude - origin.latitude) * fraction;
+      final lng = origin.longitude + (destination.longitude - origin.longitude) * fraction;
+      waypoints.add(LatLng(lat, lng));
+    }
+
+    String waypointsString = '';
+    if (waypoints.isNotEmpty) {
+      waypointsString = '&waypoints=' +
+          waypoints.map((point) => '${point.latitude},${point.longitude}').join('|');
+    }
+
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'mode=$mode&'
+        'avoid=tolls&'
+        'optimize_waypoints=false&'
+        '$waypointsString&'
+        'overview=full&'
+        'key=$apiKey';
+
+    final timeout = distance > 300 ? Duration(seconds: 45) : Duration(seconds: 20);
+    final response = await http.get(Uri.parse(url)).timeout(timeout);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+        final steps = data['routes'][0]['legs'][0]['steps'] as List;
+        final decodedPoints = steps.expand((step) {
+          final encoded = step['polyline']['points'];
+          return decodePolyline(encoded);
+        }).toList();
+
+        if (_validateRoute(decodedPoints)) {
+          return decodedPoints;
+        } else {
+          return await _fetchDirectRoute(origin, destination, apiKey, mode: mode, distance: distance);
+        }
+      } else {
+        throw Exception('Waypoint API returned: ${data['status']} - ${data['error_message'] ?? 'Unknown error'}');
+      }
+    } else {
+      throw Exception('HTTP ${response.statusCode}');
+    }
+  }
+
+  // Validate route polyline for off-road segments
+  bool _validateRoute(List<LatLng> route) {
+    if (route.length < 2) return false;
+
+    for (int i = 1; i < route.length; i++) {
+      final distance = calculateDistance(route[i - 1], route[i]);
+      if (distance > 50) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Fetch best alternative route from Google Directions API
+  Future<List<LatLng>> fetchBestAlternativeRoute(
+    LatLng origin,
+    LatLng destination,
+    String apiKey, {
+    String mode = 'driving',
+  }) async {
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${origin.latitude},${origin.longitude}&'
+        'destination=${destination.latitude},${destination.longitude}&'
+        'alternatives=true&'
+        'mode=$mode&'
+        'avoid=tolls&'
+        'overview=full&'
+        'key=$apiKey';
+
+    final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 15));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['status'] == 'OK' && data['routes'].isNotEmpty) {
+        final routes = data['routes'] as List;
+
+        var bestRoute;
+        double bestScore = double.infinity;
+
+        for (var route in routes) {
+          final steps = route['legs'][0]['steps'] as List;
+          final allPoints = steps.expand((step) {
+            return decodePolyline(step['polyline']['points']);
+          }).toList();
+
+          if (_validateRoute(allPoints)) {
+            final score = allPoints.length.toDouble();
+            if (score < bestScore) {
+              bestScore = score;
+              bestRoute = route;
+            }
+          }
+        }
+
+        if (bestRoute != null) {
+          final steps = bestRoute['legs'][0]['steps'] as List;
+          final allPoints = steps.expand((step) {
+            return decodePolyline(step['polyline']['points']);
+          }).toList();
+          return allPoints;
+        }
+      }
+    }
+
+    throw Exception('No valid alternative routes found');
+  }
+
+  // Debounced route update to avoid frequent API calls
+  void _debouncedRouteUpdate() {
+    _routeUpdateTimer?.cancel();
+    _routeUpdateTimer = Timer(const Duration(seconds: 20), () {
+      fetchAndSetRoute();
+    });
+  }
+
+  // Calculate distance between two LatLng points (km)
+  double calculateDistance(LatLng point1, LatLng point2) {
+    const double earthRadius = 6371;
+    final lat1Rad = point1.latitude * math.pi / 180;
+    final lat2Rad = point2.latitude * math.pi / 180;
+    final deltaLatRad = (point2.latitude - point1.latitude) * math.pi / 180;
+    final deltaLngRad = (point2.longitude - point1.longitude) * math.pi / 180;
+    final a =
+        math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
+            math.cos(lat1Rad) *
+                math.cos(lat2Rad) *
+                math.sin(deltaLngRad / 2) *
+                math.sin(deltaLngRad / 2);
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+    return earthRadius * c;
+  }
+
+  // Decode Google polyline string to LatLng list
+  List<LatLng> decodePolyline(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+      poly.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+    return poly;
+  }
+
+  // Fetch durations and distances for all travel modes
+  Future<void> fetchDurationsAndDistance() async {
+    if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
+    setState(() {
+      isLoadingDurations = true;
+    });
+    final modes = ['walking', 'driving', 'bicycling'];
+    final results = <String, Map<String, String>>{};
+    try {
+      for (final mode in modes) {
+        final url =
+            'https://maps.googleapis.com/maps/api/directions/json?'
+            'origin=${userLatLng!.latitude},${userLatLng!.longitude}&'
+            'destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&'
+            'mode=$mode&'
+            'key=$_apiKey';
+        final response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['status'] == 'OK' &&
+              data['routes'] != null &&
+              data['routes'].isNotEmpty &&
+              data['routes'][0]['legs'] != null &&
+              data['routes'][0]['legs'].isNotEmpty) {
+            final leg = data['routes'][0]['legs'][0];
+            results[mode] = {
+              'duration': leg['duration']['text'] ?? '-',
+              'distance': leg['distance']['text'] ?? '-',
+            };
           }
         }
       }
-
-      if (bestRoute != null) {
-        final steps = bestRoute['legs'][0]['steps'] as List;
-        final allPoints = steps.expand((step) {
-          return decodePolyline(step['polyline']['points']);
-        }).toList();
-        return allPoints;
-      }
+      setState(() {
+        walkingDuration = results['walking']?['duration'] ?? '-';
+        drivingDuration = results['driving']?['duration'] ?? '-';
+        bicyclingDuration = results['bicycling']?['duration'] ?? '-';
+        routeDistance =
+            results[selectedMode]?['distance'] ??
+            results['driving']?['distance'] ??
+            results['walking']?['distance'] ??
+            results['bicycling']?['distance'] ??
+            '-';
+        isLoadingDurations = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoadingDurations = false;
+      });
     }
   }
-
-  throw Exception('No valid alternative routes found');
-}
-
-void _debouncedRouteUpdate() {
-  _routeUpdateTimer?.cancel();
-  _routeUpdateTimer = Timer(const Duration(seconds: 20), () {
-    fetchAndSetRoute();
-  });
-}
-
-double calculateDistance(LatLng point1, LatLng point2) {
-  const double earthRadius = 6371;
-  final lat1Rad = point1.latitude * math.pi / 180;
-  final lat2Rad = point2.latitude * math.pi / 180;
-  final deltaLatRad = (point2.latitude - point1.latitude) * math.pi / 180;
-  final deltaLngRad = (point2.longitude - point1.longitude) * math.pi / 180;
-  final a =
-      math.sin(deltaLatRad / 2) * math.sin(deltaLatRad / 2) +
-          math.cos(lat1Rad) *
-              math.cos(lat2Rad) *
-              math.sin(deltaLngRad / 2) *
-              math.sin(deltaLngRad / 2);
-  final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-  return earthRadius * c;
-}
-
-List<LatLng> decodePolyline(String encoded) {
-  List<LatLng> poly = [];
-  int index = 0, len = encoded.length;
-  int lat = 0, lng = 0;
-  while (index < len) {
-    int b, shift = 0, result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lat += dlat;
-    shift = 0;
-    result = 0;
-    do {
-      b = encoded.codeUnitAt(index++) - 63;
-      result |= (b & 0x1f) << shift;
-      shift += 5;
-    } while (b >= 0x20);
-    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-    lng += dlng;
-    poly.add(LatLng(lat / 1E5, lng / 1E5));
-  }
-  return poly;
-}
-
-Future<void> fetchDurationsAndDistance() async {
-  if (userLatLng == null || siteLatLng == null || isLoadingDurations) return;
-  setState(() {
-    isLoadingDurations = true;
-  });
-  final modes = ['walking', 'driving', 'bicycling'];
-  final results = <String, Map<String, String>>{};
-  try {
-    for (final mode in modes) {
-      final url =
-          'https://maps.googleapis.com/maps/api/directions/json?'
-          'origin=${userLatLng!.latitude},${userLatLng!.longitude}&'
-          'destination=${siteLatLng!.latitude},${siteLatLng!.longitude}&'
-          'mode=$mode&'
-          'key=$_apiKey';
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'OK' &&
-            data['routes'] != null &&
-            data['routes'].isNotEmpty &&
-            data['routes'][0]['legs'] != null &&
-            data['routes'][0]['legs'].isNotEmpty) {
-          final leg = data['routes'][0]['legs'][0];
-          results[mode] = {
-            'duration': leg['duration']['text'] ?? '-',
-            'distance': leg['distance']['text'] ?? '-',
-          };
-        }
-      }
-    }
-    setState(() {
-      walkingDuration = results['walking']?['duration'] ?? '-';
-      drivingDuration = results['driving']?['duration'] ?? '-';
-      bicyclingDuration = results['bicycling']?['duration'] ?? '-';
-      routeDistance =
-          results[selectedMode]?['distance'] ??
-          results['driving']?['distance'] ??
-          results['walking']?['distance'] ??
-          results['bicycling']?['distance'] ??
-          '-';
-      isLoadingDurations = false;
-    });
-  } catch (e) {
-    setState(() {
-      isLoadingDurations = false;
-    });
-  }
-}
-
 
   @override
   void dispose() {
-    _positionStream?.cancel();
-    _motionTimer?.cancel();
-    _routeUpdateTimer?.cancel();
-    _bearingController.dispose();
-    _pulseController.dispose();
-    _destinationController.dispose();
+    _positionStream?.cancel(); // Cancel location stream
+    _motionTimer?.cancel(); // Cancel motion timer
+    _routeUpdateTimer?.cancel(); // Cancel route update timer
+    _bearingController.dispose(); // Dispose animation controller
+    _pulseController.dispose(); // Dispose animation controller
+    _destinationController.dispose(); // Dispose text controller
     super.dispose();
   }
 
+  // Build motion indicator widget (shows if user is moving)
   Widget _buildMotionIndicator() {
     return AnimatedBuilder(
       animation: _pulseAnimation,
@@ -643,6 +659,7 @@ Future<void> fetchDurationsAndDistance() async {
     );
   }
 
+  // Fit both user and site markers on the map screen
   void _fitMarkersOnScreen() {
     if (mapController == null || userLatLng == null || siteLatLng == null) {
       return;
@@ -656,6 +673,7 @@ Future<void> fetchDurationsAndDistance() async {
     mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
   }
 
+  // Show dialog to change destination
   void _showDestinationDialog() {
     _destinationController.text = widget.siteName;
     showDialog(
@@ -691,6 +709,7 @@ Future<void> fetchDurationsAndDistance() async {
     );
   }
 
+  // Build travel mode selector (drive, bike, walk)
   Widget _buildModeSelector() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -719,6 +738,7 @@ Future<void> fetchDurationsAndDistance() async {
     );
   }
 
+  // Handle mode change and fetch new route/duration
   void _onModeChanged(String mode) async {
     setState(() {
       selectedMode = mode;
@@ -728,6 +748,7 @@ Future<void> fetchDurationsAndDistance() async {
     await fetchDurationsAndDistance();
   }
 
+  // Main build method for the screen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -743,7 +764,7 @@ Future<void> fetchDurationsAndDistance() async {
       ),
       body: Column(
         children: [
-          _buildModeSelector(),
+          _buildModeSelector(), // Travel mode selector
           Expanded(
             child: Stack(
               children: [
@@ -1231,323 +1252,3 @@ Future<void> fetchDurationsAndDistance() async {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//DONE

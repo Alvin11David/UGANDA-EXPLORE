@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Screen for showing a 360° panorama virtual tour of a place
 class VirtualTourScreen extends StatefulWidget {
   final String placeName;
   const VirtualTourScreen({super.key, required this.placeName});
@@ -10,16 +11,17 @@ class VirtualTourScreen extends StatefulWidget {
 }
 
 class _VirtualTourScreenState extends State<VirtualTourScreen> {
-  String? panoramaUrl;
-  bool loading = true;
-  String? error;
+  String? panoramaUrl; // URL of the panorama image
+  bool loading = true; // Loading state
+  String? error; // Error message
 
   @override
   void initState() {
     super.initState();
-    fetchPanoramaUrl();
+    fetchPanoramaUrl(); // Fetch panorama image when screen loads
   }
 
+  // Fetch panorama image URL from Firestore for the given place
   Future<void> fetchPanoramaUrl() async {
     try {
       final query = await FirebaseFirestore.instance
@@ -52,18 +54,19 @@ class _VirtualTourScreenState extends State<VirtualTourScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('${widget.placeName} 360° Tour')),
       body: loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator()) // Show loader while fetching
           : error != null
-          ? Center(
-              child: Text(error!, style: const TextStyle(color: Colors.red)),
-            )
-          : panoramaUrl == null
-          ? const Center(child: Text('No panorama image'))
-          : _AutoScrollingImage(imageUrl: panoramaUrl!),
+              ? Center(
+                  child: Text(error!, style: const TextStyle(color: Colors.red)),
+                )
+              : panoramaUrl == null
+                  ? const Center(child: Text('No panorama image'))
+                  : _AutoScrollingImage(imageUrl: panoramaUrl!), // Show panorama image
     );
   }
 }
 
+// Widget for auto-scrolling panorama image (simulates 360° view)
 class _AutoScrollingImage extends StatefulWidget {
   final String imageUrl;
   const _AutoScrollingImage({required this.imageUrl});
@@ -74,9 +77,9 @@ class _AutoScrollingImage extends StatefulWidget {
 
 class _AutoScrollingImageState extends State<_AutoScrollingImage>
     with SingleTickerProviderStateMixin {
-  late final ScrollController _scrollController;
-  late final AnimationController _animationController;
-  bool _isAutoScrolling = true;
+  late final ScrollController _scrollController; // Controls horizontal scroll
+  late final AnimationController _animationController; // Controls auto-scroll animation
+  bool _isAutoScrolling = true; // Whether auto-scroll is active
 
   @override
   void initState() {
@@ -84,14 +87,16 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
     _scrollController = ScrollController();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20),
+      duration: const Duration(seconds: 20), // Duration for full scroll
     );
 
+    // Start auto-scroll after layout is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _startAutoScroll();
     });
   }
 
+  // Start auto-scrolling the panorama image horizontally
   void _startAutoScroll() {
     final maxScroll = _scrollController.position.maxScrollExtent;
     _animationController.repeat(reverse: true);
@@ -103,6 +108,7 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
     });
   }
 
+  // Scroll left manually
   void _scrollLeft() {
     setState(() => _isAutoScrolling = false);
     if (_scrollController.hasClients) {
@@ -118,6 +124,7 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
     }
   }
 
+  // Scroll right manually
   void _scrollRight() {
     setState(() => _isAutoScrolling = false);
     if (_scrollController.hasClients) {
@@ -146,16 +153,17 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
       builder: (context, constraints) {
         return Stack(
           children: [
+            // Panorama image with horizontal scroll
             GestureDetector(
               onHorizontalDragStart: (_) {
-                setState(() => _isAutoScrolling = false);
+                setState(() => _isAutoScrolling = false); // Stop auto-scroll on user drag
               },
               child: SingleChildScrollView(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
                 child: SizedBox(
-                  width: constraints.maxWidth * 2,
+                  width: constraints.maxWidth * 2, // Make image wider for scrolling
                   height: constraints.maxHeight,
                   child: Image.network(
                     widget.imageUrl,
@@ -170,7 +178,7 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
                 ),
               ),
             ),
-            // Left button
+            // Left scroll button
             Positioned(
               left: 16,
               top: constraints.maxHeight / 2 - 24,
@@ -186,7 +194,7 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
                 ),
               ),
             ),
-            // Right button
+            // Right scroll button
             Positioned(
               right: 16,
               top: constraints.maxHeight / 2 - 24,
@@ -208,3 +216,261 @@ class _AutoScrollingImageState extends State<_AutoScrollingImage>
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

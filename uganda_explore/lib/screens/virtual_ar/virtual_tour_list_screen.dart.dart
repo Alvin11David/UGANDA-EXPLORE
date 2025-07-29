@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uganda_explore/screens/places/street_view_page.dart';
 
+// Screen for listing available virtual tours
 class VirtualToursListScreen extends StatefulWidget {
   const VirtualToursListScreen({super.key});
 
@@ -10,8 +11,9 @@ class VirtualToursListScreen extends StatefulWidget {
 }
 
 class _VirtualToursListScreenState extends State<VirtualToursListScreen> {
-  bool isGrid = true;
+  bool isGrid = true; // Toggle between grid and list view
 
+  // Fetch virtual tours from Firestore where streetViewLat exists
   Stream<List<Map<String, dynamic>>> _fetchVirtualTours() {
     return FirebaseFirestore.instance
         .collection('tourismsites')
@@ -26,6 +28,7 @@ class _VirtualToursListScreenState extends State<VirtualToursListScreen> {
       appBar: AppBar(
         title: const Text('Suggested Virtual Tours'),
         actions: [
+          // Toggle button for grid/list view
           IconButton(
             icon: Icon(isGrid ? Icons.view_list : Icons.grid_view),
             tooltip: isGrid ? 'Switch to List View' : 'Switch to Grid View',
@@ -36,14 +39,17 @@ class _VirtualToursListScreenState extends State<VirtualToursListScreen> {
         foregroundColor: Colors.white,
         elevation: 0,
       ),
+      // StreamBuilder listens for updates from Firestore
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _fetchVirtualTours(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
+            // Show loading indicator while fetching data
             return const Center(child: CircularProgressIndicator());
           }
           final tours = snapshot.data!;
           if (tours.isEmpty) {
+            // Show message if no tours are available
             return const Center(
               child: Text(
                 'No virtual tours available.',
@@ -51,6 +57,7 @@ class _VirtualToursListScreenState extends State<VirtualToursListScreen> {
               ),
             );
           }
+          // Display tours in grid or list view
           return Padding(
             padding: const EdgeInsets.all(12),
             child: isGrid
@@ -79,6 +86,7 @@ class _VirtualToursListScreenState extends State<VirtualToursListScreen> {
   }
 }
 
+// Card widget for each virtual tour
 class _VirtualTourCard extends StatelessWidget {
   final Map<String, dynamic> site;
   const _VirtualTourCard({required this.site});
@@ -86,6 +94,7 @@ class _VirtualTourCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      // Navigate to StreetViewPage when tapped
       onTap: () {
         Navigator.push(
           context,
@@ -100,22 +109,23 @@ class _VirtualTourCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16), // reduced from 22
+          borderRadius: BorderRadius.circular(16), // Card corners
           color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.07),
-              blurRadius: 7, // reduced from 10
-              offset: const Offset(0, 4), // reduced offset
+              blurRadius: 7,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Tour image or fallback icon
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16), // reduced from 22
+                top: Radius.circular(16),
               ),
               child:
                   site['images'] != null &&
@@ -123,7 +133,7 @@ class _VirtualTourCard extends StatelessWidget {
                       (site['images'] as List).isNotEmpty
                   ? Image.network(
                       site['images'][0],
-                      height: 90, // reduced from 140
+                      height: 90,
                       fit: BoxFit.cover,
                       errorBuilder: (c, e, s) => Container(
                         height: 90,
@@ -145,37 +155,40 @@ class _VirtualTourCard extends StatelessWidget {
                       ),
                     ),
             ),
+            // Tour details
             Padding(
-              padding: const EdgeInsets.all(8), // reduced from 12
+              padding: const EdgeInsets.all(8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Tour name
                   Text(
                     site['name'] ?? '',
                     style: const TextStyle(
                       fontFamily: 'Poppins',
                       fontWeight: FontWeight.bold,
-                      fontSize: 13, // reduced from 17
+                      fontSize: 13,
                       color: Color(0xFF1E3A8A),
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 3), // reduced from 6
+                  const SizedBox(height: 3),
+                  // Location row
                   Row(
                     children: [
                       const Icon(
                         Icons.location_on,
                         color: Color(0xFF3B82F6),
-                        size: 14, // reduced from 18
+                        size: 14,
                       ),
-                      const SizedBox(width: 3), // reduced from 4
+                      const SizedBox(width: 3),
                       Expanded(
                         child: Text(
                           site['location'] ?? '',
                           style: const TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 10, // reduced from 13
+                            fontSize: 10,
                             color: Colors.black87,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -183,34 +196,34 @@ class _VirtualTourCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4), // reduced from 8
+                  const SizedBox(height: 4),
+                  // Tags row (Virtual Tour, Category)
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
+                        // Virtual Tour tag
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6, // reduced from 8
-                            vertical: 2, // reduced from 3
+                            horizontal: 6,
+                            vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF3B82F6).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(
-                              10,
-                            ), // reduced from 12
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(
                             children: [
                               const Icon(
                                 Icons.threesixty,
                                 color: Color(0xFF3B82F6),
-                                size: 13, // reduced from 18
+                                size: 13,
                               ),
-                              const SizedBox(width: 2), // reduced from 4
+                              const SizedBox(width: 2),
                               const Text(
                                 'Virtual Tour',
                                 style: TextStyle(
-                                  fontSize: 10, // reduced from 13
+                                  fontSize: 10,
                                   color: Color(0xFF3B82F6),
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -218,7 +231,8 @@ class _VirtualTourCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const SizedBox(width: 5), // reduced from 8
+                        const SizedBox(width: 5),
+                        // Category tag if available
                         if (site['category'] != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -232,7 +246,7 @@ class _VirtualTourCard extends StatelessWidget {
                             child: Text(
                               site['category'],
                               style: const TextStyle(
-                                fontSize: 10, // reduced from 13
+                                fontSize: 10,
                                 color: Color(0xFF1E3A8A),
                                 fontWeight: FontWeight.w500,
                               ),
@@ -251,3 +265,225 @@ class _VirtualTourCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
