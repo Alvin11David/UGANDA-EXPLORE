@@ -7,6 +7,7 @@ import 'package:shimmer/shimmer.dart';
 import 'dart:math';
 import 'dart:async';
 
+// ARScanScreen displays AR navigation with camera, compass, and geolocation
 class ARScanScreen extends StatefulWidget {
   final double destinationLat;
   final double destinationLng;
@@ -22,24 +23,26 @@ class ARScanScreen extends StatefulWidget {
 }
 
 class _ARScanScreenState extends State<ARScanScreen> {
-  CameraController? _controller;
-  Position? _currentPosition;
-  double? _bearingToDestination;
-  double? _heading;
-  double? _distanceToDestination;
-  double? _totalDistance;
-  double? _speed;
-  double? _altitude;
-  double? _accuracy;
-  StreamSubscription<Position>? _positionStream;
+  CameraController? _controller; // Camera preview controller
+  Position? _currentPosition; // User's current GPS position
+  double? _bearingToDestination; // Bearing to next waypoint/destination
+  double? _heading; // Device compass heading
+  double? _distanceToDestination; // Distance to next waypoint/destination
+  double? _totalDistance; // Total route distance
+  double? _speed; // User speed
+  double? _altitude; // Altitude
+  double? _accuracy; // GPS accuracy
+  StreamSubscription<Position>? _positionStream; // Location stream
 
-  List<LatLng> _waypoints = []; // You need to fill this with your route points
-  int _currentWaypointIndex = 0;
+  List<LatLng> _waypoints = []; // Route waypoints
+  int _currentWaypointIndex = 0; // Current waypoint index
 
   @override
   void initState() {
     super.initState();
-    _initCamera();
+    _initCamera(); // Start camera preview
+
+    // Listen for location updates
     _positionStream =
         Geolocator.getPositionStream(
           locationSettings: const LocationSettings(
@@ -52,16 +55,18 @@ class _ARScanScreenState extends State<ARScanScreen> {
             _speed = pos.speed;
             _altitude = pos.altitude;
             _accuracy = pos.accuracy;
-            _updateBearingAndDistance();
+            _updateBearingAndDistance(); // Update navigation info
           });
         });
+
+    // Listen for compass heading updates
     FlutterCompass.events?.listen((event) {
       setState(() {
         _heading = event.heading;
       });
     });
 
-    // Example: fill waypoints (replace with your route logic)
+    // Example waypoints (replace with your route logic)
     _waypoints = [
       LatLng(37.3318, -122.0312), // start point
       LatLng(37.3328, -122.0322), // waypoint 1
@@ -69,6 +74,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
     ];
   }
 
+  // Initialize camera preview
   Future<void> _initCamera() async {
     try {
       final cameras = await availableCameras();
@@ -84,9 +90,10 @@ class _ARScanScreenState extends State<ARScanScreen> {
     }
   }
 
+  // Update bearing and distance to next waypoint/destination
   void _updateBearingAndDistance() {
     if (_currentPosition != null && _waypoints.isNotEmpty) {
-      // Find closest waypoint ahead
+      // Move to next waypoint if close enough
       while (_currentWaypointIndex < _waypoints.length - 1) {
         double dist = Geolocator.distanceBetween(
           _currentPosition!.latitude,
@@ -95,7 +102,6 @@ class _ARScanScreenState extends State<ARScanScreen> {
           _waypoints[_currentWaypointIndex].lng,
         );
         if (dist < 20) {
-          // threshold to switch to next waypoint
           _currentWaypointIndex++;
         } else {
           break;
@@ -114,12 +120,12 @@ class _ARScanScreenState extends State<ARScanScreen> {
         target.lat,
         target.lng,
       );
-      // Optional: update _totalDistance to sum of all segments
+      // Calculate total route distance once
       _totalDistance ??= _calculateTotalRouteDistance();
     }
   }
 
-  // Helper to sum route distance
+  // Calculate total route distance by summing segments
   double _calculateTotalRouteDistance() {
     double total = 0.0;
     for (int i = 0; i < _waypoints.length - 1; i++) {
@@ -133,6 +139,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
     return total;
   }
 
+  // Get navigation instruction based on angle difference
   String getDirectionInstruction(double angle) {
     angle = (angle + 360) % 360;
     if (angle > 180) angle -= 360;
@@ -142,12 +149,13 @@ class _ARScanScreenState extends State<ARScanScreen> {
     return "Turn Left";
   }
 
+  // Convert angle to radians for arrow rotation
   double getArrowRotation(double angle) {
     // Arrow points in the direction the user needs to turn
     return angle * pi / 180;
   }
 
-  // Helper to select arrow icon based on instruction
+  // Select arrow icon based on instruction
   IconData getDirectionArrow(String instruction) {
     switch (instruction) {
       case "Go Straight":
@@ -165,19 +173,18 @@ class _ARScanScreenState extends State<ARScanScreen> {
 
   @override
   void dispose() {
-    _controller?.dispose();
-    _positionStream?.cancel();
+    _controller?.dispose(); // Dispose camera
+    _positionStream?.cancel(); // Cancel location stream
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show shimmer skeleton while camera is loading
     if (_controller == null || !_controller!.value.isInitialized) {
-      // Skeleton shimmer for loading state
       return Scaffold(
         body: Stack(
           children: [
-            // Camera skeleton
             Shimmer.fromColors(
               baseColor: Colors.grey[300]!,
               highlightColor: Colors.grey[100]!,
@@ -187,7 +194,6 @@ class _ARScanScreenState extends State<ARScanScreen> {
                 color: Colors.white,
               ),
             ),
-            // Blur rectangle skeleton
             Positioned(
               left: 4,
               right: 4,
@@ -212,6 +218,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
       );
     }
 
+    // Calculate arrow angle and instruction
     double arrowAngle = 0;
     String instruction = "";
     if (_bearingToDestination != null && _heading != null) {
@@ -220,7 +227,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
       instruction = getDirectionInstruction(angle);
     }
 
-    // Animated arrow in the center, using direction icon
+    // Animated arrow in the center
     Widget animatedArrow = Center(
       child: AnimatedScale(
         scale: 1.1,
@@ -290,7 +297,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
       ),
     );
 
-    // Motivational quote at bottom center
+    // Motivational quote panel (currently empty)
     Widget quotePanel = Positioned(
       bottom: 24,
       left: MediaQuery.of(context).size.width * 0.25,
@@ -325,7 +332,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Instruction text
+                // Instruction text and metrics
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 24.0, right: 8.0),
@@ -400,7 +407,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
       ),
     );
 
-    // Close button
+    // Close button to exit AR screen
     Widget closeButton = Positioned(
       top: 40,
       left: 1,
@@ -410,7 +417,7 @@ class _ARScanScreenState extends State<ARScanScreen> {
       ),
     );
 
-    // Calculate progress (0.0 to 1.0)
+    // Calculate progress to destination
     double progress = 0.0;
     if (_totalDistance != null &&
         _distanceToDestination != null &&
@@ -458,22 +465,23 @@ class _ARScanScreenState extends State<ARScanScreen> {
       ),
     );
 
+    // Main AR navigation UI
     return Scaffold(
       body: Stack(
         children: [
-          SizedBox.expand(child: CameraPreview(_controller!)),
-          directionPanel,
-          animatedArrow,
-          metricsPanel,
-          progressBar,
-          closeButton,
+          SizedBox.expand(child: CameraPreview(_controller!)), // Camera background
+          directionPanel, // Top navigation info
+          animatedArrow, // Center arrow
+          metricsPanel, // Bottom left metrics
+          progressBar, // Progress bar
+          closeButton, // Exit button
         ],
       ),
     );
   }
 }
 
-// Helper class for lat/lng
+// Helper class for lat/lng points
 class LatLng {
   final double lat;
   final double lng;
